@@ -13,3 +13,4 @@ tam_reg=$(echo -n $tam_substr\@$id\@$titulo\@$sinopse\@$sala\@$horarios\@ | wc -
 # finalmente, manda os valores para o arquivo
 echo -n $tam_reg\@$id\@$titulo\@$sinopse\@$sala\@$horarios\@ >> filmes.dat
 
+echo "Registro adicionado com sucesso!"
