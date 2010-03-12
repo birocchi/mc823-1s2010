@@ -14,6 +14,6 @@ typedef struct {
 int da_get_filme_by_id(filme *f_ret, int id);
 
 /* Função responsável por fazer um parse da string lida do arquivo para um filme */
-int da_string_from_file_to_filme(filme *f_ret, char *f_str);
+int da_str_to_filme(filme *f_ret, char *f_str);
 
 

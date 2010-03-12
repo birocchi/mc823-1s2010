@@ -1,5 +1,6 @@
+#include "data_access.h"
 
-int da_string_from_file_to_filme(filme *f_ret, char *f_str) {
+int da_str_to_filme (filme *f_ret, char *f_str) {
 	/* Entrada: string crua lida do arquivo, referente a um registro */
 	/* Saída: - setup da struct filme passada por referência 
 						- valor numérico para erros */
@@ -22,5 +23,10 @@ int da_string_from_file_to_filme(filme *f_ret, char *f_str) {
 
 
 
+	return(0);
+}
+
+
+int main() {
 	return(0);
 }
