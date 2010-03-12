@@ -27,8 +27,7 @@ int da_str_to_filme (filme *f_ret, int *tam_reg, char *f_str) {
 		 e que a struct f_ret já tem memória alocada para as strings 
 	*/
 
-	char str[INT];
-	char c;
+	char str[TAM_MAX_ATR]; /* string fixa bem grande pra comportar qq atributo */
 
 	int i = 0; /* índice de acesso de f_str */
 	int j = 0; /* indice para montagem da string  */

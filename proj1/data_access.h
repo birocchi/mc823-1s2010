@@ -2,15 +2,16 @@
 #define TAM_MAX_SIN 900
 #define TAM_MAX_SALA 20
 #define TAM_MAX_HOR 20
+#define INT 10 /* id ou tamanho do registro */
 
-#define INT 10
+#define TAM_MAX_ATR 900
 
 typedef struct {
 	int id;
-	char titulo[TAM_MAX_TIT];
-	char sinopse[TAM_MAX_SIN];
-	char sala[TAM_MAX_SALA];
-	char horarios[TAM_MAX_HOR];
+	char *titulo;
+	char *sinopse;
+	char *sala;
+	char *horarios;
 
 	struct filme *prox_filme; /* NULL caso seja um único filme ou o último da lista */
 } filme;
