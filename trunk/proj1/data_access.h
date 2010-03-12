@@ -24,4 +24,8 @@ int da_get_filme_by_id(filme *f_ret, int id);
 /* Função responsável por fazer um parse da string lida do arquivo para um filme */
 int da_str_to_filme(filme *f_ret, int *tam_reg, char *f_str);
 
+/* Imprime as informações já formatadas de um filme */
+void da_print_infos(filme *f);
 
+/* Libera as strings alocadas dinamicamente */
+void da_free_strs(filme *f);
