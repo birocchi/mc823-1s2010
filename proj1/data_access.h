@@ -29,3 +29,6 @@ void da_print_infos(filme *f);
 
 /* Libera as strings alocadas dinamicamente */
 void da_free_strs(filme *f);
+
+/* Retorna um filme a partir do seu id */
+int da_get_filme_by_id(int id, filme *f);
