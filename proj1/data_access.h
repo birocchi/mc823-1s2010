@@ -46,3 +46,5 @@ int da_get_filme_by_id(filme **f_ret, int id);
  - retorna o numero de filmes desalocados */
 int da_free_all(filme *f);
 
+/* Seta uma lista com todos os filmes no arquivo */
+int da_get_todos_filmes(filme **filmes);

@@ -137,7 +137,7 @@ int da_free_all(filme *f) {
 
 
 
-
+/* Função a ser chamada pelo SERVIDOR! */
 int da_get_filme_by_id(filme **f_ret, int id) {
 
   /* Função responsável por acessar o arquivo dos registros,
@@ -177,6 +177,19 @@ int da_get_filme_by_id(filme **f_ret, int id) {
 
 }
 
+
+/* Função a ser chamada pelo SERVIDOR! */
+int da_get_todos_filmes(filme **filmes_ret) {
+	/* Esta função lê o arquivo, instancia uma struct filme para cada registro,
+	   concatena as structs, e retorna o resultado para o usuário.
+		 O valor de retorno é um inteiro que representa ou o número de registros lidos,
+		 ou -1 para erro.
+	*/
+
+	/* TODO */
+
+	return(0);
+}
 
 
 
