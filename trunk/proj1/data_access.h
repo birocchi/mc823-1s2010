@@ -34,7 +34,7 @@ void da_free_strs(filme *f);
 
 
 
-/******* Funções a serem usadas pelo servidor ********/
+/******* Funções a serem chamadas externamente (API) ********/
 
 /* Imprime as informações já formatadas de um filme */
 void da_print_infos(filme *f);
