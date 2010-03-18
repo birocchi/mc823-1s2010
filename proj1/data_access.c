@@ -14,9 +14,10 @@ int da_str_to_filme (filme *f_ret, int *tam_reg, char *f_str) {
   /* Assim, uma ideia é usar separadores entre os atributos, assim como manter o tamanho do registro */
   /* 
      int tam_total_do_reg (incluindo todos os separadores do registro)
-     int id, string titulo, string sinopse, string sala, string horarios
+     int id, int avaliacoes, float media [TAMANHO FIXO NO ARQUIVO!], string titulo, string sinopse, 
+		 string sala, string horarios.
      Separador: @
-     Ex: 75@1@Rei Leão@Filme assim assim assado@Kinoplex - sala 10@12h40, 15h, 17h20@
+     Ex: 75@1@0@0@Rei Leão@Filme assim assim assado@Kinoplex - sala 10@12h40, 15h, 17h20@
      (contando tudo, incluindo os caracteres de tam_total_do_reg e os separadores)
 
      Esse esquema do número de caracteres num campo é pra possibilitar a busca entre os registros.
@@ -37,13 +38,22 @@ int da_str_to_filme (filme *f_ret, int *tam_reg, char *f_str) {
 
   /* id */
   i++; j = 0;
-  while(f_str[i]!='@') {
-    str[j] = f_str[i];
-    i++; j++;
-  }
-  str[j] = '\0';
-  (*f_ret).id = atoi(str);
+  while(f_str[i]!='@') { str[j] = f_str[i]; i++; j++; }
+  str[j] = '\0'; 
+	(*f_ret).id = atoi(str);
 
+	/* numero de avaliações */
+  i++; j = 0;
+  while(f_str[i]!='@') { str[j] = f_str[i]; i++; j++; }
+  str[j] = '\0';
+  (*f_ret).n_aval = atoi(str);
+	
+	/* média */
+  i++; j = 0;
+  while(f_str[i]!='@') { str[j] = f_str[i]; i++; j++; }
+  str[j] = '\0';
+  (*f_ret).media = atof(str);
+	
   /* titulo */
   i++; j = 0;
   while(f_str[i]!='@') {
@@ -174,12 +184,13 @@ int main() {
 
   filme *f;
   int id = 1;
+	int n_filmes_desalocados;
 
 
 	/* Exemplos de uso das funções */
   if((da_get_filme_by_id(&f, id)) == 0) {
     da_print_infos(f);
-		da_free_all(f);
+		n_filmes_desalocados = da_free_all(f);
   } else {
     printf("Filme não encontrado!\n");
   }

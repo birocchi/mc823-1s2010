@@ -3,11 +3,12 @@
 #define TAM_MAX_SIN 900
 #define TAM_MAX_SALA 20
 #define TAM_MAX_HOR 20
-#define INT 10 /* id ou tamanho do registro */
 
 #define TAM_MAX_ATR 900
 
 #define TAM_REG_ID 20 /* tamanho max dos digitos do tamanho do registro e do id */
+
+#define TAM_MEDIA 6 /* abc.de (valor de 0 a 100, com 2 dígitos decimais) */
 
 typedef struct {
 	int id;
@@ -15,6 +16,9 @@ typedef struct {
 	char *sinopse;
 	char *sala;
 	char *horarios;
+
+	int n_aval; /* número de avaliações */
+	float media;
 
 	struct filme *prox_filme; /* NULL caso seja um único filme ou o último da lista */
 } filme;
@@ -41,3 +45,4 @@ int da_get_filme_by_id(filme **f_ret, int id);
 /* Libera toda a memória alocada para o(s) filme(s) (strings e struct) 
  - retorna o numero de filmes desalocados */
 int da_free_all(filme *f);
+
