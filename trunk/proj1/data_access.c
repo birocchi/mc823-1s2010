@@ -98,6 +98,36 @@ void da_free_strs(filme *f) {
   return;
 }
 
+
+int da_free_all(filme *f) {
+	/* Esta função desaloca todos os filmes que estiverem na lista, e
+		 retorna o número desses filmes que foram desalocados.
+		 A lista precisa ser resolvida de trás pra frente, por isso 
+		 está sendo usada recursão. */
+
+	int i;
+
+	da_free_strs(f);
+
+	/* Condição de parada (último filme) */
+	if((*f).prox_filme == NULL) {
+		free(f);
+		return(0); /* retorna, inicializando contador */
+	}
+
+	/* Chamada recursiva */
+	i = da_free_all((filme *)(*f).prox_filme); /* cast pro -Wall n reclamar */
+
+	/* Resolvida a recursão, libera a struct e retorna */
+	free(f);
+	return(i);
+
+}
+	
+
+
+
+
 int da_get_filme_by_id(filme **f_ret, int id) {
 
   /* Função responsável por acessar o arquivo dos registros,
@@ -134,17 +164,22 @@ int da_get_filme_by_id(filme **f_ret, int id) {
   fclose(arq);
   
   return(1);
+
 }
+
+
+
 
 int main() {
 
   filme *f;
   int id = 1;
 
+
+	/* Exemplos de uso das funções */
   if((da_get_filme_by_id(&f, id)) == 0) {
     da_print_infos(f);
-    da_free_strs(f);
-		free(f);
+		da_free_all(f);
   } else {
     printf("Filme não encontrado!\n");
   }
