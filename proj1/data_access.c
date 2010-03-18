@@ -52,26 +52,26 @@ int da_str_to_filme (filme *f_ret, int *tam_reg, char *f_str) {
   }
   str[j] = '\0';
   /* aloca a string dinamicamente */
-  (*f_ret).titulo = (char *)malloc(j*sizeof(char));
+  (*f_ret).titulo = (char *)malloc((j+1)*sizeof(char));
   sprintf((*f_ret).titulo, "%s", str);
 
   /* Blocos de código similares ao de cima, só que comprimidos  */
   /* sinopse */
   i++; j = 0;
   while(f_str[i]!='@') { str[j] = f_str[i];	i++; j++;	} str[j] = '\0';
-  (*f_ret).sinopse = (char *)malloc(j*sizeof(char));
+  (*f_ret).sinopse = (char *)malloc((j+1)*sizeof(char));
   sprintf((*f_ret).sinopse, "%s", str);
 
   /* sala */
   i++; j = 0;
   while(f_str[i]!='@') { str[j] = f_str[i]; i++; j++; } str[j] = '\0';
-  (*f_ret).sala = (char *) malloc(j*sizeof(char));
+  (*f_ret).sala = (char *) malloc((j+1)*sizeof(char));
   sprintf((*f_ret).sala, "%s", str);
 
   /* horarios */
   i++; j = 0;
   while(f_str[i]!='@') { str[j] = f_str[i]; i++; j++; } str[j] = '\0';
-  (*f_ret).horarios = (char *) malloc(j*sizeof(char));
+  (*f_ret).horarios = (char *) malloc((j+1)*sizeof(char));
   sprintf((*f_ret).horarios, "%s", str);
 
   /* next - lembra dele? :) */
@@ -98,7 +98,7 @@ void da_free_strs(filme *f) {
   return;
 }
 
-int da_get_filme_by_id(filme *f_ret, int id) {
+int da_get_filme_by_id(filme **f_ret, int id) {
 
   /* Função responsável por acessar o arquivo dos registros,
    buscar o filme com o id igual ao passado como argumento,
@@ -107,7 +107,6 @@ int da_get_filme_by_id(filme *f_ret, int id) {
            1 - código de retorno que indica que nada foi encontrado
   */
 
-  filme filme;
   int tam_reg, id_reg;
   long int cursor = 0; /* indice de leitura do arquivo */
   char buffer[TAM_MAX_REG]; /* 1kB */
@@ -118,10 +117,12 @@ int da_get_filme_by_id(filme *f_ret, int id) {
   while(fscanf(arq, "%d@%d@", &tam_reg, &id_reg) != EOF) {
     /* registro encontrado */
     if(id_reg == id) {
-      fseek(arq, cursor, SEEK_SET);
+			/* aloca a estrutura para guardar o filme */
+			*f_ret = (filme *)malloc(sizeof(filme));
+      /* caminha no arquivo até o inicio do registro */
+			fseek(arq, cursor, SEEK_SET);
       fgets(buffer, TAM_MAX_REG, arq);
-      da_str_to_filme(&filme, &tam_reg, buffer);
-      *f_ret = filme;
+      da_str_to_filme(*f_ret, &tam_reg, buffer);
       fclose(arq);
       return(0);
     } else {
@@ -137,12 +138,13 @@ int da_get_filme_by_id(filme *f_ret, int id) {
 
 int main() {
 
-  filme f;
+  filme *f;
   int id = 1;
 
   if((da_get_filme_by_id(&f, id)) == 0) {
-    da_print_infos(&f);
-    da_free_strs(&f);
+    da_print_infos(f);
+    da_free_strs(f);
+		free(f);
   } else {
     printf("Filme não encontrado!\n");
   }
