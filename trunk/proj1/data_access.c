@@ -242,6 +242,7 @@ int main() {
   }
 
   bla = da_get_todos_filmes(&f);
+  da_free_all(f);
 
   return(0);
 }
