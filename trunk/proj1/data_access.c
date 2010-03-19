@@ -15,7 +15,7 @@ int da_str_to_filme (filme *f_ret, int *tam_reg, char *f_str) {
   /* 
      int tam_total_do_reg (incluindo todos os separadores do registro)
      int id, int avaliacoes, float media [TAMANHO FIXO NO ARQUIVO!], string titulo, string sinopse, 
-		 string sala, string horarios.
+     string sala, string horarios.
      Separador: @
      Ex: 75@1@0@0@Rei Leão@Filme assim assim assado@Kinoplex - sala 10@12h40, 15h, 17h20@
      (contando tudo, incluindo os caracteres de tam_total_do_reg e os separadores)
@@ -40,15 +40,15 @@ int da_str_to_filme (filme *f_ret, int *tam_reg, char *f_str) {
   i++; j = 0;
   while(f_str[i]!='@') { str[j] = f_str[i]; i++; j++; }
   str[j] = '\0'; 
-	(*f_ret).id = atoi(str);
+  (*f_ret).id = atoi(str);
 
-	/* numero de avaliações */
+  /* numero de avaliações */
   i++; j = 0;
   while(f_str[i]!='@') { str[j] = f_str[i]; i++; j++; }
   str[j] = '\0';
   (*f_ret).n_aval = atoi(str);
 	
-	/* média */
+  /* média */
   i++; j = 0;
   while(f_str[i]!='@') { str[j] = f_str[i]; i++; j++; }
   str[j] = '\0';
@@ -111,27 +111,27 @@ void da_free_strs(filme *f) {
 
 
 int da_free_all(filme *f) {
-	/* Esta função desaloca todos os filmes que estiverem na lista, e
-		 retorna o número desses filmes que foram desalocados.
-		 A lista precisa ser resolvida de trás pra frente, por isso 
-		 está sendo usada recursão. */
+  /* Esta função desaloca todos os filmes que estiverem na lista, e
+     retorna o número desses filmes que foram desalocados.
+     A lista precisa ser resolvida de trás pra frente, por isso 
+     está sendo usada recursão. */
 
-	int i;
+  int i;
 
-	da_free_strs(f);
+  da_free_strs(f);
 
-	/* Condição de parada (último filme) */
-	if((*f).prox_filme == NULL) {
-		free(f);
-		return(0); /* retorna, inicializando contador */
-	}
+  /* Condição de parada (último filme) */
+  if((*f).prox_filme == NULL) {
+    free(f);
+    return(0); /* retorna, inicializando contador */
+  }
 
-	/* Chamada recursiva */
-	i = da_free_all((filme *)(*f).prox_filme); /* cast pro -Wall n reclamar */
+  /* Chamada recursiva */
+  i = da_free_all((filme *)(*f).prox_filme); /* cast pro -Wall n reclamar */
 
-	/* Resolvida a recursão, libera a struct e retorna */
-	free(f);
-	return(i);
+  /* Resolvida a recursão, libera a struct e retorna */
+  free(f);
+  return(i);
 
 }
 	
@@ -142,10 +142,10 @@ int da_free_all(filme *f) {
 int da_get_filme_by_id(filme **f_ret, int id) {
 
   /* Função responsável por acessar o arquivo dos registros,
-   buscar o filme com o id igual ao passado como argumento,
-   e retornar o resultado da busca
-   Saídas: 0 *f_ret aponta p/ o filme encontrado
-           1 - código de retorno que indica que nada foi encontrado
+     buscar o filme com o id igual ao passado como argumento,
+     e retornar o resultado da busca
+     Saídas: 0 *f_ret aponta p/ o filme encontrado
+     1 - código de retorno que indica que nada foi encontrado
   */
 
   int tam_reg, id_reg;
@@ -158,10 +158,10 @@ int da_get_filme_by_id(filme **f_ret, int id) {
   while(fscanf(arq, "%d@%d@", &tam_reg, &id_reg) != EOF) {
     /* registro encontrado */
     if(id_reg == id) {
-			/* aloca a estrutura para guardar o filme */
-			*f_ret = (filme *)malloc(sizeof(filme));
+      /* aloca a estrutura para guardar o filme */
+      *f_ret = (filme *)malloc(sizeof(filme));
       /* caminha no arquivo até o inicio do registro */
-			fseek(arq, cursor, SEEK_SET);
+      fseek(arq, cursor, SEEK_SET);
       fgets(buffer, TAM_MAX_REG, arq);
       da_str_to_filme(*f_ret, &tam_reg, buffer);
       fclose(arq);
@@ -181,15 +181,46 @@ int da_get_filme_by_id(filme **f_ret, int id) {
 
 /* Função a ser chamada pelo SERVIDOR! */
 int da_get_todos_filmes(filme **filmes_ret) {
-	/* Esta função lê o arquivo, instancia uma struct filme para cada registro,
-	   concatena as structs, e retorna o resultado para o usuário.
-		 O valor de retorno é um inteiro que representa ou o número de registros lidos,
-		 ou -1 para erro.
-	*/
+  /* Esta função lê o arquivo, instancia uma struct filme para cada registro,
+     concatena as structs, e retorna o resultado para o usuário.
+     O valor de retorno é um inteiro que representa ou o número de registros lidos,
+     ou -1 para erro.
+  */
 
-	/* TODO */
+  FILE *arq;
+  int tam_reg, i = 0;
+  long int cursor = 0; /* indice de leitura do arquivo */
+  char buffer[TAM_MAX_REG]; /* 1kB */
+  filme *f; /* apontador principal que vai guardar cada um dos registros */
 
-	return(0);
+  arq = fopen("filmes.dat", "r");
+
+
+  /* Enquanto houver registros no arquivo */
+  while(fscanf(arq, "%d@", &tam_reg) != EOF) {
+    /* Para cada registro, aloca a memória para a struct, seta o registro
+     a partir da string lida, seta o cursor do arquivo p/ o próximo */
+    i++;
+    f = (filme *)malloc(sizeof(filme));
+    if(i == 1) {
+      /* Início da lista (primeiro registro) */
+      *filmes_ret = f;
+    }
+
+    fseek(arq, cursor, SEEK_SET); /* pula p/ o inicio do registro */
+    fgets(buffer, TAM_MAX_REG, arq); /* lê a string crua no buffer */
+    da_str_to_filme(f, &tam_reg, buffer); /* abriga o filme na struct */
+
+    cursor += tam_reg; /* ajuste para a leitura do próximo reg no arq */
+
+    f = (filme *)(*f).prox_filme; /* atualiza o apontador */
+  }
+
+  f = NULL; /* último registro da lista */
+  
+  fclose(arq);
+  
+  return(i);
 }
 
 
@@ -198,16 +229,19 @@ int main() {
 
   filme *f;
   int id = 1;
-	int n_filmes_desalocados;
+  int n_filmes_desalocados;
 
+  int bla;
 
-	/* Exemplos de uso das funções */
+  /* Exemplos de uso das funções */
   if((da_get_filme_by_id(&f, id)) == 0) {
-    da_print_infos(f);
-		n_filmes_desalocados = da_free_all(f);
+    da_print_full_info(f);
+    n_filmes_desalocados = da_free_all(f);
   } else {
     printf("Filme não encontrado!\n");
   }
+
+  bla = da_get_todos_filmes(&f);
 
   return(0);
 }
