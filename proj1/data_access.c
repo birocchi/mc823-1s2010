@@ -91,12 +91,13 @@ int da_str_to_filme (filme *f_ret, int *tam_reg, char *f_str) {
 }
 
 
-void da_print_infos(filme *f) {
+void da_print_full_info(filme *f) {
   printf("Id: %d\n", (*f).id);
   printf("Titulo: %s\n", (*f).titulo);
   printf("Sinopse: %s\n", (*f).sinopse);
   printf("Sala: %s\n", (*f).sala);
   printf("Horários: %s\n", (*f).horarios);
+  printf("Média: %3.2f (%d avaliações)\n", (*f).media, (*f).n_aval);
   return;
 }
 

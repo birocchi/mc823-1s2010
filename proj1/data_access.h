@@ -37,7 +37,7 @@ void da_free_strs(filme *f);
 /******* Funções a serem chamadas externamente (API) ********/
 
 /* Imprime as informações já formatadas de um filme */
-void da_print_infos(filme *f);
+void da_print_full_info(filme *f);
 
 /* Função que retorna um filme a partir de um id */
 int da_get_filme_by_id(filme **f_ret, int id);
