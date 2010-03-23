@@ -225,24 +225,24 @@ int da_get_todos_filmes(filme **filmes_ret) {
 
 
 
-int main() {
+/* int main() { */
 
-  filme *f;
-  int id = 1;
-  int n_filmes_desalocados;
+/*   filme *f; */
+/*   int id = 1; */
+/*   int n_filmes_desalocados; */
 
-  int bla;
+/*   int bla; */
 
-  /* Exemplos de uso das funções */
-  if((da_get_filme_by_id(&f, id)) == 0) {
-    da_print_full_info(f);
-    n_filmes_desalocados = da_free_all(f);
-  } else {
-    printf("Filme não encontrado!\n");
-  }
+/*   /\* Exemplos de uso das funções *\/ */
+/*   if((da_get_filme_by_id(&f, id)) == 0) { */
+/*     da_print_full_info(f); */
+/*     n_filmes_desalocados = da_free_all(f); */
+/*   } else { */
+/*     printf("Filme não encontrado!\n"); */
+/*   } */
 
-  bla = da_get_todos_filmes(&f);
-  da_free_all(f);
+/*   bla = da_get_todos_filmes(&f); */
+/*   da_free_all(f); */
 
-  return(0);
-}
+/*   return(0); */
+/* } */
