@@ -1,9 +1,28 @@
 #include<stdio.h>
 
+#define SAIR 's'
+
+char read_option() {
+	/* considera os possiveis erros e só sai quando o usuario
+	 digitar um caractere válido */
+
+	/* TODO */
+
+	return('s');
+}
+
 int main() {
 
-	printf("Olá! Eu sou o programa cliente.\n");
+	char c;
 
+	c = read_option(); 
+
+	while(c != SAIR) {
+		/* cases... */
+
+		c = read_option();
+	}
+	
 	return(0);
 
 }
