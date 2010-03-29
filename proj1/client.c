@@ -1,6 +1,9 @@
 #include<stdio.h>
 
 #define SAIR 's'
+#define BLA 'b'
+#define FOO 'f'
+
 
 char read_option() {
 	/* considera os possiveis erros e só sai quando o usuario
@@ -11,6 +14,14 @@ char read_option() {
 	return('s');
 }
 
+void bla() {
+	return;
+}
+
+void foo() {
+	return;
+}
+
 int main() {
 
 	char c;
@@ -18,7 +29,24 @@ int main() {
 	c = read_option(); 
 
 	while(c != SAIR) {
-		/* cases... */
+
+		switch(c) {
+
+		case BLA:
+			/* faça BLA */
+			bla();
+			break;
+		case FOO:
+			/* faça FOO */
+			foo();
+			break;
+
+		default:
+			/* teoricamente, nunca é pra entrar aqui, pois c já
+			 foi filtrado em read_option */
+			c = read_option();
+			break;
+		}
 
 		c = read_option();
 	}
