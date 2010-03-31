@@ -124,11 +124,6 @@ int main() {
       client_reg_avalia();
       break;
 
-    default:
-      /* teoricamente, nunca é pra entrar aqui, pois c já
-	 foi filtrado em read_option */
-      c = read_option();
-      break;
     }
 
     c = read_option();
