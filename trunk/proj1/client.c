@@ -21,11 +21,15 @@ char read_option() {
   while(TRUE) {
 
     /* Mensagem com as opções... */
-    system("clear");
-    printf("Mensagem com as opções...\n");
-    printf("Mensagem com as opções...\n");
-    printf("Mensagem com as opções...\n");
-    printf("Mensagem com as opções...\n");
+    printf("Escolha uma entre as opções e tecle Enter:\n");
+    printf("(opções com (*) requererão o id do filme)\n");
+    printf(" (a) Listar todas as informações de todos os filmes.\n");
+    printf(" (b) Listar id e título de todos os filmes.\n");
+    printf(" (c) Listar todas as informações de um filme. (*)\n");
+    printf(" (d) Mostrar a sinopse de um filme. (*)\n");
+    printf(" (e) Mostrar a avaliação de um filme. (*)\n");
+    printf(" (f) Avaliar um filme! (*)\n");
+    printf(" (s) Sair\n  ");
 
     c = getchar(); aux = getchar();
     if((c==SAIR || c==LISTAR_TODOS_COMPLETO || c==LISTAR_TODOS ||
@@ -38,6 +42,7 @@ char read_option() {
       /* caso contrário, 'come' todo o resto da linha e volta às msgs */
       if(aux != '\n') { while(getchar()!='\n'); }
     }
+		system("clear");
   } /* fim do while */
 
 }
@@ -93,6 +98,9 @@ void client_reg_avalia() {
 int main() {
 
   char c;
+
+	system("clear");
+	printf("\tSistema de Recuperação de Conteúdo de Filmes\n\n");
 
   c = read_option(); 
 
