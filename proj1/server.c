@@ -1,6 +1,7 @@
 //Bibliotecas comuns
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 //Bibliotecas para manipulacao de sockets
 #include <sys/types.h>
@@ -10,6 +11,7 @@
 
 #define MINHAPORTA 3490      // A Porta que os usuarios irao se conectar
 #define QTDE_CONEXOES 10     // Quantas conexoes pendentes a fila tera
+#define TRUE 1
 
 #define TAM_BUFFER 200       // Tamanho do Buffer de recepcao de mensagens
 char buffer[TAM_BUFFER];     
@@ -17,11 +19,11 @@ char buffer[TAM_BUFFER];
 #define TAM_MENSAGEM 200     //Tamanho do Buffer de envio de Mensagens
 char mensagem[TAM_MENSAGEM] = "Servidor diz: Pare de me encher o saco!";
 
-int bytes_enviados;  // Quantidade de bytes que foram enviados com sucesso
-int bytes_recebidos; // Quantidade de bytes que foram recebidos
-
 int main()
 {
+    int bytes_enviados;  // Quantidade de bytes que foram enviados com sucesso
+    int bytes_recebidos; // Quantidade de bytes que foram recebidos com sucesso
+  
     int listen_socketfd, connect_socketfd; // Sockets de escuta e de conexao
     
     struct sockaddr_in meu_addr;    // Informacoes do meu endereco
@@ -45,9 +47,12 @@ int main()
     connect_socketfd = accept(listen_socketfd, (struct sockaddr *)&cliente_addr, &tam_endereco); //Aceita a conexao e utiliza o socket para conexoes, deixando o socket de escuta livre
     printf("Conexao aceita!\n");
     
-    while(1){
-      send(connect_socketfd, mensagem, strlen(mensagem), 0);
+    while(TRUE){
+      bytes_recebidos = recv(connect_socketfd, buffer, TAM_BUFFER, 0);
+      printf("%s\n",buffer);
+      bytes_enviados = send(connect_socketfd, mensagem, strlen(mensagem), 0);
       close(connect_socketfd);
+      break;
     }
     
     return(0);
