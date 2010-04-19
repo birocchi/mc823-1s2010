@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "defines.h"
 
 //Bibliotecas para manipulacao de sockets
 #include <sys/types.h>
@@ -9,14 +10,11 @@
 #include <netinet/in.h>
 #include <unistd.h>
 
-#define MINHAPORTA 3490      // A Porta que os usuarios irao se conectar
-#define QTDE_CONEXOES 10     // Quantas conexoes pendentes a fila tera
-#define TRUE 1
 
-#define TAM_BUFFER 200       // Tamanho do Buffer de recepcao de mensagens
+#define QTDE_CONEXOES 10 // número máximo de conexoes pendentes na fila
+
 char buffer[TAM_BUFFER];     
 
-#define TAM_MENSAGEM 200     //Tamanho do Buffer de envio de Mensagens
 char mensagem[TAM_MENSAGEM] = "Servidor diz: Pare de me encher o saco!";
 
 int main()
@@ -34,7 +32,7 @@ int main()
     printf("Socket TCP de escuta criado!\n");
     
     meu_addr.sin_family = AF_INET;
-    meu_addr.sin_port = htons(MINHAPORTA);  // Porta em "short,network byte order", ver ":$man htons"
+    meu_addr.sin_port = htons(SERVER_PORT);  // Porta em "short,network byte order", ver ":$man htons"
     meu_addr.sin_addr.s_addr = INADDR_ANY;  // INADDR_ANY = Descubra o meu endereço IP
     memset(&(meu_addr.sin_zero), '\0', 8);  // Por definicao, zerar o vetor sin_zero
     
