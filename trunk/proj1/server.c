@@ -7,7 +7,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
-
+#include <unistd.h>
 
 #define MINHAPORTA 3490      // A Porta que os usuarios irao se conectar
 #define QTDE_CONEXOES 10     // Quantas conexoes pendentes a fila tera
