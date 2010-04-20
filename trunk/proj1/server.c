@@ -49,6 +49,8 @@ int main() {
     fprintf(stderr, "error on binding the socket to a port\n");
     exit(1);
 	}
+	freeaddrinfo(servinfo); // libera a estrutura de informações do servidor
+
   
 	//Espera por alguem que queira se conectar
 	listen(listen_socketfd, QTDE_CONEXOES);
@@ -74,6 +76,7 @@ int main() {
 		close(connect_socketfd);
 		break;
 	}
+
   
 	return(0);
 }
