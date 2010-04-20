@@ -112,31 +112,36 @@ int main(int argc, char** argv) {
 	
   //#####################################################//
 	
-	int bytes_enviados;  // Quantidade de bytes que foram enviados com sucesso
-	int bytes_recebidos; // Quantidade de bytes que foram recebidos com sucesso
+	int bytes_enviados;  // # de bytes que foram enviados com sucesso
+	int bytes_recebidos; // # de bytes que foram recebidos com sucesso
 	
 	int socketfd; //Socket de conexao
 	
-	struct hostent *servidor;         // Struct para ler corretamente de argv[1] atraves de gethostbyname()
-	struct sockaddr_in servidor_addr; // Informacao do endereco do servidor
-  
 	//Caso não haja o nome do servidor, da um erro
 	if (argc != 2) {
-		fprintf(stderr, "Uso: ./client <nome do servidor>\n");
+		fprintf(stderr, "uso: ./client <nome do servidor>\n");
 		exit(1);
 	}
   
-	servidor = gethostbyname(argv[1]);
-  
-	socketfd = socket(PF_INET, SOCK_STREAM, 0);
-		
-	servidor_addr.sin_family = AF_INET;
-	servidor_addr.sin_port = htons(SERVER_PORT);  // Porta em "short,network byte order", ver ":$man htons"
-	servidor_addr.sin_addr = *((struct in_addr *)servidor->h_addr); //Endereco IP do servidor
-	memset(&(servidor_addr.sin_zero), '\0', 8); // Por definicao, zerar o vetor sin_zero
-  
-	connect(socketfd, (struct sockaddr *)&servidor_addr, sizeof(struct sockaddr));
-  
+	int status;
+	struct addrinfo opcoes;
+	struct addrinfo *servinfo;  // will point to the results
+
+	memset(&opcoes, 0, sizeof(opcoes)); // zera a estrutura
+	opcoes.ai_family = AF_INET;         // IPv4
+	opcoes.ai_socktype = SOCK_STREAM;   // TCP stream sockets
+	opcoes.ai_flags = AI_PASSIVE;       // fill in my IP for me
+
+	status = getaddrinfo(argv[1], SERVER_PORT_STR, &opcoes, &servinfo);
+	if (status != 0) {
+    fprintf(stderr, "getaddrinfo error: %s\n", gai_strerror(status));
+    exit(1);
+	}
+
+	socketfd = socket(servinfo->ai_family, servinfo->ai_socktype, servinfo->ai_protocol);
+
+	connect(socketfd, servinfo->ai_addr, servinfo->ai_addrlen);
+
 	while(TRUE){
 		bytes_enviados = send(socketfd, mensagem, strlen(mensagem), 0);
 		bytes_recebidos = recv(socketfd, buffer, TAM_BUFFER, 0);
@@ -147,6 +152,8 @@ int main(int argc, char** argv) {
 	}
   
 	close(socketfd);
+
+	freeaddrinfo(servinfo); // libera a estrutura de informações do servidor
 	
   //#####################################################//
 
