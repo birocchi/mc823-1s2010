@@ -22,23 +22,91 @@ char buffer[TAM_BUFFER];
 
 char mensagem[TAM_MENSAGEM] = "Servidor diz: Pare de me encher o saco!";
 
+
+
+/**************************************************************/
+/******[inicio] Funções que implementam os casos de uso  ******/
+
+void server_lista_todos_completo() {
+  /* TODO */
+  return;
+}
+
+void server_lista_todos() {
+  /* TODO */
+  return;
+}
+
+void server_reg_completo() {
+  /* TODO */
+  return;
+}
+
+void server_reg_sinopse() {
+  /* TODO */
+  return;
+}
+
+void server_reg_media() {
+  /* TODO */
+  return;
+}
+
+void server_reg_avalia() {
+  /* TODO */
+  return;
+}
+
+/*******[fim] Funções que implementam os casos de uso  ********/
+/**************************************************************/
+
+
+
 void *trata_conexao (void *socket) {
   int connect_socketfd;
-  int bytes_recebidos, bytes_enviados;
+	//  int bytes_recebidos, bytes_enviados;
+
+	char option;
 
 	/* cast pra dizer que é um ap pra int, e *(...) pra de-referenciar */
-  connect_socketfd = *((int *)socket); 
-  printf("Hello World! Agora vou processar a conexão recebida no socket: %d\n", connect_socketfd);
+  connect_socketfd = *((int *)socket);
 
-  while(TRUE){
-    bytes_recebidos = recv(connect_socketfd, buffer, TAM_BUFFER, 0);
-    printf("%s\n",buffer);
-    bytes_enviados = send(connect_socketfd, mensagem, strlen(mensagem), 0);
-    close(connect_socketfd);
-    break;
+	/* recebe a opção enviada pelo cliente. */
+	recv(connect_socketfd, &option, sizeof(char), 0);
+
+	printf("opção enviada pelo cliente: %c\n", option);
+
+	/* Verificação do caso de saída e chamadas para cada caso específico */
+	while(option != SAIR) {
+      
+    switch(option) {
+			
+    case LISTAR_TODOS_COMPLETO:
+      server_lista_todos_completo();
+      break;
+    case LISTAR_TODOS:
+      server_lista_todos();
+      break;
+    case REG_COMPLETO:
+      server_reg_completo();
+      break;
+    case REG_SINOPSE:
+      server_reg_sinopse();
+      break;
+    case REG_MEDIA:
+      server_reg_media();
+      break;
+    case REG_AVALIAR:
+      server_reg_avalia();
+      break;
+		}
+
+		/* recebe a opção enviada pelo cliente. */
+		recv(connect_socketfd, &option, sizeof(char), 0);
+		printf("opção enviada pelo cliente: %c\n", option);
   }
-
-  printf("Thread diz: acabei a execução.");
+	
+	printf("Thread diz: terminei!\n");
   pthread_exit(NULL);
 }
 
@@ -76,9 +144,8 @@ int main() {
   }
   freeaddrinfo(servinfo); // libera a estrutura de informações do servidor
 
-  //Espera por alguem que queira se conectar
+  /* Atribui o socket como ouvinte das conexões. */
   listen(listen_socketfd, QTDE_CONEXOES);
-  printf("Esperando alguma conexao...\n");
 
   /* Threads Time! */
   pthread_t thread; //s[QTDE_CONEXOES]; /* TODO: multi-thread, man! */
@@ -87,10 +154,11 @@ int main() {
   struct sockaddr_storage client_addr;
   socklen_t addr_size;
 
-  void *exit_status;
+  //void *exit_status;
 
   while(TRUE) {
     /* Aceitação da conexão. */
+		printf("Esperando alguma conexao...\n");
     connect_socketfd = accept(listen_socketfd, (struct sockaddr *)&client_addr, &addr_size);
     if (connect_socketfd == -1){
       printf("Problema na conexão.\n");
@@ -105,7 +173,7 @@ int main() {
     pthread_create(&thread, NULL, trata_conexao, (void *)&connect_socketfd);
 
     /* Espera a thread terminar */
-    pthread_join(thread, &exit_status);
+    /*pthread_join(thread, &exit_status);*/
 
   }
 
