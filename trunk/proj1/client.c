@@ -84,6 +84,17 @@ int client_get_connection(char **argv) {
 }
 
 
+void send_option(int socketfd, char opt) {
+	int n = 0;
+
+	while (n != sizeof(char)) {
+		send(socketfd, &opt, sizeof(char), 0);
+	}
+
+	return;
+}
+
+
 /**************************************************************/
 /******[inicio] Funções que implementam os casos de uso  ******/
 
@@ -162,7 +173,7 @@ int main(int argc, char** argv) {
   c = read_option();
     
 	/* Envia a opção escolhida ao servidor (mesmo se for Sair) */
-	send(socketfd, &c, sizeof(char), 0);
+	send_option(socketfd, c);
 
   while(c != SAIR) {
       
@@ -190,6 +201,8 @@ int main(int argc, char** argv) {
     }
     
     c = read_option();
+		send_option(socketfd, c);
+
   }
 	
 
