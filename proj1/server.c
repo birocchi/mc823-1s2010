@@ -79,8 +79,8 @@ int main() {
   printf("Esperando alguma conexao...\n");
 
   /* Threads Time! */
-  pthread_t threads[QTDE_CONEXOES]; /* TODO: multi-thread, man! */
-  int i, available_thrs[QTDE_CONEXOES];
+  pthread_t thread; //s[QTDE_CONEXOES]; /* TODO: multi-thread, man! */
+  //int i, available_thrs[QTDE_CONEXOES];
 
   struct sockaddr_storage client_addr;
   socklen_t addr_size;
@@ -99,11 +99,11 @@ int main() {
     /* Inicia uma thread e passa o connect_socketfd pra ela. */
     printf("Main diz: vou passar para a thread o socket %d.\n", connect_socketfd);
     /* i = get_av_thr(); */
-    i = 0;
-    pthread_create(&threads[i], NULL, trata_conexao, (void *)connect_socketfd);
+    //i = 0;
+    pthread_create(&thread, NULL, trata_conexao, (void *)connect_socketfd);
 
     /* Espera a thread terminar */
-    pthread_join(threads[i], &exit_status);
+    pthread_join(thread, &exit_status);
 
   }
 
