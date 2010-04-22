@@ -61,6 +61,17 @@ void server_reg_avalia() {
 /**************************************************************/
 
 
+char recv_option(connect_socketfd) {
+	char opt;
+	int n = 0;
+
+	while (n != sizeof(char)) {
+		n = recv(connect_socketfd, &opt, sizeof(char), 0);
+	}
+
+	return(opt);
+}
+
 
 void *trata_conexao (void *socket) {
   int connect_socketfd;
@@ -72,8 +83,8 @@ void *trata_conexao (void *socket) {
   connect_socketfd = *((int *)socket);
 
 	/* recebe a opção enviada pelo cliente. */
-	recv(connect_socketfd, &option, sizeof(char), 0);
-
+	option = recv_option(connect_socketfd);
+	
 	printf("opção enviada pelo cliente: %c\n", option);
 
 	/* Verificação do caso de saída e chamadas para cada caso específico */
@@ -102,8 +113,8 @@ void *trata_conexao (void *socket) {
 		}
 
 		/* recebe a opção enviada pelo cliente. */
-		recv(connect_socketfd, &option, sizeof(char), 0);
-		printf("opção enviada pelo cliente: %c\n", option);
+		option = recv_option(connect_socketfd);
+	 	printf("opção enviada pelo cliente: %c\n", option);
   }
 	
 	printf("Thread diz: terminei!\n");
