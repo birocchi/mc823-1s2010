@@ -61,69 +61,10 @@ char read_option() {
 }
 
 
-/**************************************************************/
-/******[inicio] Funções que implementam os casos de uso  ******/
-/**************************************************************/
-void client_lista_todos_completo() {
-  /* faz uma consulta ao servidor, coletando TODAS as infos de 
-     TODOS os filmes */
+/* Função auxiliar que retorna o socketfd da conexão com o servidor */
+int client_get_connection(char **argv) {
 
-  /* para cada filme f, chama da_print_full_info(f) */
-
-  /* TODO */
-  return;
-}
-
-void client_lista_todos() {
-  /* também pega todas as infos de todos os filmes */
-
-  /* para cada filme f, chama da_print_parcial(f) */
-  /* TODO */
-  return;
-}
-
-void client_reg_completo() {
-  /* TODO */
-  return;
-}
-
-void client_reg_sinopse() {
-  /* TODO */
-  return;
-}
-
-void client_reg_media() {
-  /* TODO */
-  return;
-}
-
-void client_reg_avalia() {
-  /* TODO */
-  return;
-}
-
-/**************************************************************/
-/*******[fim] Funções que implementam os casos de uso  ********/
-/**************************************************************/
-
-
-
-int main(int argc, char** argv) {
-	
-  //#####################################################//
-	
-  int bytes_enviados;  // # de bytes que foram enviados com sucesso
-  int bytes_recebidos; // # de bytes que foram recebidos com sucesso
-	
-  int socketfd; //Socket de conexao
-	
-  //Caso não haja o nome do servidor, da um erro
-  if (argc != 2) {
-    fprintf(stderr, "uso: ./client <nome do servidor>\n");
-    exit(1);
-  }
-  
-  int status;
+  int status, socketfd;
   struct addrinfo opcoes;
   struct addrinfo *servinfo;  // will point to the results
 
@@ -138,10 +79,79 @@ int main(int argc, char** argv) {
     exit(1);
   }
 
+	/* cria o socket com os parâmetros setados */
   socketfd = socket(servinfo->ai_family, servinfo->ai_socktype, servinfo->ai_protocol);
 
+	/* faz a conexão com o socket do servidor */
   connect(socketfd, servinfo->ai_addr, servinfo->ai_addrlen);
 
+  freeaddrinfo(servinfo); // libera a estrutura de informações do servidor
+	return(socketfd);
+
+}
+
+
+/**************************************************************/
+/******[inicio] Funções que implementam os casos de uso  ******/
+
+void client_lista_todos_completo(int socketfd) {
+  /* faz uma consulta ao servidor, coletando TODAS as infos de 
+     TODOS os filmes */
+
+  /* para cada filme f, chama da_print_full_info(f) */
+
+  /* TODO */
+  return;
+}
+
+void client_lista_todos(int socketfd) {
+  /* também pega todas as infos de todos os filmes */
+
+  /* para cada filme f, chama da_print_parcial(f) */
+  /* TODO */
+  return;
+}
+
+void client_reg_completo(int socketfd) {
+  /* TODO */
+  return;
+}
+
+void client_reg_sinopse(int socketfd) {
+  /* TODO */
+  return;
+}
+
+void client_reg_media(int socketfd) {
+  /* TODO */
+  return;
+}
+
+void client_reg_avalia(int socketfd) {
+  /* TODO */
+  return;
+}
+
+/*******[fim] Funções que implementam os casos de uso  ********/
+/**************************************************************/
+
+
+
+int main(int argc, char** argv) {
+
+  /* Caso não haja o nome do servidor, da um erro */
+  if (argc != 2) {
+    fprintf(stderr, "uso: ./client <nome do servidor>\n");
+    exit(1);
+  }
+	
+	/* Estabelece a conexão com o servidor */
+	int socketfd; //Socket de conexao
+	socketfd = client_get_connection(argv);
+
+
+	/* TESTE da conexão */
+	/*int bytes_recebidos, bytes_enviados;
   while(TRUE){
     bytes_enviados = send(socketfd, mensagem, strlen(mensagem), 0);
     bytes_recebidos = recv(socketfd, buffer, TAM_BUFFER, 0);
@@ -149,46 +159,46 @@ int main(int argc, char** argv) {
       break;
     bytes_recebidos = 0;
     printf("%s\n",buffer);
-  }
+	}*/
   
-  close(socketfd);
 
-  freeaddrinfo(servinfo); // libera a estrutura de informações do servidor
-	
-  //#####################################################//
-  
-  /* char c; */
+	/* Loop da interface e chamadas para as funções que implementam cada 
+	 uso do sistema. */
+  char c;
 		
-  /* c = read_option();  */
+  c = read_option();
     
-  /* while(c != SAIR) { */
+  while(c != SAIR) {
       
-  /*   switch(c) { */
+    switch(c) {
 	
-  /*   case LISTAR_TODOS_COMPLETO: */
-  /*     client_lista_todos_completo(); */
-  /*     break; */
-  /*   case LISTAR_TODOS: */
-  /*     client_lista_todos(); */
-  /*     break; */
-  /*   case REG_COMPLETO: */
-  /*     client_reg_completo(); */
-  /*     break; */
-  /*   case REG_SINOPSE: */
-  /*     client_reg_sinopse(); */
-  /*     break; */
-  /*   case REG_MEDIA: */
-  /*     client_reg_media(); */
-  /*     break; */
-  /*   case REG_AVALIAR: */
-  /*     client_reg_avalia(); */
-  /*     break; */
+    case LISTAR_TODOS_COMPLETO:
+      client_lista_todos_completo(socketfd);
+      break;
+    case LISTAR_TODOS:
+      client_lista_todos(socketfd);
+      break;
+    case REG_COMPLETO:
+      client_reg_completo(socketfd);
+      break;
+    case REG_SINOPSE:
+      client_reg_sinopse(socketfd);
+      break;
+    case REG_MEDIA:
+      client_reg_media(socketfd);
+      break;
+    case REG_AVALIAR:
+      client_reg_avalia(socketfd);
+      break;
+			
+    }
     
-  /*   } */
-    
-  /*   c = read_option(); */
-  /* } */
+    c = read_option();
+  }
 	
+
+	close(socketfd); // fecha a conexão com o servidor
+
   return(0);
 
 }
