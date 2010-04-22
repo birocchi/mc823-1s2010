@@ -25,7 +25,9 @@ char mensagem[TAM_MENSAGEM] = "Servidor diz: Pare de me encher o saco!";
 void *trata_conexao (void *socket) {
   int connect_socketfd;
   int bytes_recebidos, bytes_enviados;
-  connect_socketfd = (int)socket;
+
+	/* cast pra dizer que é um ap pra int, e *(...) pra de-referenciar */
+  connect_socketfd = *((int *)socket); 
   printf("Hello World! Agora vou processar a conexão recebida no socket: %d\n", connect_socketfd);
 
   while(TRUE){
@@ -100,7 +102,7 @@ int main() {
     printf("Main diz: vou passar para a thread o socket %d.\n", connect_socketfd);
     /* i = get_av_thr(); */
     //i = 0;
-    pthread_create(&thread, NULL, trata_conexao, (void *)connect_socketfd);
+    pthread_create(&thread, NULL, trata_conexao, (void *)&connect_socketfd);
 
     /* Espera a thread terminar */
     pthread_join(thread, &exit_status);
