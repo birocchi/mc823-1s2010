@@ -16,15 +16,8 @@ char buffer[TAM_BUFFER];
 
 char mensagem[TAM_MENSAGEM] = "Cliente diz: Senhor, me da uma esmola?!";
 
-#define SAIR '7'
-#define LISTAR_TODOS_COMPLETO '1'
-#define LISTAR_TODOS '2'
-#define REG_COMPLETO '3'
-#define REG_SINOPSE '4'
-#define REG_MEDIA '5'
-#define REG_AVALIAR '6'
 
-
+/* Função auxiliar para tratamento de entrada */
 char read_option() {
   /* considera os possiveis erros e só sai quando o usuario
      digitar um caractere válido */
@@ -168,6 +161,9 @@ int main(int argc, char** argv) {
 		
   c = read_option();
     
+	/* Envia a opção escolhida ao servidor (mesmo se for Sair) */
+	send(socketfd, &c, sizeof(char), 0);
+
   while(c != SAIR) {
       
     switch(c) {
