@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <netdb.h>
 #include "defines.h"
+#include "internet.h"
 
 // Biblioteca para threads
 #include <pthread.h>
@@ -61,21 +62,9 @@ void server_reg_avalia() {
 /**************************************************************/
 
 
-char recv_option(connect_socketfd) {
-	char opt;
-	int n = 0;
-
-	while (n != sizeof(char)) {
-		n = recv(connect_socketfd, &opt, sizeof(char), 0);
-	}
-
-	return(opt);
-}
-
-
+/* Implementa o comportamento de cada thread */
 void *trata_conexao (void *socket) {
   int connect_socketfd;
-	//  int bytes_recebidos, bytes_enviados;
 
 	char option;
 
@@ -83,7 +72,7 @@ void *trata_conexao (void *socket) {
   connect_socketfd = *((int *)socket);
 
 	/* recebe a opção enviada pelo cliente. */
-	option = recv_option(connect_socketfd);
+	option = server_recv_option(connect_socketfd);
 	
 	printf("opção enviada pelo cliente: %c\n", option);
 
@@ -113,7 +102,7 @@ void *trata_conexao (void *socket) {
 		}
 
 		/* recebe a opção enviada pelo cliente. */
-		option = recv_option(connect_socketfd);
+		option = server_recv_option(connect_socketfd);
 	 	printf("opção enviada pelo cliente: %c\n", option);
   }
 	
@@ -124,9 +113,6 @@ void *trata_conexao (void *socket) {
 
 int main() {
 
-  //  int bytes_enviados;  // Quantidade de bytes que foram enviados com sucesso
-  //int bytes_recebidos; // Quantidade de bytes que foram recebidos com sucesso
-  
   int listen_socketfd, connect_socketfd; // Sockets de escuta e de conexao
 
   int status;
@@ -135,7 +121,7 @@ int main() {
 
   memset(&opcoes, 0, sizeof(opcoes)); // zera a estrutura
   opcoes.ai_family = AF_INET;         // IPv4
-  opcoes.ai_socktype = SOCK_STREAM;   // TCP stream sockets
+  opcoes.ai_socktype = SOCK_STREAM;   // TCP
   opcoes.ai_flags = AI_PASSIVE;       // fill in my IP for me
 
   status = getaddrinfo(NULL, SERVER_PORT_STR, &opcoes, &servinfo);

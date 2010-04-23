@@ -5,6 +5,7 @@
 #include <netdb.h>   //Para usar o gethostbyname
 #include "data_access.h"
 #include "defines.h"
+#include "internet.h"
 
 //Bibliotecas para manipulacao de sockets
 #include <sys/types.h>
@@ -54,50 +55,21 @@ char read_option() {
 }
 
 
-/* Função auxiliar que retorna o socketfd da conexão com o servidor */
-int client_get_connection(char **argv) {
-
-  int status, socketfd;
-  struct addrinfo opcoes;
-  struct addrinfo *servinfo;  // will point to the results
-
-  memset(&opcoes, 0, sizeof(opcoes)); // zera a estrutura
-  opcoes.ai_family = AF_INET;         // IPv4
-  opcoes.ai_socktype = SOCK_STREAM;   // TCP stream sockets
-  opcoes.ai_flags = AI_PASSIVE;       // fill in my IP for me
-
-  status = getaddrinfo(argv[1], SERVER_PORT_STR, &opcoes, &servinfo);
-  if (status != 0) {
-    fprintf(stderr, "getaddrinfo error: %s\n", gai_strerror(status));
-    exit(1);
-  }
-
-	/* cria o socket com os parâmetros setados */
-  socketfd = socket(servinfo->ai_family, servinfo->ai_socktype, servinfo->ai_protocol);
-
-	/* faz a conexão com o socket do servidor */
-  connect(socketfd, servinfo->ai_addr, servinfo->ai_addrlen);
-
-  freeaddrinfo(servinfo); // libera a estrutura de informações do servidor
-	return(socketfd);
-
-}
-
-/* Função auxiliar de envio da opção para o servidor */
-void send_option(int socketfd, char opt) {
-	int n = 0;
-	while (n != sizeof(char))
-		n = send(socketfd, &opt, sizeof(char), 0);
-	return;
-}
-
 
 /**************************************************************/
 /******[inicio] Funções que implementam os casos de uso  ******/
 
 void client_lista_todos_completo(int socketfd) {
-  /* faz uma consulta ao servidor, coletando TODAS as infos de 
-     TODOS os filmes */
+	/* 
+		 Não é necessário enviar mais informações ao servidor, apenas
+		 aguardar um retorno.
+		 O formato desse retorno será:
+		 n_filmes@str_do_filme1@str_do_filme2@str_do_filme3
+	*/
+	
+	int n_filmes = client_get_n_filmes(socketfd);
+	
+
 
   /* para cada filme f, chama da_print_full_info(f) */
 
@@ -150,19 +122,6 @@ int main(int argc, char** argv) {
 	int socketfd; //Socket de conexao
 	socketfd = client_get_connection(argv);
 
-
-	/* TESTE da conexão */
-	/*int bytes_recebidos, bytes_enviados;
-  while(TRUE){
-    bytes_enviados = send(socketfd, mensagem, strlen(mensagem), 0);
-    bytes_recebidos = recv(socketfd, buffer, TAM_BUFFER, 0);
-    if(bytes_recebidos == 0) //Se o servidor encerrou a conexao,sai do loop
-      break;
-    bytes_recebidos = 0;
-    printf("%s\n",buffer);
-	}*/
-  
-
 	/* Loop da interface e chamadas para as funções que implementam cada 
 	 uso do sistema. */
   char c;
@@ -170,7 +129,7 @@ int main(int argc, char** argv) {
   c = read_option();
     
 	/* Envia a opção escolhida ao servidor (mesmo se for Sair) */
-	send_option(socketfd, c);
+	client_send_option(socketfd, c);
 
   while(c != SAIR) {
       
@@ -198,7 +157,7 @@ int main(int argc, char** argv) {
     }
     
     c = read_option();
-		send_option(socketfd, c);
+		client_send_option(socketfd, c);
 
   }
 	
