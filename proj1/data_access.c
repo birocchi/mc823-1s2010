@@ -236,8 +236,6 @@ int da_get_n_filmes() {
 
   /* Enquanto houver registros no arquivo */
   while(fscanf(arq, "%d@", &tam_reg) != EOF) {
-    /* Para cada registro, aloca a memória para a struct, seta o registro
-     a partir da string lida, seta o cursor do arquivo p/ o próximo */
     i++;
     fseek(arq, cursor, SEEK_SET); /* pula p/ o inicio do registro */
     cursor += tam_reg; /* ajuste para a leitura do próximo reg no arq */
@@ -253,28 +251,25 @@ int da_get_n_filmes() {
 void da_get_raw_strings (char **registros, int n_registros) {
 	/* registros já é um vetor de apontadores pra strings, 
 	 cujo tamanho é o número de registros no arquivo. */
-	/* TODO!!! */
-	return;
+  FILE *arq;
+  int tam_reg, i = 0;
+  long int cursor = 0; /* indice de leitura do arquivo */
+
+  arq = fopen("filmes.dat", "r");
+
+  /* Enquanto houver registros no arquivo */
+  while(fscanf(arq, "%d@", &tam_reg) != EOF) {
+    /* Para cada registro, aloca e seta a string */
+		registros[i] = (char *)malloc((tam_reg+1) * sizeof(char));
+
+    fseek(arq, cursor, SEEK_SET); /* volta p/ o inicio do registro */
+    fgets(registros[i], tam_reg, arq); /* lê a string crua */
+    cursor += tam_reg; /* ajuste para a leitura do próximo reg */
+		
+    i++;
+  }
+  
+  fclose(arq);
+  
+  return;
 }
-
-/* int main() { */
-
-/*   filme *f; */
-/*   int id = 1; */
-/*   int n_filmes_desalocados; */
-
-/*   int bla; */
-
-/*   /\* Exemplos de uso das funções *\/ */
-/*   if((da_get_filme_by_id(&f, id)) == 0) { */
-/*     da_print_full_info(f); */
-/*     n_filmes_desalocados = da_free_all(f); */
-/*   } else { */
-/*     printf("Filme não encontrado!\n"); */
-/*   } */
-
-/*   bla = da_get_todos_filmes(&f); */
-/*   da_free_all(f); */
-
-/*   return(0); */
-/* } */
