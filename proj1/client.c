@@ -67,13 +67,46 @@ void client_lista_todos_completo(int socketfd) {
 		 n_filmes@str_do_filme1@str_do_filme2@str_do_filme3
 	*/
 	
-	int n_filmes = client_get_n_filmes(socketfd);
+	int n_filmes, i;
+	char filme_str[TAM_MAX_REG]; /* 1024 */
+	filme *lista_filmes, *f, *last_f;
 	
+	/* Leitura do número de filmes retornado pelo servidor */
+	n_filmes = client_get_n_filmes(socketfd);
 
+	if (n_filmes == 0) {
+		printf("Não há filmes no servidor!\n");
+		printf("Tecle qualquer tecla para continuar...");
+		getchar();
+		return;
+	}
 
-  /* para cada filme f, chama da_print_full_info(f) */
+	for (i = 0; i < n_filmes; i++) {
+		
+		/* Le a string do filme */
+		client_get_filme_str(socketfd, filme_str);
 
-  /* TODO */
+		/* Aloca a estrutura para guardar o filme */
+		f = (filme *)malloc(sizeof(filme));
+
+		/* Seta a lista dos filmes */
+		if (i==0){ /* primeiro filme */
+			lista_filmes = f; 
+		}
+		else {
+			last_f->prox_filme = f; /* concatena o filme à lista */
+		}
+		last_f = f; /* atualiza o apontador para o último filme */
+	}
+	
+  /* para cada filme na lista, chama da_print_full_info(f) */
+	for (f = lista_filmes; f != NULL; f = (filme *)f->prox_filme) {
+		da_print_full_info(f);
+	}
+	
+	/* libera a memória dos filmes */
+	da_free_all(lista_filmes);
+
   return;
 }
 

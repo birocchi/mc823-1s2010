@@ -10,6 +10,9 @@ void client_send_option(int socketfd, char opt);
 /* Le o número de filmes passado no próximo parâmetro da stream */
 int client_get_n_filmes(int socket);
 
+/* Copia a str de filme da stream */
+void client_get_filme_str(int socket, char *f_str);
+
 
 /*************************** Cliente *********************************/
 /*********************************************************************/
@@ -23,4 +26,18 @@ int client_get_n_filmes(int socket);
 char server_recv_option(int connect_socketfd);
 
 /**************************** Server *********************************/
+/*********************************************************************/
+
+
+
+/*********************************************************************/
+/***************************** Geral *********************************/
+
+/* Envia um caractere para a stream */
+void socket_push_char(int socket, char c);
+
+/* Retira um caractere da stream */
+char socket_pop_char(int socket);
+
+/***************************** Geral *********************************/
 /*********************************************************************/
