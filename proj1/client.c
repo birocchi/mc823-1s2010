@@ -83,12 +83,15 @@ int client_get_connection(char **argv) {
 
 }
 
-
+/* Envio da opção com caractere de finalização '@' */
 void send_option(int socketfd, char opt) {
 	int n = 0;
+	//	char *msg;
+
+	//	sprintf(msg, "%c@", opt);
 
 	while (n != sizeof(char)) {
-		send(socketfd, &opt, sizeof(char), 0);
+		n = send(socketfd, &opt, sizeof(char), 0);
 	}
 
 	return;

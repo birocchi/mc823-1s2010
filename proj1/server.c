@@ -117,7 +117,8 @@ void *trata_conexao (void *socket) {
 	 	printf("opção enviada pelo cliente: %c\n", option);
   }
 	
-	printf("Thread diz: terminei!\n");
+	printf("Thread diz: terminei! Fechando o socket...\n");
+	close(connect_socketfd);
   pthread_exit(NULL);
 }
 
