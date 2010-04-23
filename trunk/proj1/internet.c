@@ -1,5 +1,6 @@
 #include "internet.h"
 #include "defines.h"
+#include "data_access.h"
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -45,17 +46,61 @@ int client_get_connection(char **argv) {
 
 /* Função auxiliar de envio da opção para o servidor */
 void client_send_option(int socketfd, char opt) {
-	int n = 0;
-	while (n != sizeof(char))
-		n = send(socketfd, &opt, sizeof(char), 0);
+	socket_push_char(socketfd, opt);
 	return;
 }
 
 /* Le o número de filmes passado no próximo parâmetro da stream */
 int client_get_n_filmes(int socket) {
+
+	char str[10], c;
+	int i = 0;
+
 	/* Preenche uma str com os numeros até chegar o '@' */
+	c = socket_pop_char(socket);
+	while (c != '@') {
+		str[i] = c;
+		i++;
+		c = socket_pop_char(socket);
+	}
+	str[i] = '\0';
 	
-	return(2);
+	return(atoi(str));
+}
+
+/* Copia a str de filme da stream */
+void client_get_filme_str(int socket, char *f_str) {
+	
+	int i, tam_reg;
+	char c, tam_reg_str[TAM_REG_ID];
+
+	/* leitura do tamanho do registro */
+	i = 0;
+	c = socket_pop_char(socket);
+	while (c != '@') {
+		//f_str[i] = c;
+		tam_reg_str[i] = c;
+		i++;
+		c = socket_pop_char(socket);
+	}
+	//f_str[i] = '@';
+	tam_reg_str[i] = '\0';
+
+	tam_reg = atoi(tam_reg_str);
+
+	/* Sei o tamanho do registro e sei até onde já li; vou ler o resto */
+	tam_reg = tam_reg - i -1; /* numero de caracteres restantes */
+	int n = 0;
+	char buffer[TAM_MAX_ATR];
+	while (n < tam_reg) {
+		n += recv(socket, &buffer[n], (tam_reg - n), 0);
+	}
+	buffer[n] = '\0';
+	
+	/* por fim, concatena as strings já lidas, copiando para a str de retorno */
+	sprintf(f_str, "%s%s", tam_reg_str, buffer);
+	
+	return;
 }
 
 /*************************** Cliente *********************************/
@@ -67,17 +112,39 @@ int client_get_n_filmes(int socket) {
 
 /* Recebe a opção da stream */
 char server_recv_option(int connect_socketfd) {
-	char opt;
-	int n = 0;
-
-	while (n != sizeof(char)) {
-		n = recv(connect_socketfd, &opt, sizeof(char), 0);
-	}
-
-	return(opt);
+	return(socket_pop_char(connect_socketfd));
 }
 
 
 /**************************** Server *********************************/
 /*********************************************************************/
 
+
+/*********************************************************************/
+/***************************** Geral *********************************/
+
+/* Envia um caractere para a stream */
+void socket_push_char(int socket, char c) {
+	int n = 0;
+	
+	while (n != sizeof(char)) {
+		n = send(socket, &c, sizeof(char), 0);
+	}
+
+	return;
+}
+
+/* Retira um caractere da stream */
+char socket_pop_char(int socket) {
+	char c;
+	int n = 0;
+
+	while (n != sizeof(char)) {
+		n = recv(socket, &c, sizeof(char), 0);
+	}
+
+	return(c);
+}
+
+/***************************** Geral *********************************/
+/*********************************************************************/

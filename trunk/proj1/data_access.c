@@ -159,7 +159,6 @@ int da_get_filme_by_id(filme **f_ret, int id) {
     /* registro encontrado */
     if(id_reg == id) {
       /* aloca a estrutura para guardar o filme */
-      *f_ret = (filme *)malloc(sizeof(filme));
       /* caminha no arquivo até o inicio do registro */
       fseek(arq, cursor, SEEK_SET);
       fgets(buffer, TAM_MAX_REG, arq);
