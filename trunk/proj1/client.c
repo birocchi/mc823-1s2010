@@ -64,7 +64,7 @@ void client_lista_todos_completo(int socketfd) {
 		 Não é necessário enviar mais informações ao servidor, apenas
 		 aguardar um retorno.
 		 O formato desse retorno será:
-		 n_filmes@str_do_filme1@str_do_filme2@str_do_filme3
+		 n_filmes@str_do_filme1@str_do_filme2@str_do_filme3@
 	*/
 	
 	int n_filmes, i;
@@ -80,6 +80,7 @@ void client_lista_todos_completo(int socketfd) {
 		getchar();
 		return;
 	}
+	printf("%d filmes:\n\n", n_filmes);
 
 	for (i = 0; i < n_filmes; i++) {
 		
@@ -102,6 +103,7 @@ void client_lista_todos_completo(int socketfd) {
   /* para cada filme na lista, chama da_print_full_info(f) */
 	for (f = lista_filmes; f != NULL; f = (filme *)f->prox_filme) {
 		da_print_full_info(f);
+		printf("\n\n-------------------------\n\n");
 	}
 	
 	/* libera a memória dos filmes */
@@ -111,8 +113,6 @@ void client_lista_todos_completo(int socketfd) {
 }
 
 void client_lista_todos(int socketfd) {
-  /* também pega todas as infos de todos os filmes */
-
   /* para cada filme f, chama da_print_parcial(f) */
   /* TODO */
   return;

@@ -5,6 +5,7 @@
 #include <netdb.h>
 #include "defines.h"
 #include "internet.h"
+#include "data_access.h"
 
 // Biblioteca para threads
 #include <pthread.h>
@@ -28,32 +29,63 @@ char mensagem[TAM_MENSAGEM] = "Servidor diz: Pare de me encher o saco!";
 /**************************************************************/
 /******[inicio] Funções que implementam os casos de uso  ******/
 
-void server_lista_todos_completo() {
+void server_lista_todos_completo(int socket) {
+
+	/*
+		Esta função envia ao cliente uma sequencia de caracteres no formato:
+		n_filmes@str_filme1@str_filme2@...@
+	 */
+
+	/* Envio do numero de filmes */
+	int n_filmes, n, i;
+	char n_filmes_str[10]; /* max: 999999999@ */
+
+	n_filmes = da_get_n_filmes();
+	sprintf(n_filmes_str, "%d@", n_filmes);
+
+	n = 0;
+	while (n < strlen(n_filmes_str)) {
+		n = send(socket, n_filmes_str, strlen(n_filmes_str), 0);
+	}
+
+	/* Agora, para cada filme, envia sua string crua. */
+	char **registros;
+	registros = (char **)malloc(n_filmes*sizeof(char));
+	da_get_raw_strings(registros, n_filmes);
+
+	for (i = 0; i < n_filmes; i++) {
+		n = 0;
+		while (n < strlen(registros[i])) {
+			n = send(socket, registros[i], strlen(registros[i]), 0);
+		}
+		free(registros[i]);
+	}
+	free(registros);
+
+  return;
+}
+
+void server_lista_todos(int socket) {
   /* TODO */
   return;
 }
 
-void server_lista_todos() {
+void server_reg_completo(int socket) {
   /* TODO */
   return;
 }
 
-void server_reg_completo() {
+void server_reg_sinopse(int socket) {
   /* TODO */
   return;
 }
 
-void server_reg_sinopse() {
+void server_reg_media(int socket) {
   /* TODO */
   return;
 }
 
-void server_reg_media() {
-  /* TODO */
-  return;
-}
-
-void server_reg_avalia() {
+void server_reg_avalia(int socket) {
   /* TODO */
   return;
 }
@@ -82,22 +114,22 @@ void *trata_conexao (void *socket) {
     switch(option) {
 			
     case LISTAR_TODOS_COMPLETO:
-      server_lista_todos_completo();
+      server_lista_todos_completo(connect_socketfd);
       break;
     case LISTAR_TODOS:
-      server_lista_todos();
+      server_lista_todos(connect_socketfd);
       break;
     case REG_COMPLETO:
-      server_reg_completo();
+      server_reg_completo(connect_socketfd);
       break;
     case REG_SINOPSE:
-      server_reg_sinopse();
+      server_reg_sinopse(connect_socketfd);
       break;
     case REG_MEDIA:
-      server_reg_media();
+      server_reg_media(connect_socketfd);
       break;
     case REG_AVALIAR:
-      server_reg_avalia();
+      server_reg_avalia(connect_socketfd);
       break;
 		}
 

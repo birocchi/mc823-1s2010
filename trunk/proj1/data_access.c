@@ -224,6 +224,38 @@ int da_get_todos_filmes(filme **filmes_ret) {
 }
 
 
+/* Retorna o número de filmes no arquivo */
+int da_get_n_filmes() {
+
+  FILE *arq;
+  int tam_reg, i = 0;
+  long int cursor = 0; /* indice de leitura do arquivo */
+
+  arq = fopen("filmes.dat", "r");
+
+
+  /* Enquanto houver registros no arquivo */
+  while(fscanf(arq, "%d@", &tam_reg) != EOF) {
+    /* Para cada registro, aloca a memória para a struct, seta o registro
+     a partir da string lida, seta o cursor do arquivo p/ o próximo */
+    i++;
+    fseek(arq, cursor, SEEK_SET); /* pula p/ o inicio do registro */
+    cursor += tam_reg; /* ajuste para a leitura do próximo reg no arq */
+  }
+  
+  fclose(arq);
+  
+  return(i);
+	
+}
+
+/* Retorna uma matriz com os registros todos em formato string pura */
+void da_get_raw_strings (char **registros, int n_registros) {
+	/* registros já é um vetor de apontadores pra strings, 
+	 cujo tamanho é o número de registros no arquivo. */
+	/* TODO!!! */
+	return;
+}
 
 /* int main() { */
 
