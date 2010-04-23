@@ -48,3 +48,9 @@ int da_free_all(filme *f);
 
 /* Seta uma lista com todos os filmes no arquivo */
 int da_get_todos_filmes(filme **filmes);
+
+/* Retorna o número de filmes no arquivo */
+int da_get_n_filmes();
+
+/* Retorna uma matriz com os registros todos em formato string pura */
+void da_get_raw_strings (char **registros, int n_registros);
