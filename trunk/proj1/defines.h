@@ -11,8 +11,8 @@
 
 
 // A Porta em que o servidor escuta e na qual os clientes irão se conectar
-#define SERVER_PORT 3491
-#define SERVER_PORT_STR "3491"
+#define SERVER_PORT 50001
+#define SERVER_PORT_STR "50001"
 
 // Tamanho do Buffer de recepcao de mensagens
 #define TAM_BUFFER 200
