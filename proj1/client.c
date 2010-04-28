@@ -291,12 +291,11 @@ void client_reg_avalia(int socketfd) {
   char c, id_avaliar[TAM_REG_ID] /*20*/, nota[TAM_MEDIA]/*6*/;
   int i = 0, j = 0;
 
-  /* Leitura do id do filme para avaliar e da nota */
+  /* Leitura do id do filme para avaliar e nota */
   printf("ID do filme a avaliar: ");
   c = getchar();
   while (c!='\n') { id_avaliar[i] = c; i++; c = getchar(); }
   id_avaliar[i] = '@'; /* coloca um @ para finalizar o id */
-
   printf("Nota [formato: abc.de]: ");
   c = getchar();
   while (c!='\n') { nota[j] = c; j++; c = getchar(); }
@@ -315,24 +314,7 @@ void client_reg_avalia(int socketfd) {
   if (c == '#') {
     printf("\nFilme não encontrado.\n");
   } else {
-    /* recebe a str do filme encontrado */
-    char f_str[TAM_MAX_REG];
-    i = 0;
-    c = socket_pop_char(socketfd);
-    while(c != '\0') { 
-      f_str[i] = c;
-      c = socket_pop_char(socketfd);
-      i++;
-    }
-
-    /* monta a estrutura de filme */
-    filme f;
-    int tam_reg;
-    da_str_to_filme(&f, &tam_reg, f_str);
-
-    /* Imprime resultado da pesquisa */
-    printf("Filme encontrado!\n\n");
-    da_print_full_info(&f);
+    printf("\nAvaliação realizada com sucesso!\n");
   }
 
   printf("\nAperte Enter para continuar...");
