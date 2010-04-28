@@ -37,7 +37,13 @@ int client_get_connection(char **argv) {
   socketfd = socket(servinfo->ai_family, servinfo->ai_socktype, servinfo->ai_protocol);
 
   /* faz a conexão com o socket do servidor */
-  connect(socketfd, servinfo->ai_addr, servinfo->ai_addrlen);
+  status = connect(socketfd, servinfo->ai_addr, servinfo->ai_addrlen);
+
+  /* Caso dê algum erro na conexão, pára o cliente */
+  if (status == -1){
+    fprintf(stderr, "Problema na conexão.\n");
+    exit(1);
+  }
 
   freeaddrinfo(servinfo); // libera a estrutura de informações do servidor
   return(socketfd);
@@ -158,9 +164,7 @@ void socket_push_buffer(int socket, int n, char *buffer) {
   int i = 0;
   
   while(i < (n-1)) {
-    printf("Envio de stream começando pelo caractere: %d.\n", i);
     i += send(socket, &buffer[i], (n - i), 0);
-    printf("Enviei %d...\n", i);
   }
 
   return;
@@ -180,7 +184,6 @@ void socket_pop_buffer(int socket, int n, char *buffer) {
    chega ao fim, continua lendo... */
   while(i < (n-1)) {
     i += recv(socket, &buffer[i], (n - i), 0);
-    printf("\nRecebi: %d.\n", i);
   }
 
   return;
