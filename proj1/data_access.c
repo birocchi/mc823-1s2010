@@ -101,6 +101,13 @@ void da_print_full_info(filme *f) {
   return;
 }
 
+void da_print_partial_info(filme *f) {
+  printf("Id: %d\n", (*f).id);
+  printf("Titulo: %s\n", (*f).titulo);
+  return;
+}
+
+
 void da_free_strs(filme *f) {
   free((*f).titulo);
   free((*f).sinopse);
