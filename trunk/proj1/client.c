@@ -247,13 +247,97 @@ void client_reg_sinopse(int socketfd) {
 
 /* ## 5 ## */
 void client_reg_media(int socketfd) {
-  /* TODO */
+
+  /* Cópia do caso de uso para a listagem completa de um filme, 
+     diferenciando apenas a impressão dos dados.*/
+
+  char c, id_procurado[TAM_REG_ID]; int i = 0;
+
+  printf("ID do filme: "); c = getchar();
+  while (c!='\n') { id_procurado[i] = c; i++; c = getchar(); }
+  id_procurado[i] = '@'; /* coloca um @ para finalizar o id */
+
+  socket_push_buffer(socketfd, i+1, id_procurado);
+
+  do { c = socket_pop_char(socketfd);
+  } while(c == '\0'); /* limpa a stream */
+  
+  if (c == '#') { printf("\nFilme não encontrado.\n"); }
+  else {
+    char f_str[TAM_MAX_REG];
+    i = 0; c = socket_pop_char(socketfd);
+    while(c != '\0') { 
+      f_str[i] = c; 
+      c = socket_pop_char(socketfd);
+      i++;
+    }
+
+    filme f; int tam_reg;
+    da_str_to_filme(&f, &tam_reg, f_str);
+
+    printf("Filme encontrado!\n\n");
+    printf("Média: %3.2f (%d avaliações)\n", f.media, f.n_aval);
+  }
+
+  printf("\nAperte Enter para continuar...");
+  getchar();
+
   return;
 }
 
 /* ## 6 ## */
 void client_reg_avalia(int socketfd) {
-  /* TODO */
+
+  char c, id_avaliar[TAM_REG_ID] /*20*/, nota[TAM_MEDIA]/*6*/;
+  int i = 0, j = 0;
+
+  /* Leitura do id do filme para avaliar e da nota */
+  printf("ID do filme a avaliar: ");
+  c = getchar();
+  while (c!='\n') { id_avaliar[i] = c; i++; c = getchar(); }
+  id_avaliar[i] = '@'; /* coloca um @ para finalizar o id */
+
+  printf("Nota [formato: abc.de]: ");
+  c = getchar();
+  while (c!='\n') { nota[j] = c; j++; c = getchar(); }
+  nota[j] = '@'; /* coloca um @ para finalizar a nota*/
+
+  /* envia o id e a nota ao servidor */
+  socket_push_buffer(socketfd, i+1, id_avaliar);
+  socket_push_buffer(socketfd, j+1, nota);
+
+  /* leitura da resposta do servidor */
+  do {
+    c = socket_pop_char(socketfd);
+  } while(c == '\0'); /* limpa a stream */
+  
+  /* Caso não tenha encontrado nenhum filme */
+  if (c == '#') {
+    printf("\nFilme não encontrado.\n");
+  } else {
+    /* recebe a str do filme encontrado */
+    char f_str[TAM_MAX_REG];
+    i = 0;
+    c = socket_pop_char(socketfd);
+    while(c != '\0') { 
+      f_str[i] = c;
+      c = socket_pop_char(socketfd);
+      i++;
+    }
+
+    /* monta a estrutura de filme */
+    filme f;
+    int tam_reg;
+    da_str_to_filme(&f, &tam_reg, f_str);
+
+    /* Imprime resultado da pesquisa */
+    printf("Filme encontrado!\n\n");
+    da_print_full_info(&f);
+  }
+
+  printf("\nAperte Enter para continuar...");
+  getchar();
+
   return;
 }
 
