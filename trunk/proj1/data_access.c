@@ -143,10 +143,8 @@ int da_free_all(filme *f) {
 }
 	
 
-
-
 /* Função a ser chamada pelo SERVIDOR! */
-int da_get_filme_by_id(char *f_str, int id) {
+int da_get_filme_by_id(char *f_str, int id, int *tamanho) {
 
   /* Função responsável por acessar o arquivo dos registros,
      buscar o filme com o id igual ao passado como argumento,
@@ -167,6 +165,7 @@ int da_get_filme_by_id(char *f_str, int id) {
       /* caminha no arquivo até o inicio do registro */
       fseek(arq, cursor, SEEK_SET);
       fgets(f_str, tam_reg, arq);
+      *tamanho = tam_reg;
       fclose(arq);
       return(0);
     } else {
