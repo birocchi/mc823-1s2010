@@ -45,17 +45,18 @@ void server_lista_todos_completo(int socket) {
 
   /* Agora, para cada filme, envia sua string crua. */
   char **registros;
-  registros = (char **)malloc(n_filmes*sizeof(char));
-  da_get_raw_strings(registros, n_filmes);
+  int *tam_reg;
+  registros = (char **)malloc(n_filmes*sizeof(char *));
+  tam_reg = (int *)malloc(n_filmes*sizeof(int));
+  da_get_raw_strings(registros, tam_reg, n_filmes);
 
   for (i = 0; i < n_filmes; i++) {
     n = 0;
-    while (n < strlen(registros[i])) {
-      n = send(socket, registros[i], strlen(registros[i]), 0);
-    }
+    socket_push_buffer(socket, tam_reg[i], registros[i]);
     free(registros[i]);
   }
   free(registros);
+  free(tam_reg);
 
   return;
 }
