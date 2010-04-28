@@ -62,8 +62,11 @@ int client_get_n_filmes(int socket) {
   char str[10], c;
   int i = 0;
 
-  /* Preenche uma str com os numeros até chegar o '@' */
+	/* Limpa o buffer do canal de comunicação */
   c = socket_pop_char(socket);
+	while(c=='\0') c = socket_pop_char(socket);
+
+  /* Preenche uma str com os numeros até chegar o '@' */
   while (c != '@') {
     str[i] = c;
     i++;
