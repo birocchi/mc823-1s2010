@@ -80,7 +80,42 @@ void server_lista_todos(int socket) {
 
 /* ## 3 ## */
 void server_reg_completo(int socket) {
-  /* TODO */
+  
+  /* servidor lê o ID que está sendo passado */
+  char c, id_procurado[TAM_REG_ID]; /* 20 */
+  int i = 0;
+
+  /* leitura do ID pesquisado pelo cliente */
+  c = socket_pop_char(socket);
+  while (c!='@') {
+    id_procurado[i] = c;
+    c = socket_pop_char(socket);
+    i++;
+  }
+  id_procurado[i] = '\0';
+
+  int id;
+  id = atoi(id_procurado);
+
+  /* Função que faz a busca.
+     Retorna 1 se n encontrou nenhum filme.
+     Caso contrário, aloca a memória e seta o filme. */
+  
+  char f_str[TAM_MAX_REG];
+
+  /* se não encontrou nenhum filme, envia erro ao cliente */
+  if (da_get_filme_by_id(f_str, id) == 1) {
+    socket_push_char(socket, '#');
+    return;
+  }
+
+  /* se encontrou... */
+  /* envia caractere de confirmação */
+  socket_push_char(socket, '%');
+  
+  /* envia o filme */
+  socket_push_buffer(socket, strlen(f_str), f_str);
+
   return;
 }
 
