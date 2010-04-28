@@ -104,7 +104,7 @@ void client_get_filme_str(int socket, char *f_str) {
   buffer[n] = '\0';
 	
   /* por fim, concatena as strings já lidas, copiando para a str de retorno */
-  sprintf(f_str, "%s%s", tam_reg_str, buffer);
+  sprintf(f_str, "%d@%s", (tam_reg+i+1), buffer);
 	
   return;
 }

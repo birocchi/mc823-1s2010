@@ -80,7 +80,7 @@ int da_str_to_filme (filme *f_ret, int *tam_reg, char *f_str) {
 
   /* horarios */
   i++; j = 0;
-  while(f_str[i]!='@') { str[j] = f_str[i]; i++; j++; } str[j] = '\0';
+  while(f_str[i]!='@' || f_str[i]!='\0') { str[j] = f_str[i]; i++; j++; } str[j] = '\0';
   (*f_ret).horarios = (char *) malloc((j+1)*sizeof(char));
   sprintf((*f_ret).horarios, "%s", str);
 
@@ -233,7 +233,6 @@ int da_get_n_filmes() {
 
   arq = fopen("filmes.dat", "r");
 
-
   /* Enquanto houver registros no arquivo */
   while(fscanf(arq, "%d@", &tam_reg) != EOF) {
     i++;
@@ -243,12 +242,12 @@ int da_get_n_filmes() {
   
   fclose(arq);
   
-  return(i);
+  return(i-1);
 	
 }
 
 /* Retorna uma matriz com os registros todos em formato string pura */
-void da_get_raw_strings (char **registros, int n_registros) {
+void da_get_raw_strings (char **registros, int *tam_registros, int n_registros) {
 	/* registros já é um vetor de apontadores pra strings, 
 	 cujo tamanho é o número de registros no arquivo. */
   FILE *arq;
@@ -260,10 +259,12 @@ void da_get_raw_strings (char **registros, int n_registros) {
   /* Enquanto houver registros no arquivo */
   while(fscanf(arq, "%d@", &tam_reg) != EOF) {
     /* Para cada registro, aloca e seta a string */
-		registros[i] = (char *)malloc((tam_reg+1) * sizeof(char));
-
+    registros[i] = (char *)malloc((tam_reg+1) * sizeof(char));
     fseek(arq, cursor, SEEK_SET); /* volta p/ o inicio do registro */
     fgets(registros[i], tam_reg, arq); /* lê a string crua */
+
+    tam_registros[i] = tam_reg; /* seta também os tamanhos dos registros */
+
     cursor += tam_reg; /* ajuste para a leitura do próximo reg */
 		
     i++;

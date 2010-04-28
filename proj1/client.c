@@ -80,15 +80,18 @@ void client_lista_todos_completo(int socketfd) {
     getchar();
     return;
   }
-  printf("%d filmes:\n\n", n_filmes);
+  printf("Número de filmes encontrados: %d\n\n", n_filmes);
 
   for (i = 0; i < n_filmes; i++) {
+
+    int tam_filme;
 		
     /* Le a string do filme */
     client_get_filme_str(socketfd, filme_str);
 
     /* Aloca a estrutura para guardar o filme */
     f = (filme *)malloc(sizeof(filme));
+    da_str_to_filme(f, &tam_filme, filme_str);
 
     /* Seta a lista dos filmes */
     if (i==0){ /* primeiro filme */

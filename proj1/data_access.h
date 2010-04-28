@@ -53,4 +53,4 @@ int da_get_todos_filmes(filme **filmes);
 int da_get_n_filmes();
 
 /* Retorna uma matriz com os registros todos em formato string pura */
-void da_get_raw_strings (char **registros, int n_registros);
+void da_get_raw_strings (char **registros, int *tam_registros, int n_registros);
