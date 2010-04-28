@@ -11,6 +11,9 @@
 // Biblioteca para threads
 #include <pthread.h>
 
+// Exclusão Mútua
+#include <semaphore.h>
+
 // Bibliotecas para manipulacao de sockets
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -27,6 +30,11 @@
    FALSE: significa que ela não está disponível.
 */
 int available_thrs[QTDE_CONEXOES];
+
+
+/* Semáforo global usado para garantir exclusão mútua entre as threads 
+   no uso do arquivo (escrita). */
+sem_t semaphore;
 
 
 /**************************************************************/
@@ -152,7 +160,7 @@ void server_reg_media(int socket) {
 void server_reg_avalia(int socket) {
 
   /* servidor lê o ID que está sendo passado */
-  char c, id_avaliar[TAM_REG_ID] /*20*/, nota[TAM_MEDIA]/*6*/;
+  char c, id_avaliar[TAM_REG_ID] /*20*/, nota_s[TAM_MEDIA]/*6*/;
   int i = 0, tam_reg;
 
   /* leitura do ID requisitado pelo cliente p/ avaliação */
@@ -164,28 +172,46 @@ void server_reg_avalia(int socket) {
   id = atoi(id_avaliar);
 
   /* leitura da nota */
-  
+  c = socket_pop_char(socket);
+  while (c!='@') { nota_s[i] = c; c = socket_pop_char(socket); i++; }
+  nota_s[i] = '\0';
+
+  float nota;
+  nota = atof(nota_s);
 
   printf("  id p/ avaliar: %d\n", id);
 
-  /* Função que faz a busca.
-     Retorna 1 se n encontrou nenhum filme.
-     Caso contrário, aloca a memória e seta o filme. */
+
+  /* 
+   * Importante: Uso do semáforo para controle de concorrência
+   * do recurso (no caso o arquivo), garantido exclusão mútua,
+   * isto é, apenas uma thread poderá escrever nele por vez.
+   */
+  sem_wait(&semaphore); /* trava até o semáforo estar liberado */
+
+  /**************************************/
+  /* [Início] Região com Exclusão Mútua */
+  int status;
+  sleep(10);
   
-  char f_str[TAM_MAX_REG];
+  /*
+   * Função que realiza a avaliação:
+   * Retorna 1 se o filme não existe.
+   * Retorna 0 se ocorreu tudo bem.
+   */
+  //status = da_avalia_filme();
+  /** [Fim] Região com Exclusão Mútua ***/
+  /**************************************/
+
+  sem_post(&semaphore); /* libera o semáforo */
 
   /* se não encontrou nenhum filme, envia erro ao cliente */
-  if (da_get_filme_by_id(f_str, id, &tam_reg) == 1) {
+  if (status == 1) {
     socket_push_char(socket, '#');
-    return;
+  } else {
+    /* se encontrou, envia caractere de confirmação */
+    socket_push_char(socket, '%');
   }
-
-  /* se encontrou... */
-  /* envia caractere de confirmação */
-  socket_push_char(socket, '%');
-  
-  /* envia o filme */
-  socket_push_buffer(socket, tam_reg, f_str);
 
   return;
 }
@@ -257,6 +283,10 @@ void trata_SIGINT(int sig) {
      um close(list_socket) aqui, continua com o problema do bind depois de
      interromper o servidor. Isso acontece por causa da implementação do TCP
      no Kernel, que demora algum tempo pra liberar novamente a porta para bind. */
+
+  /* Desaloca recursos para o semáforo */
+  sem_destroy(&semaphore);
+
   exit(0);
 }
 
@@ -295,6 +325,12 @@ int main() {
 
   /* Atribui o socket como ouvinte das conexões. */
   listen(listen_socketfd, QTDE_CONEXOES);
+
+  /* Inicializa o semáforo. O número de recursos compartilhados é 1 (apenas uma thread 
+     pode usar o arquivo para escrita de cada vez) - este é o terceiro argumento. 
+     O segundo argumento é uma flag com valor padrão 0. */
+  sem_init(&semaphore, 0, 1);
+
 
   /* Threads Time! */
   //  pthread_t thread;
@@ -343,6 +379,5 @@ int main() {
 
   }
 
-  
   return(0);
 }
