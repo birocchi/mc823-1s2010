@@ -21,9 +21,17 @@
 #define PTHREAD_THREADS_MAX 10  /* valor maximo de threads simultaneas */
 
 
+/* Variável global que armazena o status para cada thread
+   TRUE: significa que ela está disponível;
+   FALSE: significa que ela não está disponível.
+*/
+int available_thrs[QTDE_CONEXOES];
+
+
 /**************************************************************/
 /******[inicio] Funções que implementam os casos de uso  ******/
 
+/* ## 1 ## */
 void server_lista_todos_completo(int socket) {
 
   /*
@@ -61,6 +69,7 @@ void server_lista_todos_completo(int socket) {
   return;
 }
 
+/* ## 2 ## */
 void server_lista_todos(int socket) {
   /* O servidor faz exatamente a mesma coisa para a 
    listagem parcial. Todas informações são passadas
@@ -69,21 +78,25 @@ void server_lista_todos(int socket) {
   return;
 }
 
+/* ## 3 ## */
 void server_reg_completo(int socket) {
   /* TODO */
   return;
 }
 
+/* ## 4 ## */
 void server_reg_sinopse(int socket) {
   /* TODO */
   return;
 }
 
+/* ## 5 ## */
 void server_reg_media(int socket) {
   /* TODO */
   return;
 }
 
+/* ## 6 ## */
 void server_reg_avalia(int socket) {
   /* TODO */
   return;
@@ -94,13 +107,16 @@ void server_reg_avalia(int socket) {
 
 
 /* Implementa o comportamento de cada thread */
-void *trata_conexao (void *socket) {
+void *trata_conexao (void *a) {
+  
   int connect_socketfd;
+  int t;
 
   char option;
 
-  /* cast pra dizer que é um ap pra int, e *(...) pra de-referenciar */
-  connect_socketfd = *((int *)socket);
+  /* cast pra dizer que é um ap pra thread_attr */
+  connect_socketfd = ((thread_attr *)a)->connect_socket;
+  t = ((thread_attr *)a)->thr_index;
 
   /* recebe a opção enviada pelo cliente. */
   option = server_recv_option(connect_socketfd);
@@ -137,8 +153,12 @@ void *trata_conexao (void *socket) {
     printf("opção enviada pelo cliente: %c\n", option);
   }
 	
-  printf("Thread diz: terminei! Fechando o socket...\n");
+  printf("Thread %d diz: terminei! Fechando o socket %d...\n", t, connect_socketfd);
   close(connect_socketfd);
+
+  /* thread seta o valor do vetor de disponíveis para TRUE novamente */
+  available_thrs[t] = TRUE;
+
   pthread_exit(NULL);
 }
 
@@ -177,13 +197,15 @@ int main() {
   listen(listen_socketfd, QTDE_CONEXOES);
 
   /* Threads Time! */
-  pthread_t thread; //s[QTDE_CONEXOES]; /* TODO: multi-thread, man! */
-  //int i, available_thrs[QTDE_CONEXOES];
+  //  pthread_t thread;
+  pthread_t threads[QTDE_CONEXOES];
+  int i, t;
+
+  /* Inicializa o vetor de threds disponíveis */
+  for (i = 0; i < QTDE_CONEXOES; i++) available_thrs[i] = TRUE;
 
   struct sockaddr_storage client_addr;
   socklen_t addr_size;
-
-  //void *exit_status;
 
   while(TRUE) {
     /* Aceitação da conexão. */
@@ -195,17 +217,31 @@ int main() {
     }
     printf("Conexao aceita!\n");
     
-    /* Inicia uma thread e passa o connect_socketfd pra ela. */
-    printf("Main diz: vou passar para a thread o socket %d.\n", connect_socketfd);
-    /* i = get_av_thr(); */
-    //i = 0;
-    pthread_create(&thread, NULL, trata_conexao, (void *)&connect_socketfd);
+    /* Seleciona a primeira thread disponível */
+    /* t recebe o indice da primeira thread disponível */
+    t = -1;
+    for (i = 0; i < QTDE_CONEXOES; i++) {
+      if (available_thrs[i]==TRUE) {
+	t = i; break;
+      }
+    }
+    
+    /* caso não haja nenhuma thread disponível, fecha a conexão e volta a ouvir */
+    if (t == -1) { 
+      printf("Não há thread disponível para aceitar a conexão.\n");
+      close(connect_socketfd); continue;
+    }
 
-    /* Espera a thread terminar */
-    /*pthread_join(thread, &exit_status);*/
+    /* Inicia a thread e passa o connect_socketfd pra ela. */
+    available_thrs[t] = FALSE; /* agora essa thread não está disponível */
+    printf("Main diz: vou passar para a thread o socket %d.\n", connect_socketfd);
+    /* inicializa o atributo a passar para a thread */
+    thread_attr a;
+    a.connect_socket = connect_socketfd;
+    a.thr_index = t;
+    pthread_create(&threads[t], NULL, trata_conexao, (void *)&a);
 
   }
-
 
   
   return(0);

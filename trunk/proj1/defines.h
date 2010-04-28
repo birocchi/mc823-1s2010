@@ -20,3 +20,9 @@
 //Tamanho do Buffer de envio de Mensagens
 #define TAM_MENSAGEM 200
 
+
+// Estrutura para definir o atributo a ser passado para a thread
+typedef struct {
+  int connect_socket;
+  int thr_index;
+} thread_attr ;
