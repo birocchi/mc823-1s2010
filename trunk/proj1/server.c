@@ -6,6 +6,7 @@
 #include "defines.h"
 #include "internet.h"
 #include "data_access.h"
+#include <signal.h>
 
 // Biblioteca para threads
 #include <pthread.h>
@@ -197,9 +198,17 @@ void *trata_conexao (void *a) {
   pthread_exit(NULL);
 }
 
+//Trata o sinal de interrupcao mandar uma mensagem antes de encerrar
+void trata_SIGINT(int sig){
+  printf("\nFechando socket e encerrando o servidor!\n");
+  exit(0);
+}
+
 int main() {
 
   int listen_socketfd, connect_socketfd; // Sockets de escuta e de conexao
+
+  signal(SIGINT,trata_SIGINT);
 
   int status;
   struct addrinfo opcoes;
