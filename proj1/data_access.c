@@ -146,18 +146,17 @@ int da_free_all(filme *f) {
 
 
 /* Função a ser chamada pelo SERVIDOR! */
-int da_get_filme_by_id(filme **f_ret, int id) {
+int da_get_filme_by_id(char *f_str, int id) {
 
   /* Função responsável por acessar o arquivo dos registros,
      buscar o filme com o id igual ao passado como argumento,
      e retornar o resultado da busca
-     Saídas: 0 *f_ret aponta p/ o filme encontrado
+     Saídas: 0 - filme encontrado (setado em f_str)
      1 - código de retorno que indica que nada foi encontrado
   */
 
   int tam_reg, id_reg;
   long int cursor = 0; /* indice de leitura do arquivo */
-  char buffer[TAM_MAX_REG]; /* 1kB */
   FILE *arq;
 
   arq = fopen("filmes.dat", "r");
@@ -165,12 +164,9 @@ int da_get_filme_by_id(filme **f_ret, int id) {
   while(fscanf(arq, "%d@%d@", &tam_reg, &id_reg) != EOF) {
     /* registro encontrado */
     if(id_reg == id) {
-      /* aloca a estrutura para guardar o filme */
-			*f_ret = (filme *)malloc(sizeof(filme));
       /* caminha no arquivo até o inicio do registro */
       fseek(arq, cursor, SEEK_SET);
-      fgets(buffer, TAM_MAX_REG, arq);
-      da_str_to_filme(*f_ret, &tam_reg, buffer);
+      fgets(f_str, tam_reg, arq);
       fclose(arq);
       return(0);
     } else {
@@ -178,7 +174,7 @@ int da_get_filme_by_id(filme **f_ret, int id) {
       fseek(arq, cursor, SEEK_SET);
     }
   } /* só vai sair do while se não encontrar o filme */
-
+  
   fclose(arq);
   
   return(1);

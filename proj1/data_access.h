@@ -43,7 +43,7 @@ void da_print_full_info(filme *f);
 void da_print_partial_info(filme *f);
 
 /* Função que retorna um filme a partir de um id */
-int da_get_filme_by_id(filme **f_ret, int id);
+int da_get_filme_by_id(char *f_str, int id);
 
 /* Libera toda a memória alocada para o(s) filme(s) (strings e struct) 
  - retorna o numero de filmes desalocados */

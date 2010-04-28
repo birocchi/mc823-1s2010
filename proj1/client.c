@@ -157,7 +157,49 @@ void client_lista_todos(int socketfd) {
 
 /* ## 3 ## */
 void client_reg_completo(int socketfd) {
-  /* TODO */
+
+  char c, id_procurado[TAM_REG_ID]; /* 20 */
+  int i = 0;
+
+  /* Leitura do id procurado (digito p/ dig.) */
+  printf("ID do filme: ");
+  c = getchar();
+  while (c!='\n') { id_procurado[i] = c; i++; c = getchar(); }
+  id_procurado[i] = '@'; /* coloca um @ para finalizar o id */
+
+  /* envia o id procurado ao servidor */
+  socket_push_buffer(socketfd, i+1, id_procurado);
+
+  /* leitura da resposta do servidor */
+  c = socket_pop_char(socketfd);
+  
+  /* Caso não tenha encontrado nenhum filme */
+  if (c == '#') {
+    printf("\nFilme não encontrado.\n");
+  } else {
+    /* recebe a str do filme encontrado */
+    char f_str[TAM_MAX_REG];
+    i = 0;
+    c = socket_pop_char(socketfd);
+    while(c != '\0') { 
+      f_str[i] = c;
+      c = socket_pop_char(socketfd);
+      i++;
+    }
+
+    /* monta a estrutura de filme */
+    filme f;
+    int tam_reg;
+    da_str_to_filme(&f, &tam_reg, f_str);
+
+    /* Imprime resultado da pesquisa */
+    printf("Filme encontrado!\n\n");
+    da_print_full_info(&f);
+  }
+
+  printf("\nAperte Enter para continuar...");
+  getchar();
+
   return;
 }
 
