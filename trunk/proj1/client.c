@@ -60,54 +60,59 @@ char read_option() {
 /******[inicio] Funções que implementam os casos de uso  ******/
 
 void client_lista_todos_completo(int socketfd) {
-	/* 
-		 Não é necessário enviar mais informações ao servidor, apenas
-		 aguardar um retorno.
-		 O formato desse retorno será:
-		 n_filmes@str_do_filme1@str_do_filme2@str_do_filme3@
-	*/
-	
-	int n_filmes, i;
-	char filme_str[TAM_MAX_REG]; /* 1024 */
-	filme *lista_filmes, *f, *last_f;
-	
-	/* Leitura do número de filmes retornado pelo servidor */
-	n_filmes = client_get_n_filmes(socketfd);
+  /* 
+     Não é necessário enviar mais informações ao servidor, apenas
+     aguardar um retorno.
+     O formato desse retorno será:
+     n_filmes@str_do_filme1@str_do_filme2@str_do_filme3@
+  */
 
-	if (n_filmes == 0) {
-		printf("Não há filmes no servidor!\n");
-		printf("Tecle qualquer tecla para continuar...");
-		getchar();
-		return;
-	}
-	printf("%d filmes:\n\n", n_filmes);
+/*   int n_filmes, i; */
+/*   char filme_str[TAM_MAX_REG]; /\* 1024 *\/ */
+/*   filme *lista_filmes, *f, *last_f; */
+	
+/*   /\* Leitura do número de filmes retornado pelo servidor *\/ */
+/*   n_filmes = client_get_n_filmes(socketfd); */
 
-	for (i = 0; i < n_filmes; i++) {
+/*   if (n_filmes == 0) { */
+/*     printf("Não há filmes no servidor!\n"); */
+/*     printf("Tecle qualquer tecla para continuar..."); */
+/*     getchar(); */
+/*     return; */
+/*   } */
+/*   printf("%d filmes:\n\n", n_filmes); */
+
+/*   for (i = 0; i < n_filmes; i++) { */
 		
-		/* Le a string do filme */
-		client_get_filme_str(socketfd, filme_str);
+/*     /\* Le a string do filme *\/ */
+/*     client_get_filme_str(socketfd, filme_str); */
 
-		/* Aloca a estrutura para guardar o filme */
-		f = (filme *)malloc(sizeof(filme));
+/*     /\* Aloca a estrutura para guardar o filme *\/ */
+/*     f = (filme *)malloc(sizeof(filme)); */
 
-		/* Seta a lista dos filmes */
-		if (i==0){ /* primeiro filme */
-			lista_filmes = f; 
-		}
-		else {
-			last_f->prox_filme = f; /* concatena o filme à lista */
-		}
-		last_f = f; /* atualiza o apontador para o último filme */
-	}
+/*     /\* Seta a lista dos filmes *\/ */
+/*     if (i==0){ /\* primeiro filme *\/ */
+/*       lista_filmes = f;  */
+/*     } */
+/*     else { */
+/*       last_f->prox_filme = f; /\* concatena o filme à lista *\/ */
+/*     } */
+/*     last_f = f; /\* atualiza o apontador para o último filme *\/ */
+/*   } */
 	
-  /* para cada filme na lista, chama da_print_full_info(f) */
-	for (f = lista_filmes; f != NULL; f = (filme *)f->prox_filme) {
-		da_print_full_info(f);
-		printf("\n\n-------------------------\n\n");
-	}
+/*   /\* para cada filme na lista, chama da_print_full_info(f) *\/ */
+/*   for (f = lista_filmes; f != NULL; f = (filme *)f->prox_filme) { */
+/*     da_print_full_info(f); */
+/*     printf("\n\n-------------------------\n\n"); */
+/*   } */
 	
-	/* libera a memória dos filmes */
-	da_free_all(lista_filmes);
+/*   /\* libera a memória dos filmes *\/ */
+/*   da_free_all(lista_filmes); */
+
+  char msg[300000];
+  socket_pop_buffer(socketfd, 288000, msg);
+  msg[288000]='\0';
+  printf("%s", msg);
 
   return;
 }
@@ -151,18 +156,18 @@ int main(int argc, char** argv) {
     exit(1);
   }
 	
-	/* Estabelece a conexão com o servidor */
-	int socketfd; //Socket de conexao
-	socketfd = client_get_connection(argv);
+  /* Estabelece a conexão com o servidor */
+  int socketfd; //Socket de conexao
+  socketfd = client_get_connection(argv);
 
-	/* Loop da interface e chamadas para as funções que implementam cada 
-	 uso do sistema. */
+  /* Loop da interface e chamadas para as funções que implementam cada 
+     uso do sistema. */
   char c;
 		
   c = read_option();
     
-	/* Envia a opção escolhida ao servidor (mesmo se for Sair) */
-	client_send_option(socketfd, c);
+  /* Envia a opção escolhida ao servidor (mesmo se for Sair) */
+  client_send_option(socketfd, c);
 
   while(c != SAIR) {
       
@@ -190,11 +195,11 @@ int main(int argc, char** argv) {
     }
     
     c = read_option();
-		client_send_option(socketfd, c);
+    client_send_option(socketfd, c);
 
   }
 	
-	close(socketfd); // fecha a conexão com o servidor
+  close(socketfd); // fecha a conexão com o servidor
   return(0);
 
 }

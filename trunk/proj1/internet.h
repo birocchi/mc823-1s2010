@@ -39,5 +39,12 @@ void socket_push_char(int socket, char c);
 /* Retira um caractere da stream */
 char socket_pop_char(int socket);
 
+/* Envia um buffer para a stream */
+void socket_push_buffer(int socket, int n, char *buffer);
+
+/* Retira um buffer da stream */
+void socket_pop_buffer(int socket, int n, char *buffer);
+
+
 /***************************** Geral *********************************/
 /*********************************************************************/
