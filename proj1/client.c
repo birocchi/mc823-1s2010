@@ -59,6 +59,7 @@ char read_option() {
 /**************************************************************/
 /******[inicio] Funções que implementam os casos de uso  ******/
 
+/* ## 1 ## */
 void client_lista_todos_completo(int socketfd) {
   /* 
      Não é necessário enviar mais informações ao servidor, apenas
@@ -118,6 +119,7 @@ void client_lista_todos_completo(int socketfd) {
   return;
 }
 
+/* ## 2 ## */
 void client_lista_todos(int socketfd) {
 
   /* Cliente praticamente igual para a listagem completa. */
@@ -153,21 +155,25 @@ void client_lista_todos(int socketfd) {
   return;
 }
 
+/* ## 3 ## */
 void client_reg_completo(int socketfd) {
   /* TODO */
   return;
 }
 
+/* ## 4 ## */
 void client_reg_sinopse(int socketfd) {
   /* TODO */
   return;
 }
 
+/* ## 5 ## */
 void client_reg_media(int socketfd) {
   /* TODO */
   return;
 }
 
+/* ## 6 ## */
 void client_reg_avalia(int socketfd) {
   /* TODO */
   return;
