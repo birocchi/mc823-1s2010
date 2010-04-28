@@ -6,7 +6,6 @@
 #include "defines.h"
 #include "internet.h"
 #include "data_access.h"
-#include <signal.h>
 
 // Biblioteca para threads
 #include <pthread.h>
@@ -84,7 +83,7 @@ void server_reg_completo(int socket) {
   
   /* servidor lê o ID que está sendo passado */
   char c, id_procurado[TAM_REG_ID]; /* 20 */
-  int i = 0;
+  int i = 0, tam_reg;
 
   /* leitura do ID pesquisado pelo cliente */
   c = socket_pop_char(socket);
@@ -98,6 +97,8 @@ void server_reg_completo(int socket) {
   int id;
   id = atoi(id_procurado);
 
+  printf("  id requisitado: %d\n", id);
+
   /* Função que faz a busca.
      Retorna 1 se n encontrou nenhum filme.
      Caso contrário, aloca a memória e seta o filme. */
@@ -105,7 +106,7 @@ void server_reg_completo(int socket) {
   char f_str[TAM_MAX_REG];
 
   /* se não encontrou nenhum filme, envia erro ao cliente */
-  if (da_get_filme_by_id(f_str, id) == 1) {
+  if (da_get_filme_by_id(f_str, id, &tam_reg) == 1) {
     socket_push_char(socket, '#');
     return;
   }
@@ -115,7 +116,7 @@ void server_reg_completo(int socket) {
   socket_push_char(socket, '%');
   
   /* envia o filme */
-  socket_push_buffer(socket, strlen(f_str), f_str);
+  socket_push_buffer(socket, tam_reg, f_str);
 
   return;
 }
@@ -198,17 +199,9 @@ void *trata_conexao (void *a) {
   pthread_exit(NULL);
 }
 
-//Trata o sinal de interrupcao mandar uma mensagem antes de encerrar
-void trata_SIGINT(int sig){
-  printf("\nFechando socket e encerrando o servidor!\n");
-  exit(0);
-}
-
 int main() {
 
   int listen_socketfd, connect_socketfd; // Sockets de escuta e de conexao
-
-  signal(SIGINT,trata_SIGINT);
 
   int status;
   struct addrinfo opcoes;

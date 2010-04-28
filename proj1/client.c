@@ -171,7 +171,9 @@ void client_reg_completo(int socketfd) {
   socket_push_buffer(socketfd, i+1, id_procurado);
 
   /* leitura da resposta do servidor */
-  c = socket_pop_char(socketfd);
+  do {
+    c = socket_pop_char(socketfd);
+  } while(c == '\0'); /* limpa a stream */
   
   /* Caso não tenha encontrado nenhum filme */
   if (c == '#') {
