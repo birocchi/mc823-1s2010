@@ -76,7 +76,7 @@ void client_lista_todos_completo(int socketfd) {
 
   if (n_filmes == 0) {
     printf("Não há filmes no servidor!\n");
-    printf("Tecle qualquer tecla para continuar...");
+    printf("Tecle Enter para continuar...");
     getchar();
     return;
   }
@@ -106,11 +106,14 @@ void client_lista_todos_completo(int socketfd) {
   /* para cada filme na lista, chama da_print_full_info(f) */
   for (f = lista_filmes; f != NULL; f = (filme *)f->prox_filme) {
     da_print_full_info(f);
-    printf("\n\n-------------------------\n\n");
+    printf("\n-------------------------\n");
   }
 	
   /* libera a memória dos filmes */
   da_free_all(lista_filmes);
+
+  printf("Tecle Enter para continuar...");
+  getchar();
 
   return;
 }

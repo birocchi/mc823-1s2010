@@ -80,7 +80,7 @@ int da_str_to_filme (filme *f_ret, int *tam_reg, char *f_str) {
 
   /* horarios */
   i++; j = 0;
-  while(f_str[i]!='@' || f_str[i]!='\0') { str[j] = f_str[i]; i++; j++; } str[j] = '\0';
+  while(f_str[i]!='@' && f_str[i]!='\0') { str[j] = f_str[i]; i++; j++; } str[j] = '\0';
   (*f_ret).horarios = (char *) malloc((j+1)*sizeof(char));
   sprintf((*f_ret).horarios, "%s", str);
 
