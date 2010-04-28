@@ -119,8 +119,37 @@ void client_lista_todos_completo(int socketfd) {
 }
 
 void client_lista_todos(int socketfd) {
-  /* para cada filme f, chama da_print_parcial(f) */
-  /* TODO */
+
+  /* Cliente praticamente igual para a listagem completa. */
+  int n_filmes, i;
+  char filme_str[TAM_MAX_REG]; /* 1024 */
+  filme *lista_filmes, *f, *last_f;
+	
+  n_filmes = client_get_n_filmes(socketfd);
+
+  if (n_filmes == 0) { printf("Não há filmes no servidor!\n");
+    printf("Tecle Enter para continuar..."); getchar(); return;
+  }
+  printf("Número de filmes encontrados: %d\n\n", n_filmes);
+
+  for (i = 0; i < n_filmes; i++) {
+
+    int tam_filme;
+    client_get_filme_str(socketfd, filme_str);
+    f = (filme *)malloc(sizeof(filme));
+    da_str_to_filme(f, &tam_filme, filme_str);
+    if (i==0) { lista_filmes = f;} else { last_f->prox_filme = f; }
+    last_f = f; /* atualiza o apontador para o último filme */
+  }
+	
+  /* para cada filme na lista, chama da_print_partial_info(f) */
+  for (f = lista_filmes; f != NULL; f = (filme *)f->prox_filme) {
+    da_print_partial_info(f);
+    printf("\n-------------------------\n");
+  }
+	
+  da_free_all(lista_filmes);
+  printf("Tecle Enter para continuar..."); getchar();
   return;
 }
 

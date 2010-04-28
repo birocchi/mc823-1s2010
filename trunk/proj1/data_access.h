@@ -11,16 +11,16 @@
 #define TAM_MEDIA 6 /* abc.de (valor de 0 a 100, com 2 dígitos decimais) */
 
 typedef struct {
-	int id;
-	char *titulo;
-	char *sinopse;
-	char *sala;
-	char *horarios;
-
-	int n_aval; /* número de avaliações */
-	float media;
-
-	struct filme *prox_filme; /* NULL caso seja um único filme ou o último da lista */
+  int id;
+  char *titulo;
+  char *sinopse;
+  char *sala;
+  char *horarios;
+  
+  int n_aval; /* número de avaliações */
+  float media;
+  
+  struct filme *prox_filme; /* NULL caso seja um único filme ou o último da lista */
 } filme;
 
 /* 'da' refere-se a data access (para facilitar depois pra chamar as funções) */
@@ -38,6 +38,9 @@ void da_free_strs(filme *f);
 
 /* Imprime as informações já formatadas de um filme */
 void da_print_full_info(filme *f);
+
+/* Imprime as informações já formatadas de um filme */
+void da_print_partial_info(filme *f);
 
 /* Função que retorna um filme a partir de um id */
 int da_get_filme_by_id(filme **f_ret, int id);

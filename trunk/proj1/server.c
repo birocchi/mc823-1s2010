@@ -62,7 +62,10 @@ void server_lista_todos_completo(int socket) {
 }
 
 void server_lista_todos(int socket) {
-  /* TODO */
+  /* O servidor faz exatamente a mesma coisa para a 
+   listagem parcial. Todas informações são passadas
+   para o cliente, mas este só imprime algumas delas. */
+  server_lista_todos_completo(socket);
   return;
 }
 
