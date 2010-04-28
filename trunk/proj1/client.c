@@ -207,7 +207,41 @@ void client_reg_completo(int socketfd) {
 
 /* ## 4 ## */
 void client_reg_sinopse(int socketfd) {
-  /* TODO */
+
+  /* Cópia do caso de uso para a listagem completa de um filme, 
+     diferenciando apenas a impressão dos dados.*/
+  
+  char c, id_procurado[TAM_REG_ID]; int i = 0;
+
+  printf("ID do filme: "); c = getchar();
+  while (c!='\n') { id_procurado[i] = c; i++; c = getchar(); }
+  id_procurado[i] = '@'; /* coloca um @ para finalizar o id */
+
+  socket_push_buffer(socketfd, i+1, id_procurado);
+
+  do { c = socket_pop_char(socketfd);
+  } while(c == '\0'); /* limpa a stream */
+  
+  if (c == '#') { printf("\nFilme não encontrado.\n"); }
+  else {
+    char f_str[TAM_MAX_REG];
+    i = 0; c = socket_pop_char(socketfd);
+    while(c != '\0') { 
+      f_str[i] = c; 
+      c = socket_pop_char(socketfd);
+      i++;
+    }
+
+    filme f; int tam_reg;
+    da_str_to_filme(&f, &tam_reg, f_str);
+
+    printf("Filme encontrado!\n\n");
+    printf("Sinopse: %s\n", f.sinopse);
+  }
+
+  printf("\nAperte Enter para continuar...");
+  getchar();
+
   return;
 }
 
