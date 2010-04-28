@@ -124,19 +124,69 @@ void server_reg_completo(int socket) {
 
 /* ## 4 ## */
 void server_reg_sinopse(int socket) {
-  /* TODO */
+  /* Neste caso, o servidor faz exatamente o mesmo  
+   * que na listagem completa de um registro:
+   * 1- Recebe o registro procurado;
+   * 2- Faz a busca;
+   * 3- Se não encontrar o filme, retorna o caractere '#'
+   * 4- Se encontrar, retorna a string crua do filme
+   */
+  server_reg_completo(socket);
   return;
 }
 
 /* ## 5 ## */
 void server_reg_media(int socket) {
-  /* TODO */
+  /* Neste caso, o servidor faz exatamente o mesmo  
+   * que na listagem completa de um registro:
+   * 1- Recebe o registro procurado;
+   * 2- Faz a busca;
+   * 3- Se não encontrar o filme, retorna o caractere '#'
+   * 4- Se encontrar, retorna a string crua do filme
+   */
+  server_reg_completo(socket);
   return;
 }
 
 /* ## 6 ## */
 void server_reg_avalia(int socket) {
-  /* TODO */
+
+  /* servidor lê o ID que está sendo passado */
+  char c, id_avaliar[TAM_REG_ID] /*20*/, nota[TAM_MEDIA]/*6*/;
+  int i = 0, tam_reg;
+
+  /* leitura do ID requisitado pelo cliente p/ avaliação */
+  c = socket_pop_char(socket);
+  while (c!='@') { id_avaliar[i] = c; c = socket_pop_char(socket); i++; }
+  id_avaliar[i] = '\0';
+
+  int id;
+  id = atoi(id_avaliar);
+
+  /* leitura da nota */
+  
+
+  printf("  id p/ avaliar: %d\n", id);
+
+  /* Função que faz a busca.
+     Retorna 1 se n encontrou nenhum filme.
+     Caso contrário, aloca a memória e seta o filme. */
+  
+  char f_str[TAM_MAX_REG];
+
+  /* se não encontrou nenhum filme, envia erro ao cliente */
+  if (da_get_filme_by_id(f_str, id, &tam_reg) == 1) {
+    socket_push_char(socket, '#');
+    return;
+  }
+
+  /* se encontrou... */
+  /* envia caractere de confirmação */
+  socket_push_char(socket, '%');
+  
+  /* envia o filme */
+  socket_push_buffer(socket, tam_reg, f_str);
+
   return;
 }
 
