@@ -40,19 +40,19 @@ int da_str_to_filme (filme *f_ret, int *tam_reg, char *f_str) {
   i++; j = 0;
   while(f_str[i]!='@') { str[j] = f_str[i]; i++; j++; }
   str[j] = '\0'; 
-  (*f_ret).id = atoi(str);
+  f_ret->id = atoi(str);
 
   /* numero de avaliações */
   i++; j = 0;
   while(f_str[i]!='@') { str[j] = f_str[i]; i++; j++; }
   str[j] = '\0';
-  (*f_ret).n_aval = atoi(str);
+  f_ret->n_aval = atoi(str);
 	
   /* média */
   i++; j = 0;
   while(f_str[i]!='@') { str[j] = f_str[i]; i++; j++; }
   str[j] = '\0';
-  (*f_ret).media = atof(str);
+  f_ret->media = atof(str);
 	
   /* titulo */
   i++; j = 0;
@@ -62,57 +62,57 @@ int da_str_to_filme (filme *f_ret, int *tam_reg, char *f_str) {
   }
   str[j] = '\0';
   /* aloca a string dinamicamente */
-  (*f_ret).titulo = (char *)malloc((j+1)*sizeof(char));
-  sprintf((*f_ret).titulo, "%s", str);
+  f_ret->titulo = (char *)malloc((j+1)*sizeof(char));
+  sprintf(f_ret->titulo, "%s", str);
 
   /* Blocos de código similares ao de cima, só que comprimidos  */
   /* sinopse */
   i++; j = 0;
   while(f_str[i]!='@') { str[j] = f_str[i];	i++; j++;	} str[j] = '\0';
-  (*f_ret).sinopse = (char *)malloc((j+1)*sizeof(char));
-  sprintf((*f_ret).sinopse, "%s", str);
+  f_ret->sinopse = (char *)malloc((j+1)*sizeof(char));
+  sprintf(f_ret->sinopse, "%s", str);
 
   /* sala */
   i++; j = 0;
   while(f_str[i]!='@') { str[j] = f_str[i]; i++; j++; } str[j] = '\0';
-  (*f_ret).sala = (char *) malloc((j+1)*sizeof(char));
-  sprintf((*f_ret).sala, "%s", str);
+  f_ret->sala = (char *) malloc((j+1)*sizeof(char));
+  sprintf(f_ret->sala, "%s", str);
 
   /* horarios */
   i++; j = 0;
   while(f_str[i]!='@' && f_str[i]!='\0') { str[j] = f_str[i]; i++; j++; } str[j] = '\0';
-  (*f_ret).horarios = (char *) malloc((j+1)*sizeof(char));
-  sprintf((*f_ret).horarios, "%s", str);
+  f_ret->horarios = (char *) malloc((j+1)*sizeof(char));
+  sprintf(f_ret->horarios, "%s", str);
 
   /* next - lembra dele? :) */
-  (*f_ret).prox_filme = NULL;
+  f_ret->prox_filme = NULL;
 
   return(0);
 }
 
 
 void da_print_full_info(filme *f) {
-  printf("Id: %d\n", (*f).id);
-  printf("Titulo: %s\n", (*f).titulo);
-  printf("Sinopse: %s\n", (*f).sinopse);
-  printf("Sala: %s\n", (*f).sala);
-  printf("Horários: %s\n", (*f).horarios);
-  printf("Média: %3.2f (%d avaliações)\n", (*f).media, (*f).n_aval);
+  printf("Id: %d\n", f->id);
+  printf("Titulo: %s\n", f->titulo);
+  printf("Sinopse: %s\n", f->sinopse);
+  printf("Sala: %s\n", f->sala);
+  printf("Horários: %s\n", f->horarios);
+  printf("Média: %3.2f (%d avaliações)\n", f->media, f->n_aval);
   return;
 }
 
 void da_print_partial_info(filme *f) {
-  printf("Id: %d\n", (*f).id);
-  printf("Titulo: %s\n", (*f).titulo);
+  printf("Id: %d\n", f->id);
+  printf("Titulo: %s\n", f->titulo);
   return;
 }
 
 
 void da_free_strs(filme *f) {
-  free((*f).titulo);
-  free((*f).sinopse);
-  free((*f).sala);
-  free((*f).horarios);
+  free(f->titulo);
+  free(f->sinopse);
+  free(f->sala);
+  free(f->horarios);
   return;
 }
 
@@ -128,13 +128,13 @@ int da_free_all(filme *f) {
   da_free_strs(f);
 
   /* Condição de parada (último filme) */
-  if((*f).prox_filme == NULL) {
+  if(f->prox_filme == NULL) {
     free(f);
     return(0); /* retorna, inicializando contador */
   }
 
   /* Chamada recursiva */
-  i = da_free_all((filme *)(*f).prox_filme); /* cast pro -Wall n reclamar */
+  i = da_free_all((filme *)f->prox_filme); /* cast pro -Wall n reclamar */
 
   /* Resolvida a recursão, libera a struct e retorna */
   free(f);
@@ -220,7 +220,7 @@ int da_get_todos_filmes(filme **filmes_ret) {
 
     cursor += tam_reg; /* ajuste para a leitura do próximo reg no arq */
 
-    f = (filme *)(*f).prox_filme; /* atualiza o apontador */
+    f = (filme *)f->prox_filme; /* atualiza o apontador */
   }
 
   f = NULL; /* último registro da lista */
