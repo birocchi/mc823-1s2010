@@ -4,7 +4,7 @@ CC_FLAGS = -ggdb -Wall
 
 
 # Dependências gerais
-all: client server
+all: client server relatorio
 
 # Cliente
 client: data_access.o internet.o client.o
@@ -27,6 +27,12 @@ data_access.o: data_access.c data_access.h defines.h
 internet.o: internet.c internet.h defines.h
 	$(CC) $(CC_FLAGS) -c internet.c
 
+
+# Relatório (LaTeX)
+relatorio:
+	pdflatex relatorio.tex
+
 # Clean
 clean:
 	rm *.o client server
+	rm *.aux *.toc *.pdf *.log

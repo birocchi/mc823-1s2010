@@ -1,0 +1,101 @@
+% Exemplo de relatório técnico do IC
+% Criado por P.J.de Rezende antes do Alvorecer da História.
+% Modificado em 97-06-15 e 01-02-26 por J.Stolfi.
+% Last edited on 2003-06-07 21:12:18 by stolfi
+
+% modificado em 1o. de outubro de 2008
+
+\documentclass[11pt,twoside]{article}
+\usepackage{techrep-ic}
+\usepackage[pdftex]{graphicx}
+\usepackage{enumerate}
+
+%%% SE USAR INGLÊS, TROQUE AS ATIVAÇÕES DOS DOIS COMANDOS A SEGUIR:
+\usepackage[brazil]{babel}
+%% \usepackage[english]{babel}
+
+%%% SE USAR CODIFICAÇÃO LATIN1, TROQUE AS ATIVAÇÕES DOS DOIS COMANDOS A
+%%% SEGUIR:
+%% \usepackage[latin1]{inputenc}
+\usepackage[utf8]{inputenc}
+
+\begin{document}
+
+%%% PÁGINA DE CAPA %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% Número do relatório
+\TRNumber{45}
+
+% DATA DE PUBLICAÇÃO (PARA A CAPA)
+%
+\TRYear{10} % Dois dígitos apenas
+\TRMonth{03} % Numérico, 01-12
+
+% LISTA DE AUTORES PARA CAPA (sem afiliações).
+\TRAuthor{Birocchi, Anderson - RA: 072787 \and Braga, Felipe - RA:070803}
+
+% TÍTULO PARA A CAPA (use \\ para forçar quebras de linha).
+\TRTitle{MC823 - Laboratório de Redes\\Projeto 1: Servidor TCP Multi-usuário para Consulta a Banco de Dados de um Cinema}
+
+\TRMakeCover
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% O que segue é apenas uma sugestão - sinta-se à vontade para
+% usar seu formato predileto, desde que as margens tenham pelo
+% menos 25mm nos quatro lados, e o tamanho do fonte seja pelo menos
+% 11pt. Certifique-se também de que o título e lista de autores
+% estão reproduzidos na íntegra na página 1, a primeira depois da
+% página de capa.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Nomes de autores ABREVIADOS e titulo ABREVIADO,
+% para cabeçalhos em cada página.
+%
+\markboth{Birocchi, Braga}{MC823 - Projeto 1, Aplicação TCP}
+\pagestyle{myheadings}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% TÍTULO e NOMES DOS AUTORES, completos, para a página 1.
+% Use "\\" para quebrar linhas, "\and" para separar autores.
+%
+\title{MC823 - Projeto 1, Servidor TCP Multi-usuário para Consulta a Banco de Dados de um Cinema}
+
+\author{Anderson Birocchi, Felipe Braga}
+
+\date{}
+
+\newpage
+\tableofcontents
+\newpage
+
+\maketitle
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+\begin{abstract}
+Este projeto consiste da implementação de um sistema, que implementa comunicação em rede, baseado no paradigma cliente-servidor, motivado pela provisão de acesso a uma base de dados de filmes. O protocolo de transporte utilizado foi o TCP - \textit{Transmission Control Protocol}, e foram feitas análises quanto ao desempenho da aplicação considerando os atrasos de comunicação.
+\end{abstract}
+
+\section{Introdução}
+Nos dia de hoje é comum se ter qualquer tipo de informação de forma rápida e prática através da internet, como mapas, receitas, notícias, preços de mercado, cotação das moedas do mundo todo, etc. De tudo que se pode fazer pela internet, a área que mais cresce é a de prestação de serviços, onde já se pode fazer compras, pagar contas, fazer transações bancárias dentre várias outras coisas, e um desses tipos de serviço será implementado pelo nosso projeto.\\
+Nosso projeto irá implementar um servidor TCP multi-usuário para consultas em bancos de dados de um cinema, onde são armazenadas várias informações sobre os filmes em cartaz, como o título, sinopse, horário das sessões e as salas.\\
+O intuito é de centralizar as informações dos filmes em um único local, evitando que cada cliente tenha que ficar se sincronizando toda vez que for fazer uma consulta; além de tornar o programa cliente leve e livre da carga de processamento necessário para as consultas, permitindo assim que aparelhos com poder de processamento menor como celulares ou palm-tops também possam executar o programa sem problemas.\\
+Iremos criar os 2 aplicativos, o servidor e o cliente, e também criaremos o protocolo de comunicação entre os 2, e esse protocolo será baseado em sockets TCP programados em C.\\
+A seção 2 irá especificar o que exatamente o programa deve fazer; a seção 3 irá comentar mais detalhadamente a implementação, as definições, suposições tomadas e ferramentas utilizadas; a seção 4 irá analisar o desempenho da aplicação atraveś de várias medidas de tempo; a seção 5 irá mostrar quão confiável e consistente é a aplicação; na seção 6 encontra-se uma breve conclusão sobre o projeto e, por último, na seção 7 estará o código fonte necessário para compilar e executar o servidor e o cliente.
+
+
+\section{Casos de Uso}
+\section{Implementação}
+\section{Análise de Tempo}
+\section{Confiabilidade e Consistência}
+\section{Conclusão}
+\section{Código Fonte}
+
+\begin{thebibliography}{99}
+\bibitem{R1} HALL, Brian. Beej's Guide to Network Programming. Disponível em: http://http://beej.us/guide/bgnet/output/html/multipage/index.html.
+\end{thebibliography}
+
+\end{document}
