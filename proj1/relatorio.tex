@@ -73,6 +73,13 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\newenvironment{codelisting}
+{\begin{list}{}{\setlength{\leftmargin}{1em}}
+\item\scriptsize\bfseries}{\end{list}}
+
+\newenvironment{tinycodelisting}
+{\begin{list}{}{\setlength{\leftmargin}{1em}}\item\tiny\bfseries}
+{\end{list}}
 
 
 \begin{abstract}
@@ -145,13 +152,26 @@ Como todas as threads funcionam com a mesma função, e foi possível fazer a se
 Além disso, sendo o caso de escrita concorrente em arquivo, o semáforo é iniciado com o valor 1, permitindo que apenas uma thread possa utilizar o recurso de cada vez.
 
 
-
 \section{Análise de Tempo}
+%% TODO!!!
+
 \section{Confiabilidade e Consistência}
+Dois pontos a considerar: robustez quanto à comunicação e consistência dos dados.\\
+Tentamos fazer todas as verificações de erros possíveis nas funções das bibliotecas de comunicação com o socket, tanto no lado cliente como no servidor. Ainda assim, não conseguimos implementar um importante caso de exceção: notificar e encerrar o cliente quando o servidor "cai".\\
+Com relação à consistência dos dados, esta é garantida pela exclusão mútua nas operações de atualização de avaliação.
+
 \section{Conclusão}
+
 
 \section{Código Fonte}
 \subsection{add\_filme.sh}  % 1
+\begin{codelisting}
+\begin{verbatim}
+
+
+\end{verbatim}
+\end{codelisting}
+
 \subsection{data\_access.h} % 2
 \subsection{data\_access.c} % 3
 \subsection{internet.h}     % 4
