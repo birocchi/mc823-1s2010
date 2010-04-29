@@ -10,6 +10,8 @@
 
 #define TAM_MEDIA 6 /* abc.de (valor de 0 a 100, com 2 dígitos decimais) */
 
+#define TAM_N_AVALIACOES 4 /* cada filme pode ter até 9999 avaliações */
+
 typedef struct {
   int id;
   char *titulo;
@@ -57,3 +59,6 @@ int da_get_n_filmes();
 
 /* Retorna uma matriz com os registros todos em formato string pura */
 void da_get_raw_strings (char **registros, int *tam_registros, int n_registros);
+
+/* Avalia a nota de avaliação do filme e atualiza seu número de atualizações */
+int da_avalia_filme(int id, float nota);

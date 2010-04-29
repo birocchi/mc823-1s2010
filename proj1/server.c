@@ -192,14 +192,14 @@ void server_reg_avalia(int socket) {
   /**************************************/
   /* [Início] Região com Exclusão Mútua */
   int status;
-  sleep(10);
+  /* sleep(10); */ /* testes */
   
   /*
    * Função que realiza a avaliação:
    * Retorna 1 se o filme não existe.
    * Retorna 0 se ocorreu tudo bem.
    */
-  //status = da_avalia_filme();
+  status = da_avalia_filme(id, nota);
   /** [Fim] Região com Exclusão Mútua ***/
   /**************************************/
 

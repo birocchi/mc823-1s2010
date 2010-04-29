@@ -250,8 +250,8 @@ int da_get_n_filmes() {
 
 /* Retorna uma matriz com os registros todos em formato string pura */
 void da_get_raw_strings (char **registros, int *tam_registros, int n_registros) {
-	/* registros já é um vetor de apontadores pra strings, 
-	 cujo tamanho é o número de registros no arquivo. */
+  /* registros já é um vetor de apontadores pra strings, 
+     cujo tamanho é o número de registros no arquivo. */
   FILE *arq;
   int tam_reg, i = 0;
   long int cursor = 0; /* indice de leitura do arquivo */
@@ -275,4 +275,48 @@ void da_get_raw_strings (char **registros, int *tam_registros, int n_registros) 
   fclose(arq);
   
   return;
+}
+
+
+/* Avalia a nota de avaliação do filme e atualiza seu número de atualizações */
+int da_avalia_filme(int id, float nota) {
+  /* Retorno
+     1 - O filme com o id passado não existe
+     0 - Atualização efetuada.
+  */
+
+  int tam_reg, id_reg;
+  float media;
+  long int cursor = 0; /* indice de leitura do arquivo */
+  FILE *arq;
+
+  /* abre o arquivo com permissão para escrita */
+  arq = fopen("filmes.dat", "r+");
+
+  while(fscanf(arq, "%d@%d@%d@%3.2f@", &tam_reg, &id_reg, &n_aval, &media) != EOF) {
+    /* registro encontrado */
+    if(id_reg == id) {
+      
+
+
+      /* caminha no arquivo até o início da média */
+      fseek(arq, -7, SEEK_CUR);
+
+
+      /* caminha no arquivo até o inicio do registro */
+      fseek(arq, cursor, SEEK_SET);
+      fgets(f_str, tam_reg, arq);
+      *tamanho = tam_reg;
+      fclose(arq);
+      return(0);
+    } else {
+      cursor += tam_reg;
+      fseek(arq, cursor, SEEK_SET);
+    }
+  } /* só vai sair do while se não encontrar o filme */
+  
+  fclose(arq);
+  
+  return(1);
+
 }
