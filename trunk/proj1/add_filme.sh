@@ -25,3 +25,4 @@ fi
 echo -n $tam_reg\@$id\@0000\@000\.00\@$titulo\@$sinopse\@$sala\@$horarios\@ >> filmes.dat
 
 echo "Registro adicionado com sucesso!"
+
