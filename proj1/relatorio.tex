@@ -88,11 +88,56 @@ A seção 2 irá especificar o que exatamente o programa deve fazer; a seção 3
 
 
 \section{Casos de Uso}
+Primeiramente, devemos especificar o que a aplicação deve fazer, portanto segue abaixo uma listagem de 6 ações que serão implementadas. Nota: as ações com (*) precisam receber um identificador numérico do filme como entrada.\\
+As ações sempre serão tomadas pelo cliente, sendo o servidor apenas quem irá processar o pedido. O resultado da ação apenas é vista pelo cliente que a iniciou, deixando o servidor totalmente à parte do que está acontecendo do lado dos seus clientes.
+\subsection{Listar todas as informações de todos os filmes}
+Mostrar o ID, título, sinopse, horário das sessões e as salas de todos os filmes cadastrados no banco de dados do servidor.
+\subsection{Listar ID e título de todos os filmes}
+Fazer uma busca rápida de todos os títulos e seus IDs, mais utilizado para auxiliar em futuras consultas, e utilização dos próximos casos de uso.
+\subsection{Listar todas as informações de um filme (*)}
+Buscar todas as informações sobre o filme com o dado ID.
+\subsection{Mostrar a sinopse de um filme (*)}
+Mostrar a sinopse completa do filme com o dado ID.
+\subsection{Mostrar a avaliação de um filme (*)}
+Mostrar a quantidade de votos o filme teve e qual foi a pontuação obtida.
+\subsection{Avaliar um filme (*)}
+Dar uma pontuação ao filme com o dado ID.
+
+
+
 \section{Implementação}
+O sistema é desenvolvido na linguagem C, utiliza as bibliotecas de sockets TCP para fazer a comunicação pela rede, gerencia as várias conexões com threads da biblioteca pthreads.h e faz controle de exclusão mútua através de semáforos da biblioteca semaphore.h.\\
+Primeiramente vamos explicar como foi implementado o banco de dados e suas operações, e depois explicar como é feita a comunicação entre o servidor e o cliente, qual protocolo seguem, como são distribuídas as conexões entre as threads e quando e como são criadas.\\
+Basicamente, o funcionamento do sistema é: o servidor fica em um laço infinito, aguardando requisições de conexão; o cliente estabelece essa conexão; inicia-se uma sequencia de requisições do cliente e respostas por parte do servidor; cliente encerra o uso.\\
+Para organizar a discussão sobre a implementação, vamos tratar de tópicos separamente.
+
+\subsection{Dados}
+\subsubsection{Armazenamento (banco de dados)}
+Ao invés de usar um sistema de gerenciamento de banco de dados (SGDB) optamos, pela praticidade, armazenar todos os nossos dados em um arquivo de texto puro chamado "filmes.dat" onde os campos que contém os atributos de um filme são separados pelo caractere '@' . Um registro da base de dados tem o seguinte formato:\\
+\textit{tamanho do registro@ID@avaliações@média@título@sinopse@sala@horários@}\\
+Com relação aos tipos dos dados, \textit{tamanho do registro} e \textit{ID} são numéricos, inteiros, de tamanho variável com limites de 1024 para o primeiro e $10^{20}$ - 1 para o segundo.\\
+\textit{Número de avaliações} e \textit{média} são numéricos, com o primeiro inteiro até 9999 e o segundo, ponto flutuante de 0 a 999, com duas casas decimais (000.00 a 999.99).\\
+\textit{Título} (30), \textit{Sinopse} (900), \textit{Sala} (20) e \textit{Horários} (20) são cadeias de caracteres (\textit{strings}), com seus respectivos tamanhos citados.\\
+Segue um exemplo de uma entrada no banco de dados:\\
+\textit{279@1@0000@000.00@Rei Leão@Sinopse do filme@sala10@10h, 12h30, 15h@}\\
+Nota: Para facilitar a inserção de novos filmes no sistema, foi feito um script (add\_filme.sh) que pode ser visto na seção 7.1.
+\subsubsection{Estruturas de dados}
+
+
+\subsection{Comunicação Cliente-Servidor}
+\subsection{Concorrência}
+\subsection{Exclusão Mútua}
+
+
+
+
+
 \section{Análise de Tempo}
 \section{Confiabilidade e Consistência}
 \section{Conclusão}
+
 \section{Código Fonte}
+\subsection{add\_filme.sh}
 
 \begin{thebibliography}{99}
 \bibitem{R1} HALL, Brian. Beej's Guide to Network Programming. Disponível em: http://http://beej.us/guide/bgnet/output/html/multipage/index.html.
