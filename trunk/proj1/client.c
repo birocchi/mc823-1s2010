@@ -288,16 +288,16 @@ void client_reg_media(int socketfd) {
 /* ## 6 ## */
 void client_reg_avalia(int socketfd) {
 
-  char c, id_avaliar[TAM_REG_ID] /*20*/, nota[TAM_MEDIA]/*6*/;
-  int i = 0, j = 0;
+  char c, id_avaliar[TAM_REG_ID] /*20*/, nota[7];
+  int i, j;
 
   /* Leitura do id do filme para avaliar e nota */
   printf("ID do filme a avaliar: ");
-  c = getchar();
+  i = 0; c = getchar();
   while (c!='\n') { id_avaliar[i] = c; i++; c = getchar(); }
   id_avaliar[i] = '@'; /* coloca um @ para finalizar o id */
   printf("Nota [formato: abc.de]: ");
-  c = getchar();
+  j = 0; c = getchar();
   while (c!='\n') { nota[j] = c; j++; c = getchar(); }
   nota[j] = '@'; /* coloca um @ para finalizar a nota*/
 

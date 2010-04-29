@@ -160,20 +160,33 @@ void server_reg_media(int socket) {
 void server_reg_avalia(int socket) {
 
   /* servidor lê o ID que está sendo passado */
-  char c, id_avaliar[TAM_REG_ID] /*20*/, nota_s[TAM_MEDIA]/*6*/;
-  int i = 0, tam_reg;
+  char c, id_avaliar[TAM_REG_ID] /*20*/, nota_s[7];
+  int i = 0;
 
   /* leitura do ID requisitado pelo cliente p/ avaliação */
-  c = socket_pop_char(socket);
-  while (c!='@') { id_avaliar[i] = c; c = socket_pop_char(socket); i++; }
+  do { 
+    c = socket_pop_char(socket);
+  } while (c=='\0'); /* limpa stream */
+  while (c!='@') {
+    id_avaliar[i] = c;
+    c = socket_pop_char(socket);
+    i++;
+  }
   id_avaliar[i] = '\0';
 
   int id;
   id = atoi(id_avaliar);
 
   /* leitura da nota */
-  c = socket_pop_char(socket);
-  while (c!='@') { nota_s[i] = c; c = socket_pop_char(socket); i++; }
+  i = 0;
+  do { 
+    c = socket_pop_char(socket);
+  } while (c=='\0'); /* limpa stream */
+  while (c!='@') {
+    nota_s[i] = c;
+    c = socket_pop_char(socket);
+    i++;
+  }
   nota_s[i] = '\0';
 
   float nota;
@@ -181,6 +194,7 @@ void server_reg_avalia(int socket) {
 
   printf("  id p/ avaliar: %d\n", id);
 
+  printf("  nota enviada: %06.2f", nota);
 
   /* 
    * Importante: Uso do semáforo para controle de concorrência

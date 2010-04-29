@@ -97,7 +97,7 @@ void da_print_full_info(filme *f) {
   printf("Sinopse: %s\n", f->sinopse);
   printf("Sala: %s\n", f->sala);
   printf("Horários: %s\n", f->horarios);
-  printf("Média: %3.2f (%d avaliações)\n", f->media, f->n_aval);
+  printf("Média: %06.2f (%d avaliações)\n", f->media, f->n_aval);
   return;
 }
 
@@ -285,7 +285,7 @@ int da_avalia_filme(int id, float nota) {
      0 - Atualização efetuada.
   */
 
-  int tam_reg, id_reg;
+  int tam_reg, id_reg, n_aval;
   float media;
   long int cursor = 0; /* indice de leitura do arquivo */
   FILE *arq;
@@ -293,20 +293,20 @@ int da_avalia_filme(int id, float nota) {
   /* abre o arquivo com permissão para escrita */
   arq = fopen("filmes.dat", "r+");
 
-  while(fscanf(arq, "%d@%d@%d@%3.2f@", &tam_reg, &id_reg, &n_aval, &media) != EOF) {
+  while(fscanf(arq, "%d@%d@%d@%f@", &tam_reg, &id_reg, &n_aval, &media) != EOF) {
     /* registro encontrado */
     if(id_reg == id) {
+      /* Cálculo da nova média para o filme */
+      float nova_media;
+      nova_media = (media*n_aval + nota)/(n_aval+1);
+      printf("  thread diz: média antiga %06.2f; nova %06.2f\n", media, nova_media);
       
+      /* caminha no arquivo até o início do número de avaliações */
+      fseek(arq, -(2/*@s*/ + TAM_MEDIA + TAM_N_AVALIACOES), SEEK_CUR);
 
+      /* Atualização dos valores: número de avaliações e média */
+      fprintf(arq, "%04d@%06.2f@", n_aval+1, nova_media);
 
-      /* caminha no arquivo até o início da média */
-      fseek(arq, -7, SEEK_CUR);
-
-
-      /* caminha no arquivo até o inicio do registro */
-      fseek(arq, cursor, SEEK_SET);
-      fgets(f_str, tam_reg, arq);
-      *tamanho = tam_reg;
       fclose(arq);
       return(0);
     } else {
