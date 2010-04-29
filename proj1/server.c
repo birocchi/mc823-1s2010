@@ -292,7 +292,7 @@ void *trata_conexao (void *a) {
 
 //Trata o sinal de interrupcao mandar uma mensagem antes de encerrar
 void trata_SIGINT(int sig) {
-  printf("\nFechando socket e encerrando o servidor!\n");
+  printf("\nEncerrando o servidor...\n");
   /* Mesmo usando o socket de listen como variável global, e dando
      um close(list_socket) aqui, continua com o problema do bind depois de
      interromper o servidor. Isso acontece por causa da implementação do TCP
