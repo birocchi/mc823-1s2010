@@ -13,11 +13,6 @@
 #include <netinet/in.h>
 #include <unistd.h>
 
-char buffer[TAM_BUFFER];     
-
-char mensagem[TAM_MENSAGEM] = "Cliente diz: Senhor, me da uma esmola?!";
-
-
 /* Função auxiliar para tratamento de entrada */
 char read_option() {
   /* considera os possiveis erros e só sai quando o usuario
