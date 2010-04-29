@@ -170,7 +170,10 @@ Tentamos fazer todas as verificações de erros possíveis nas funções das bib
 Com relação à consistência dos dados, esta é garantida pela exclusão mútua nas operações de atualização de avaliação.
 
 \section{Conclusão}
-
+Podemos considerar que a aplicação já está totalmente funcional, todas as consultas estão funcionando corretamente, há a garantia da consistência do banco de dados do cinema e a comunicação entre cliente e servidor está boa, exceto no caso em que o servidor cai, deixando o cliente esperando por uma resposta.
+Por utilizar o protocolo TCP, a comunicação possui todas as suas vantagens, como confiabilidade na transferência de pacotes, controle de fluxo e controle de congestionamento, o que garante uma qualidade maior à aplicação.
+Podemos dizer também que fomos felizes ao utilizar um controle de conexões por threads, pois fica mais fácil de controlar do que com processos, já que quando o processo principal termina, todas as threads também terminam, evitando assim processos zumbi, além de ser mais fácil se implementar exclusão mútua de threads, por exemplo, com semáforos ou mutex lock.
+Nosso servidor de banco de dados de cinema ainda não é um sistema completo e bem acabado, mas já provê uma base sólida para implementar aplicações gráficas e de maior porte, utilizando o servidor como o núcleo da aplicação. Pretendemos, em versões posteriores, melhorar o programa, resolver bugs e talvez, utilizar uma biblioteca gráfica para tornar sua interface mais usável. 
 
 \section{Código Fonte}
 
