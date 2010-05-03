@@ -355,13 +355,13 @@ int main(int argc, char** argv) {
     switch(c) {
 	
     case LISTAR_TODOS_COMPLETO:
-      gettimeofday(&tv1, NULL); /* lê o t1 */
+//      gettimeofday(&tv1, NULL); /* lê o t1 */
       client_lista_todos_completo(socketfd);
-      gettimeofday(&tv2, NULL); /* lê o t2 */
-      timersub(&tv2, &tv1, &tvres); /* resposta = t2 - t1 */
-      total_time = tvres.tv_sec*1000000 + tvres.tv_usec; /* resposta em micro-segundos */
+      //gettimeofday(&tv2, NULL); /* lê o t2 */
+      //timersub(&tv2, &tv1, &tvres); /* resposta = t2 - t1 */
+      //total_time = tvres.tv_sec*1000000 + tvres.tv_usec; /* resposta em micro-segundos */
       /* manda o tempo para a saída padrão de erro: coleta para um arquivo (via shell) */
-      fprintf(stderr, "%.0Lf\n", (long double) total_time );
+      //fprintf(stderr, "%.0Lf\n", (long double) total_time );
       break;
     case LISTAR_TODOS:
       client_lista_todos(socketfd);

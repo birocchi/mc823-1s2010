@@ -114,14 +114,10 @@ Dar uma pontuação ao filme com o dado ID.
 O sistema é desenvolvido na linguagem C, utiliza as bibliotecas de sockets TCP para fazer a comunicação pela rede, gerencia as várias conexões com threads da biblioteca pthreads.h e faz controle de exclusão mútua através de semáforos da biblioteca semaphore.h.\\
 Primeiramente vamos explicar como foi implementado o banco de dados e suas operações, e depois explicar como é feita a comunicação entre o servidor e o cliente, qual protocolo seguem, como são distribuídas as conexões entre as threads e quando e como são criadas.\\
 Basicamente, o funcionamento do sistema é: o servidor fica em um laço infinito, aguardando requisições de conexão; o cliente estabelece essa conexão; inicia-se uma sequencia de requisições do cliente e respostas por parte do servidor; cliente encerra o uso.\\
-%%%%%%%%
-% TODO
-%%%%%%%%
-No fim, a quantidade de linhas de código de todos os arquivos do sistema (*.c e *.h) é: .\\
-%%%%%%%%
-% \TODO
-%%%%%%%%
-Para organizar a discussão sobre a implementação, vamos tratar de tópicos separamente.
+
+No fim, a quantidade de linhas de código de todos os arquivos do sistema (*.c e *.h) é 1461, o que já não é um programa simples, porém ainda está longe de ser uma grande aplicação.\\
+
+Para organizar a discussão sobre a implementação, vamos tratar de tópicos separamente.\\
 
 \subsection{Dados}
 \subsubsection{Armazenamento (banco de dados)}
@@ -158,47 +154,63 @@ Além disso, sendo o caso de escrita concorrente em arquivo, o semáforo é inic
 
 
 \section{Análise de Tempo}
-Para a análise de tempo, foram consideradas duas operações a serem analisadas: comunicação e consulta/atualização local.\\
-%%%%%%%%
-% TODO
-%%%%%%%%
-Explicação do jeito como foi feita a contagem do tempo (falar sobre o gettimeofday...)
-%%%%%%%%
-% TODO
-%%%%%%%%
+Para a análise de tempo, foram consideradas duas operações a serem analisadas: tempo de comunicação (RTT) e consulta ao servidor.\\
+Para se obter uma boa precisão, foi utilizada a função "gettimeofday", que tem a precisão em microsegundos, o que já é boa o suficiente para nossa aplicação. A função pega o tempo atual em que foi chamada, portanto, para calcular o tempo de alguma operação, basta calcular o tempo antes e depois da operação e calcular a diferença entre eles.\\
 Foram usadas duas configurações:\\
 \textbf{Configuração 1: }Dois computadores presentes na mesma sub-rede (SIFEEC).\\
-IP local: ???.???.???.???\\
-IP remoto: ???.???.???.???\\
-%% TODO: execução do traceroute
-%% essa que coloquei é um exemplo; não usar esses valores, pq estou no IC de uma máquina pra outra daqui
-\begin{verbatim}
-[ra070803@dickens proj1]$ traceroute bocaccio
-traceroute to bocaccio (143.106.16.211), 30 hops max, 60 byte packets
- 1  bocaccio.lab.ic.unicamp.br (143.106.16.211)  1.372 ms  1.369 ms  1.358 ms
-\end{verbatim}
+IP local: 143.106.150.81\\
+IP remoto: 143.106.150.80\\
 \textbf{Configuração 2: }Um computador no laboratório do IC3 e outro no SIFEEC.\\
+IP local: 143.106.150.81\\
+IP remoto: 143.106.16.163 (xaveco)\\
 \begin{verbatim}
-Acessar o IC por ssh, dar um traceroute do IC pro IP da máquina da FEEC e copiar o resultado aqui.
+[ra070803@xaveco ~]$ traceroute 143.106.150.81
+traceroute to 143.106.150.81 (143.106.150.81), 30 hops max, 60 byte packets
+ 1  routeric3.lab.ic.unicamp.br (143.106.16.148)  2.786 ms  5.378 ms  7.860 ms
+ 2  143.106.16.150 (143.106.16.150)  0.094 ms  0.069 ms  0.067 ms
+ 3  143.106.7.129 (143.106.7.129)  0.158 ms  0.119 ms  0.120 ms
+ 4  area3-gw.unicamp.br (143.106.1.129)  0.668 ms  0.819 ms  1.020 ms
+ 5  ptp-nct-nbs.unicamp.br (143.106.199.13)  0.542 ms  0.735 ms  0.920 ms
+ 6  fee-gw.unicamp.br (143.106.1.10)  0.979 ms  1.263 ms  1.636 ms
+ 7  le20-17.grad.fee.unicamp.br (143.106.150.81)  1.999 ms  1.978 ms  2.346 ms
+[ra070803@xaveco ~]$
 \end{verbatim}
-\textit{Observação: }Todos os tempos que serão mostrados nas próximas seções estão em micro-segundos.
+\textit{Observação: }Todos os tempos que serão mostrados nas próximas seções estão em micro-segundos, e pode-se verificar todos os valores encontrados na seção de Anexos.\\
 
-\subsection{Tempo de Comunicação}
-\subsubsection{Estabelecimento de conexão}
+\subsection{Tempo de Comunicação - RTT}
 Tempo decorrido entre o cliente chamar a função para conectar ao servidor e a resposta deste.\\
 \textbf{Configuração 1: }\\
-
+Média do tempo de RTT: \textbf{274,16 us}\\
+Desvio padrão: \textbf{10,72 us}\\
 \textbf{Configuração 2: }\\
+Média do tempo de RTT: \textbf{1601,7 us}\\
+Desvio padrão: \textbf{1697,68 us}\\
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=15cm]{rtt.png} 
+  \caption{Representação das medições para o RTT.}
+  \label{fig:rtt}
+\end{figure}
 
-\subsubsection{Transmissão de caractere único}
-\subsubsection{Transmissão de buffer}
-\subsubsection{Transmissão de sequencia, caractere por caractere}
+\subsection{Tempo de Consulta}
+Tempo decorrido entre o cliente realizar o caso de uso 1 (consulta completa de todos os filmes do banco de dados).\\
+\textbf{Configuração 1: }\\
+Média do tempo de RTT: \textbf{1769,16 us}\\
+Desvio padrão: \textbf{432,29 us}\\
+\textbf{Configuração 2: }\\
+Média do tempo de RTT: \textbf{9390,89 us}\\
+Desvio padrão: \textbf{9758,98 us}\\
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=15cm]{consulta.png} 
+  \caption{Representação das medições para a consulta.}
+  \label{fig:rtt}
+\end{figure}
 
-\subsection{Tempo de Operações Locais do Servidor}
-\subsubsection{Tempo de Seleção de Registro no Arquivo}
-\subsubsection{Tempo de Atualização de Média (Avaliação)}
-\subsubsection{Tempo de Operação para server\_lista\_todos\_completo()}
 
+Pode-se verificar a diferença considerável entre os tempos de RTT para as duas configurações. Obviamente, o tempo para abertura da conexão foi maior para a segunda 
+configuração, já que os pacotes devem ser transmitidos através de roteadores e enlaces adicionais, como mostrado no resultado do traceroute acima.\\
+De modo a comprovar a influência do tráfego na rede, é visível a grande diferença entre os desvios padrão em porcentagem com relação ao valor absoluto.\\
 
 
 \section{Confiabilidade e Consistência}
@@ -207,9 +219,11 @@ Tentamos fazer todas as verificações de erros possíveis nas funções das bib
 Com relação à consistência dos dados, esta é garantida pela exclusão mútua nas operações de atualização de avaliação.
 
 \section{Conclusão}
-Podemos considerar que a aplicação já está totalmente funcional, todas as consultas estão funcionando corretamente, há a garantia da consistência do banco de dados do cinema e a comunicação entre cliente e servidor está boa, exceto no caso em que o servidor cai, deixando o cliente esperando por uma resposta.
-Por utilizar o protocolo TCP, a comunicação possui todas as suas vantagens, como confiabilidade na transferência de pacotes, controle de fluxo e controle de congestionamento, o que garante uma qualidade maior à aplicação.
-Podemos dizer também que fomos felizes ao utilizar um controle de conexões por threads, pois fica mais fácil de controlar do que com processos, já que quando o processo principal termina, todas as threads também terminam, evitando assim processos zumbi, além de ser mais fácil se implementar exclusão mútua de threads, por exemplo, com semáforos ou mutex lock.
+Podemos considerar que a aplicação já está totalmente funcional, todas as consultas estão funcionando corretamente, há a garantia da consistência do banco de dados do cinema e a comunicação entre cliente e servidor está boa, exceto no caso em que o servidor cai, deixando o cliente esperando por uma resposta.\\
+Por utilizar o protocolo TCP, a comunicação possui todas as suas vantagens, como confiabilidade na transferência de pacotes, controle de fluxo e controle de congestionamento, o que garante uma qualidade maior à aplicação.\\
+A análise de tempo também cumpriu com as espectativas, tendo uma média e um desvio padrão mais baixo para redes próximas e valores mais altos para redes mais distantes.\\
+Ao fazer a aplicação em C, o nível de abstração não foi muito alto, pois tivemos que tratar muitos detalhes das conexões.\\
+Podemos dizer também que fomos felizes ao utilizar um controle de conexões por threads, pois fica mais fácil de controlar do que com processos, já que quando o processo principal termina, todas as threads também terminam, evitando assim processos zumbi, além de ser mais fácil se implementar exclusão mútua de threads, por exemplo, com semáforos ou mutex lock.\\
 Nosso servidor de banco de dados de cinema ainda não é um sistema completo e bem acabado, mas já provê uma base sólida para implementar aplicações gráficas e de maior porte, utilizando o servidor como o núcleo da aplicação. Pretendemos, em versões posteriores, melhorar o programa, resolver bugs e talvez, utilizar uma biblioteca gráfica para tornar sua interface mais usável. 
 
 \section{Código Fonte}
@@ -1802,7 +1816,13 @@ clean:
   rm *.aux *.toc *.pdf *.log
 \end{verbatim}
 
-
+\section{Anexo}
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=15cm]{medicoes.png} 
+  \caption{Representação das medições para a consulta.}
+  \label{fig:rtt}
+\end{figure}
 
 \begin{thebibliography}{99}
 \bibitem{R1} HALL, Brian. Beej's Guide to Network Programming. Disponível em: http://http://beej.us/guide/bgnet/output/html/multipage/index.html.
