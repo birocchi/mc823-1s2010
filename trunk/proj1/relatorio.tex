@@ -114,6 +114,13 @@ Dar uma pontuação ao filme com o dado ID.
 O sistema é desenvolvido na linguagem C, utiliza as bibliotecas de sockets TCP para fazer a comunicação pela rede, gerencia as várias conexões com threads da biblioteca pthreads.h e faz controle de exclusão mútua através de semáforos da biblioteca semaphore.h.\\
 Primeiramente vamos explicar como foi implementado o banco de dados e suas operações, e depois explicar como é feita a comunicação entre o servidor e o cliente, qual protocolo seguem, como são distribuídas as conexões entre as threads e quando e como são criadas.\\
 Basicamente, o funcionamento do sistema é: o servidor fica em um laço infinito, aguardando requisições de conexão; o cliente estabelece essa conexão; inicia-se uma sequencia de requisições do cliente e respostas por parte do servidor; cliente encerra o uso.\\
+%%%%%%%%
+% TODO
+%%%%%%%%
+No fim, a quantidade de linhas de código de todos os arquivos do sistema (*.c e *.h) é: .\\
+%%%%%%%%
+% \TODO
+%%%%%%%%
 Para organizar a discussão sobre a implementação, vamos tratar de tópicos separamente.
 
 \subsection{Dados}
@@ -151,8 +158,38 @@ Além disso, sendo o caso de escrita concorrente em arquivo, o semáforo é inic
 
 
 \section{Análise de Tempo}
-Para a análise de tempo, foram consideradas duas operações a serem analisadas: comunicação e consulta/atualização local.
+Para a análise de tempo, foram consideradas duas operações a serem analisadas: comunicação e consulta/atualização local.\\
+%%%%%%%%
+% TODO
+%%%%%%%%
+Explicação do jeito como foi feita a contagem do tempo (falar sobre o gettimeofday...)
+%%%%%%%%
+% TODO
+%%%%%%%%
+Foram usadas duas configurações:\\
+\textbf{Configuração 1: }Dois computadores presentes na mesma sub-rede (SIFEEC).\\
+IP local: ???.???.???.???\\
+IP remoto: ???.???.???.???\\
+%% TODO: execução do traceroute
+%% essa que coloquei é um exemplo; não usar esses valores, pq estou no IC de uma máquina pra outra daqui
+\begin{verbatim}
+[ra070803@dickens proj1]$ traceroute bocaccio
+traceroute to bocaccio (143.106.16.211), 30 hops max, 60 byte packets
+ 1  bocaccio.lab.ic.unicamp.br (143.106.16.211)  1.372 ms  1.369 ms  1.358 ms
+\end{verbatim}
+\textbf{Configuração 2: }Um computador no laboratório do IC3 e outro no SIFEEC.\\
+\begin{verbatim}
+Acessar o IC por ssh, dar um traceroute do IC pro IP da máquina da FEEC e copiar o resultado aqui.
+\end{verbatim}
+\textit{Observação: }Todos os tempos que serão mostrados nas próximas seções estão em micro-segundos.
+
 \subsection{Tempo de Comunicação}
+\subsubsection{Estabelecimento de conexão}
+Tempo decorrido entre o cliente chamar a função para conectar ao servidor e a resposta deste.\\
+\textbf{Configuração 1: }\\
+
+\textbf{Configuração 2: }\\
+
 \subsubsection{Transmissão de caractere único}
 \subsubsection{Transmissão de buffer}
 \subsubsection{Transmissão de sequencia, caractere por caractere}
