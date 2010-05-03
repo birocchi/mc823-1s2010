@@ -13,6 +13,9 @@
 #include <netinet/in.h>
 #include <unistd.h>
 
+#include <sys/time.h>
+#include <time.h>
+
 /* Função auxiliar para tratamento de entrada */
 char read_option() {
   /* considera os possiveis erros e só sai quando o usuario
@@ -108,8 +111,8 @@ void client_lista_todos_completo(int socketfd) {
   /* libera a memória dos filmes */
   da_free_all(lista_filmes);
 
-  printf("Tecle Enter para continuar...");
-  getchar();
+  //printf("Tecle Enter para continuar...");
+  //getchar();
 
   return;
 }
@@ -325,6 +328,9 @@ void client_reg_avalia(int socketfd) {
 
 int main(int argc, char** argv) {
 
+  struct timeval tv1, tv2, tvres;
+  long double total_time;
+
   /* Caso não haja o nome do servidor, da um erro */
   if (argc != 2) {
     fprintf(stderr, "uso: ./client <nome do servidor>\n");
@@ -349,7 +355,13 @@ int main(int argc, char** argv) {
     switch(c) {
 	
     case LISTAR_TODOS_COMPLETO:
+      gettimeofday(&tv1, NULL); /* lê o t1 */
       client_lista_todos_completo(socketfd);
+      gettimeofday(&tv2, NULL); /* lê o t2 */
+      timersub(&tv2, &tv1, &tvres); /* resposta = t2 - t1 */
+      total_time = tvres.tv_sec*1000000 + tvres.tv_usec; /* resposta em micro-segundos */
+      /* manda o tempo para a saída padrão de erro: coleta para um arquivo (via shell) */
+      fprintf(stderr, "%.0Lf\n", (long double) total_time );
       break;
     case LISTAR_TODOS:
       client_lista_todos(socketfd);
