@@ -40,16 +40,16 @@ int client_get_connection(char **argv) {
 
   /* faz a conexão com o socket do servidor */
   /* inicia contagem do tempo */
-  struct timeval tv1, tv2, tvres;
-  long double total_time;
+  //struct timeval tv1, tv2, tvres;
+  //long double total_time;
 
-  gettimeofday(&tv1, NULL); /* lê o t1 */
+  //gettimeofday(&tv1, NULL); /* lê o t1 */
   status = connect(socketfd, servinfo->ai_addr, servinfo->ai_addrlen);
-  gettimeofday(&tv2, NULL); /* lê o t2 */
-  timersub(&tv2, &tv1, &tvres); /* resposta = t2 - t1 */
-  total_time = tvres.tv_sec*1000000 + tvres.tv_usec; /* resposta em micro-segundos */
+  //gettimeofday(&tv2, NULL); /* lê o t2 */
+  //timersub(&tv2, &tv1, &tvres); /* resposta = t2 - t1 */
+  //total_time = tvres.tv_sec*1000000 + tvres.tv_usec; /* resposta em micro-segundos */
   /* manda o tempo para a saída padrão de erro: coleta para um arquivo (via shell) */
-  fprintf(stderr, "%.0Lf ", (long double) total_time );
+  //fprintf(stderr, "%.0Lf\n", (long double) total_time );
 
   /* Caso dê algum erro na conexão, pára o cliente */
   if (status == -1){
