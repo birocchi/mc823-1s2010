@@ -359,50 +359,62 @@ int main(int argc, char** argv) {
 	*/
 	
 
+
+	char msg[7] = "Oi! :-)";
+	int tam = 7;
+
+	send(socketfd, msg, tam, 0);
+
+	char buffer[100];
+	recv(socketfd, buffer, 99, 0);
+	buffer[10] = '\0';
+	printf("Resposta do servidor: %s\n", buffer);
+
+
   /* Loop da interface e chamadas para as funções que implementam 
 		 cada uso do sistema. */
-  char c;
+/*   char c; */
 		
-  c = read_option();
+/*   c = read_option(); */
     
-  /* Envia a opção escolhida ao servidor (mesmo se for Sair) */
-  client_send_option(socketfd, c);
+/*   /\* Envia a opção escolhida ao servidor (mesmo se for Sair) *\/ */
+/*   client_send_option(socketfd, c); */
 
-  while(c != SAIR) {
+/*   while(c != SAIR) { */
       
-    switch(c) {
+/*     switch(c) { */
 	
-    case LISTAR_TODOS_COMPLETO:
-      //gettimeofday(&tv1, NULL); /* lê o t1 */
-      client_lista_todos_completo(socketfd);
-      //gettimeofday(&tv2, NULL); /* lê o t2 */
-      //timersub(&tv2, &tv1, &tvres); /* resposta = t2 - t1 */
-      //total_time = tvres.tv_sec*1000000 + tvres.tv_usec; /* resposta em micro-segundos */
-      /* manda o tempo para a saída padrão de erro: coleta para um arquivo (via shell) */
-      //fprintf(stderr, "%.0Lf\n", (long double) total_time );
-      break;
-    case LISTAR_TODOS:
-      client_lista_todos(socketfd);
-      break;
-    case REG_COMPLETO:
-      client_reg_completo(socketfd);
-      break;
-    case REG_SINOPSE:
-      client_reg_sinopse(socketfd);
-      break;
-    case REG_MEDIA:
-      client_reg_media(socketfd);
-      break;
-    case REG_AVALIAR:
-      client_reg_avalia(socketfd);
-      break;
+/*     case LISTAR_TODOS_COMPLETO: */
+/*       //gettimeofday(&tv1, NULL); /\* lê o t1 *\/ */
+/*       client_lista_todos_completo(socketfd); */
+/*       //gettimeofday(&tv2, NULL); /\* lê o t2 *\/ */
+/*       //timersub(&tv2, &tv1, &tvres); /\* resposta = t2 - t1 *\/ */
+/*       //total_time = tvres.tv_sec*1000000 + tvres.tv_usec; /\* resposta em micro-segundos *\/ */
+/*       /\* manda o tempo para a saída padrão de erro: coleta para um arquivo (via shell) *\/ */
+/*       //fprintf(stderr, "%.0Lf\n", (long double) total_time ); */
+/*       break; */
+/*     case LISTAR_TODOS: */
+/*       client_lista_todos(socketfd); */
+/*       break; */
+/*     case REG_COMPLETO: */
+/*       client_reg_completo(socketfd); */
+/*       break; */
+/*     case REG_SINOPSE: */
+/*       client_reg_sinopse(socketfd); */
+/*       break; */
+/*     case REG_MEDIA: */
+/*       client_reg_media(socketfd); */
+/*       break; */
+/*     case REG_AVALIAR: */
+/*       client_reg_avalia(socketfd); */
+/*       break; */
 			
-    }
+/*     } */
     
-    c = read_option();
-    client_send_option(socketfd, c);
+/*     c = read_option(); */
+/*     client_send_option(socketfd, c); */
 
-  }
+/*   } */
 	
   close(socketfd); // fecha a conexão com o servidor
   return(0);

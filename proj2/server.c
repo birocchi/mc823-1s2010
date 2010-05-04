@@ -306,13 +306,13 @@ void trata_SIGINT(int sig) {
 
 int main() {
 
-  int listen_socketfd, connect_socketfd; // Sockets de escuta e de conexao
+  int socketfd; /* Socket único do servidor */
 
   signal(SIGINT,trata_SIGINT);
 
   int status;
   struct addrinfo opcoes;
-  struct addrinfo *servinfo;  // Informações do meu endereço
+  struct addrinfo *servinfo; // Informações do meu endereço
 
   memset(&opcoes, 0, sizeof(opcoes)); // zera a estrutura
   opcoes.ai_family = AF_INET;         // IPv4
@@ -325,18 +325,41 @@ int main() {
     exit(1);
   }
 
-  // cria o socket TCP de escuta
-  listen_socketfd = socket(servinfo->ai_family, servinfo->ai_socktype, servinfo->ai_protocol);
-  printf("Socket TCP de escuta criado!\n");
+  /* Cria o socket e o associa a uma porta */
+  socketfd = socket(servinfo->ai_family, servinfo->ai_socktype, 
+										servinfo->ai_protocol);
   
-  //Atribui a porta utilizada ao socket de escuta
-  status = bind(listen_socketfd, servinfo->ai_addr, servinfo->ai_addrlen); 
+  status = bind(socketfd, servinfo->ai_addr, servinfo->ai_addrlen);
   if (status == -1) {
     fprintf(stderr, "error on binding the socket to a port\n");
     exit(1);
   }
-  freeaddrinfo(servinfo); // libera a estrutura de informações do servidor
+  freeaddrinfo(servinfo);
+  printf("Socket UDP criado!\n");
 
+	
+	char buffer[100];
+	int tam_msg;
+	struct sockaddr_storage client_addr;
+	size_t client_addr_len;
+
+	client_addr_len = sizeof(client_addr); /* necessário */
+	
+	/* Quando a função retornar, client_addr e client_addr_len
+		 estarão setados. */
+	status = recvfrom(socketfd, buffer, 99, 0,	(struct socket_addr *)
+					 &client_addr, &client_addr_len);
+	
+	buffer[7] = '\0';
+	
+	printf("Mensagem: %s\n", buffer);
+
+	
+	char resposta[10] = "Fala mano!";
+	
+	sendto(socketfd, resposta, 10, 0, (struct socket_addr *)
+				 &client_addr, client_addr_len);
+	
   /* Atribui o socket como ouvinte das conexões. */
   //NÃO EH MAIS NECESSARIO DAR LISTEN!//
   //listen(listen_socketfd, QTDE_CONEXOES);
@@ -344,58 +367,58 @@ int main() {
   /* Inicializa o semáforo. O número de recursos compartilhados é 1 (apenas uma thread 
      pode usar o arquivo para escrita de cada vez) - este é o terceiro argumento. 
      O segundo argumento é uma flag com valor padrão 0. */
-  sem_init(&semaphore, 0, 1);
+/*   sem_init(&semaphore, 0, 1); */
 
 
-  /* Threads Time! */
-  //  pthread_t thread;
-  pthread_t threads[QTDE_CONEXOES];
-  int i, t;
+/*   /\* Threads Time! *\/ */
+/*   //  pthread_t thread; */
+/*   pthread_t threads[QTDE_CONEXOES]; */
+/*   int i, t; */
 
-  /* Inicializa o vetor de threds disponíveis */
-  for (i = 0; i < QTDE_CONEXOES; i++) available_thrs[i] = TRUE;
+/*   /\* Inicializa o vetor de threds disponíveis *\/ */
+/*   for (i = 0; i < QTDE_CONEXOES; i++) available_thrs[i] = TRUE; */
 
-  struct sockaddr_storage client_addr;
-  socklen_t addr_size;
+/*   struct sockaddr_storage client_addr; */
+/*   socklen_t addr_size; */
 
-  while(TRUE) {
+/*   while(TRUE) { */
 
-    //TODO Arrumar a manipulação de sockets, ja que o connect_socketfd nao existira mais!//
-    /* Aceitação da conexão. */
-    //NÃO EH MAIS NECESSARIO DAR ACCEPT!//
-    //printf("Esperando alguma conexao...\n");
-    //connect_socketfd = accept(listen_socketfd, (struct sockaddr *)&client_addr, &addr_size);
-    //if (connect_socketfd == -1){
-    //  printf("Problema na conexão.\n");
-    //  continue; /* Desiste dessa conexão e volta a tentar conectar a outro. */
-    //}
-    printf("Esperando Datagramas!\n");
+/*     //TODO Arrumar a manipulação de sockets, ja que o connect_socketfd nao existira mais!// */
+/*     /\* Aceitação da conexão. *\/ */
+/*     //NÃO EH MAIS NECESSARIO DAR ACCEPT!// */
+/*     //printf("Esperando alguma conexao...\n"); */
+/*     //connect_socketfd = accept(listen_socketfd, (struct sockaddr *)&client_addr, &addr_size); */
+/*     //if (connect_socketfd == -1){ */
+/*     //  printf("Problema na conexão.\n"); */
+/*     //  continue; /\* Desiste dessa conexão e volta a tentar conectar a outro. *\/ */
+/*     //} */
+/*     printf("Esperando Datagramas!\n"); */
     
-    /* Seleciona a primeira thread disponível */
-    /* t recebe o indice da primeira thread disponível */
-    t = -1;
-    for (i = 0; i < QTDE_CONEXOES; i++) {
-      if (available_thrs[i]==TRUE) {
-	t = i; break;
-      }
-    }
+/*     /\* Seleciona a primeira thread disponível *\/ */
+/*     /\* t recebe o indice da primeira thread disponível *\/ */
+/*     t = -1; */
+/*     for (i = 0; i < QTDE_CONEXOES; i++) { */
+/*       if (available_thrs[i]==TRUE) { */
+/* 	t = i; break; */
+/*       } */
+/*     } */
     
-    /* caso não haja nenhuma thread disponível, fecha a conexão e volta a ouvir */
-    if (t == -1) { 
-      printf("Não há thread disponível para aceitar a conexão.\n");
-      close(connect_socketfd); continue;
-    }
+/*     /\* caso não haja nenhuma thread disponível, fecha a conexão e volta a ouvir *\/ */
+/*     if (t == -1) {  */
+/*       printf("Não há thread disponível para aceitar a conexão.\n"); */
+/*       close(connect_socketfd); continue; */
+/*     } */
 
-    /* Inicia a thread e passa o connect_socketfd pra ela. */
-    available_thrs[t] = FALSE; /* agora essa thread não está disponível */
-    printf("Main diz: vou passar para a thread o socket %d.\n", connect_socketfd);
-    /* inicializa o atributo a passar para a thread */
-    thread_attr a;
-    a.connect_socket = connect_socketfd;
-    a.thr_index = t;
-    pthread_create(&threads[t], NULL, trata_conexao, (void *)&a);
+/*     /\* Inicia a thread e passa o connect_socketfd pra ela. *\/ */
+/*     available_thrs[t] = FALSE; /\* agora essa thread não está disponível *\/ */
+/*     printf("Main diz: vou passar para a thread o socket %d.\n", connect_socketfd); */
+/*     /\* inicializa o atributo a passar para a thread *\/ */
+/*     thread_attr a; */
+/*     a.connect_socket = connect_socketfd; */
+/*     a.thr_index = t; */
+/*     pthread_create(&threads[t], NULL, trata_conexao, (void *)&a); */
 
-  }
+/*   } */
 
   return(0);
 }
