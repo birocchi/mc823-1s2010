@@ -40,10 +40,10 @@ char read_option() {
 
     c = getchar(); aux = getchar();
     if((c==SAIR || c==LISTAR_TODOS_COMPLETO || c==LISTAR_TODOS ||
-	c==REG_COMPLETO || c==REG_SINOPSE || c==REG_MEDIA ||
-	c==REG_AVALIAR) && aux=='\n') {
+				c==REG_COMPLETO || c==REG_SINOPSE || c==REG_MEDIA ||
+				c==REG_AVALIAR) && aux=='\n') {
       /* se a opcao lida é válida e o próximo caractere foi Enter, 
-	 retorna o caractere válido digitado*/
+				 retorna o caractere válido digitado*/
       return(c);
     } else {
       /* caso contrário, 'come' todo o resto da linha e volta às msgs */
@@ -338,9 +338,24 @@ int main(int argc, char** argv) {
     exit(1);
   }
 	
-  /* Estabelece a conexão com o servidor */
-  int socketfd; //Socket de conexao
-  socketfd = client_get_connection(argv);
+	/* 
+		 Beej 5.8
+		 Remember, if you connect() a datagram socket, you can then simply use send() 
+		 and recv() for all your transactions. The socket itself is still a datagram socket 
+		 and the packets still use UDP, but the socket interface will automatically add 
+		 the destination and source information for you.
+	*/
+	/* Configura o UDP para que sempre que for enviar e receber, o faça para o IP e 
+		 porta do servidor (bem-conhecidos). */
+  int socketfd;
+  socketfd = client_get_connection(argv); /* mesma forma que antes */
+
+	/* Nota:
+		 APENAS O CLIENTE estabelece essa configuração de enviar para e receber de um mesmo 
+		 IP/porta. Dessa forma, apenas o cliente envia e recebe usando send() e recv().
+		 Importante lembrar que a comunicação continua sendo via UDP, i.e, sem garantia de entrega.
+	*/
+	
 
   /* Loop da interface e chamadas para as funções que implementam cada 
      uso do sistema. */
