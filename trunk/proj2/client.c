@@ -340,25 +340,27 @@ int main(int argc, char** argv) {
 	
 	/* 
 		 Beej 5.8
-		 Remember, if you connect() a datagram socket, you can then simply use send() 
-		 and recv() for all your transactions. The socket itself is still a datagram socket 
-		 and the packets still use UDP, but the socket interface will automatically add 
+		 Remember, if you connect() a datagram socket, you can then
+		 simply use send() and recv() for all your transactions. 
+		 The socket itself is still a datagram socket and the packets
+		 still use UDP, but the socket interface will automatically add 
 		 the destination and source information for you.
 	*/
-	/* Configura o UDP para que sempre que for enviar e receber, o faça para o IP e 
-		 porta do servidor (bem-conhecidos). */
+	/* Configura o UDP para que sempre que for enviar e receber,
+		 o faça para o IP e porta do servidor (bem-conhecidos). */
   int socketfd;
-  socketfd = client_get_connection(argv); /* mesma forma que antes */
+  socketfd = client_get_connection(argv); /* como antes */
 
 	/* Nota:
-		 APENAS O CLIENTE estabelece essa configuração de enviar para e receber de um mesmo 
-		 IP/porta. Dessa forma, apenas o cliente envia e recebe usando send() e recv().
-		 Importante lembrar que a comunicação continua sendo via UDP, i.e, sem garantia de entrega.
+		 APENAS O CLIENTE estabelece essa configuração de enviar para 
+		 e receber de um mesmo IP/porta. Dessa forma, apenas o cliente 
+		 envia e recebe usando send() e recv(). Importante lembrar que 
+		 a comunicação continua sendo via UDP.
 	*/
 	
 
-  /* Loop da interface e chamadas para as funções que implementam cada 
-     uso do sistema. */
+  /* Loop da interface e chamadas para as funções que implementam 
+		 cada uso do sistema. */
   char c;
 		
   c = read_option();

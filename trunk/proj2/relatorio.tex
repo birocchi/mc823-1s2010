@@ -185,12 +185,12 @@ Desvio padrão: \textbf{10,72 us}\\
 \textbf{Configuração 2: }\\
 Média do tempo de RTT: \textbf{1601,7 us}\\
 Desvio padrão: \textbf{1697,68 us}\\
-\begin{figure}[htb]
-  \centering
-  \includegraphics[width=15cm]{rtt.png} 
-  \caption{Representação das medições para o RTT.}
-  \label{fig:rtt}
-\end{figure}
+%\begin{figure}[htb]
+%  \centering
+%  \includegraphics[width=15cm]{rtt.png} 
+%  \caption{Representação das medições para o RTT.}
+%  \label{fig:rtt}
+%\end{figure}
 
 \subsection{Tempo de Consulta}
 Tempo decorrido entre o cliente realizar o caso de uso 1 (consulta completa de todos os filmes do banco de dados).\\
@@ -200,12 +200,12 @@ Desvio padrão: \textbf{432,29 us}\\
 \textbf{Configuração 2: }\\
 Média do tempo de RTT: \textbf{9390,89 us}\\
 Desvio padrão: \textbf{9758,98 us}\\
-\begin{figure}[htb]
-  \centering
-  \includegraphics[width=15cm]{consulta.png} 
-  \caption{Representação das medições para a consulta.}
-  \label{fig:rtt}
-\end{figure}
+%\begin{figure}[htb]
+%  \centering
+%  \includegraphics[width=15cm]{consulta.png} 
+%  \caption{Representação das medições para a consulta.}
+%  \label{fig:rtt}
+%\end{figure}
 
 
 Pode-se verificar a diferença considerável entre os tempos de RTT para as duas configurações. Obviamente, o tempo para abertura da conexão foi maior para a segunda 
@@ -1404,6 +1404,27 @@ int main() {
 #include <unistd.h>
 
 
+	/* 
+		 Beej 5.8
+		 Remember, if you connect() a datagram socket, you can then
+		 simply use send() and recv() for all your transactions. 
+		 The socket itself is still a datagram socket and the packets
+		 still use UDP, but the socket interface will automatically add 
+		 the destination and source information for you.
+	*/
+	/* Configura o UDP para que sempre que for enviar e receber,
+		 o faça para o IP e porta do servidor (bem-conhecidos). */
+  int socketfd;
+  socketfd = client_get_connection(argv); /* como antes */
+
+	/* Nota:
+		 APENAS O CLIENTE estabelece essa configuração de enviar para 
+		 e receber de um mesmo IP/porta. Dessa forma, apenas o cliente 
+		 envia e recebe usando send() e recv(). Importante lembrar que 
+		 a comunicação continua sendo via UDP.
+	*/
+
+
 /* Função auxiliar para tratamento de entrada */
 char read_option() {
   /* considera os possiveis erros e só sai quando o usuario
@@ -1816,13 +1837,13 @@ clean:
   rm *.aux *.toc *.pdf *.log
 \end{verbatim}
 
-\section{Anexo}
-\begin{figure}[htb]
-  \centering
-  \includegraphics[width=15cm]{medicoes.png} 
-  \caption{Representação das medições para a consulta.}
-  \label{fig:rtt}
-\end{figure}
+%\section{Anexo}
+%\begin{figure}[htb]
+%  \centering
+%  \includegraphics[width=15cm]{medicoes.png} 
+%  \caption{Representação das medições para a consulta.}
+%  \label{fig:rtt}
+%\end{figure}
 
 \begin{thebibliography}{99}
 \bibitem{R1} HALL, Brian. Beej's Guide to Network Programming. Disponível em: http://http://beej.us/guide/bgnet/output/html/multipage/index.html.
