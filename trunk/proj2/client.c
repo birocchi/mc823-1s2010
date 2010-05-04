@@ -13,6 +13,7 @@
 #include <netinet/in.h>
 #include <unistd.h>
 
+//Bibliotecas para analise de tempo
 #include <sys/time.h>
 #include <time.h>
 
@@ -111,8 +112,8 @@ void client_lista_todos_completo(int socketfd) {
   /* libera a memória dos filmes */
   da_free_all(lista_filmes);
 
-  //printf("Tecle Enter para continuar...");
-  //getchar();
+  printf("Tecle Enter para continuar...");
+  getchar();
 
   return;
 }
@@ -327,9 +328,9 @@ void client_reg_avalia(int socketfd) {
 
 
 int main(int argc, char** argv) {
-
-  struct timeval tv1, tv2, tvres;
-  long double total_time;
+  /*Variaveis para analise de tempo*/
+  //struct timeval tv1, tv2, tvres;
+  //long double total_time;
 
   /* Caso não haja o nome do servidor, da um erro */
   if (argc != 2) {
@@ -355,7 +356,7 @@ int main(int argc, char** argv) {
     switch(c) {
 	
     case LISTAR_TODOS_COMPLETO:
-//      gettimeofday(&tv1, NULL); /* lê o t1 */
+      //gettimeofday(&tv1, NULL); /* lê o t1 */
       client_lista_todos_completo(socketfd);
       //gettimeofday(&tv2, NULL); /* lê o t2 */
       //timersub(&tv2, &tv1, &tvres); /* resposta = t2 - t1 */

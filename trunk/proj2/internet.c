@@ -1,3 +1,4 @@
+//Bibliotecas comuns
 #include "internet.h"
 #include "defines.h"
 #include "data_access.h"
@@ -6,11 +7,13 @@
 #include <stdlib.h>
 #include <netdb.h>
 
+//Bibliotecas para manipulacao de sockets
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <unistd.h>
 
+//Bibliotecas para analise de tempo
 #include <sys/time.h>
 #include <time.h>
 
@@ -26,7 +29,7 @@ int client_get_connection(char **argv) {
 
   memset(&opcoes, 0, sizeof(opcoes)); // zera a estrutura
   opcoes.ai_family = AF_INET;         // IPv4
-  opcoes.ai_socktype = SOCK_STREAM;   // TCP stream sockets
+  opcoes.ai_socktype = SOCK_DGRAM;    // UDP datagram sockets
   opcoes.ai_flags = AI_PASSIVE;       // fill in my IP for me
 
   status = getaddrinfo(argv[1], SERVER_PORT_STR, &opcoes, &servinfo);
@@ -40,16 +43,16 @@ int client_get_connection(char **argv) {
 
   /* faz a conexão com o socket do servidor */
   /* inicia contagem do tempo */
-  struct timeval tv1, tv2, tvres;
-  long double total_time;
+  //struct timeval tv1, tv2, tvres;
+  //long double total_time;
 
-  gettimeofday(&tv1, NULL); /* lê o t1 */
+  //gettimeofday(&tv1, NULL); /* lê o t1 */
   status = connect(socketfd, servinfo->ai_addr, servinfo->ai_addrlen);
-  gettimeofday(&tv2, NULL); /* lê o t2 */
-  timersub(&tv2, &tv1, &tvres); /* resposta = t2 - t1 */
-  total_time = tvres.tv_sec*1000000 + tvres.tv_usec; /* resposta em micro-segundos */
+  //gettimeofday(&tv2, NULL); /* lê o t2 */
+  //timersub(&tv2, &tv1, &tvres); /* resposta = t2 - t1 */
+  //total_time = tvres.tv_sec*1000000 + tvres.tv_usec; /* resposta em micro-segundos */
   /* manda o tempo para a saída padrão de erro: coleta para um arquivo (via shell) */
-  fprintf(stderr, "%.0Lf\n", (long double) total_time );
+  //fprintf(stderr, "%.0Lf\n", (long double) total_time );
 
   /* Caso dê algum erro na conexão, pára o cliente */
   if (status == -1){

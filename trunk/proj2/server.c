@@ -316,7 +316,7 @@ int main() {
 
   memset(&opcoes, 0, sizeof(opcoes)); // zera a estrutura
   opcoes.ai_family = AF_INET;         // IPv4
-  opcoes.ai_socktype = SOCK_STREAM;   // TCP
+  opcoes.ai_socktype = SOCK_DGRAM;    // UDP datagram sockets
   opcoes.ai_flags = AI_PASSIVE;       // fill in my IP for me
 
   status = getaddrinfo(NULL, SERVER_PORT_STR, &opcoes, &servinfo);
@@ -338,7 +338,8 @@ int main() {
   freeaddrinfo(servinfo); // libera a estrutura de informações do servidor
 
   /* Atribui o socket como ouvinte das conexões. */
-  listen(listen_socketfd, QTDE_CONEXOES);
+  //NÃO EH MAIS NECESSARIO DAR LISTEN!//
+  //listen(listen_socketfd, QTDE_CONEXOES);
 
   /* Inicializa o semáforo. O número de recursos compartilhados é 1 (apenas uma thread 
      pode usar o arquivo para escrita de cada vez) - este é o terceiro argumento. 
@@ -358,14 +359,17 @@ int main() {
   socklen_t addr_size;
 
   while(TRUE) {
+
+    //TODO Arrumar a manipulação de sockets, ja que o connect_socketfd nao existira mais!//
     /* Aceitação da conexão. */
-    printf("Esperando alguma conexao...\n");
-    connect_socketfd = accept(listen_socketfd, (struct sockaddr *)&client_addr, &addr_size);
-    if (connect_socketfd == -1){
-      printf("Problema na conexão.\n");
-      continue; /* Desiste dessa conexão e volta a tentar conectar a outro. */
-    }
-    printf("Conexao aceita!\n");
+    //NÃO EH MAIS NECESSARIO DAR ACCEPT!//
+    //printf("Esperando alguma conexao...\n");
+    //connect_socketfd = accept(listen_socketfd, (struct sockaddr *)&client_addr, &addr_size);
+    //if (connect_socketfd == -1){
+    //  printf("Problema na conexão.\n");
+    //  continue; /* Desiste dessa conexão e volta a tentar conectar a outro. */
+    //}
+    printf("Esperando Datagramas!\n");
     
     /* Seleciona a primeira thread disponível */
     /* t recebe o indice da primeira thread disponível */
