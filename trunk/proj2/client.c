@@ -17,6 +17,15 @@
 #include <sys/time.h>
 #include <time.h>
 
+
+/* Socket único do cliente */
+int socketfd;
+
+
+
+/**************************************************************/
+/******************* Funções auxiliares ***********************/
+
 /* Função auxiliar para tratamento de entrada */
 char read_option() {
   /* considera os possiveis erros e só sai quando o usuario
@@ -60,13 +69,10 @@ void read_id (char *request) {
   char c;
   int dif, i = 1;
 
-  printf(" Id: ");
-  c = getchar();
+  printf(" Id: "); c = getchar();
 
   while (c!='\n' && i!=20) {
-    request[i] = c;
-    c = getchar();
-    i++;
+    request[i] = c; c = getchar(); i++;
   }
 
   /* right-shift de i em request[1-20] (id) */
@@ -76,31 +82,35 @@ void read_id (char *request) {
     request[i+dif] = request[i];
     request[i] = '0';
   }
-
   return;
 }
 
 
+/* Função auxiliar para inserção da nota no request */
 void read_nota(char *request) {
   
   char c; int i = 21;
   
   printf(" Nota (abc.de): ");
   c = getchar();
-  while (c!='\n' && i!=26) {
-    request[i] = c;
-    c = getchar();
-    i++;
+  while (c!='\n' && i<=26) {
+    request[i] = c; c = getchar(); i++;
   }
-
   return;
 }
 
-/* /\**************************************************************\/ */
-/* /\******[inicio] Funções que implementam os casos de uso  ******\/ */
+/******************* Funções auxiliares ***********************/
+/**************************************************************/
 
-/* /\* ## 1 ## *\/ */
-/* void client_lista_todos_completo(int socketfd) { */
+
+
+
+
+/**************************************************************/
+/******[inicio] Funções que implementam os casos de uso  ******/
+
+/* ## 1 ## */
+void client_lista_todos_completo() {
 /*   /\*  */
 /*      Não é necessário enviar mais informações ao servidor, apenas */
 /*      aguardar um retorno. */
@@ -156,11 +166,11 @@ void read_nota(char *request) {
 /*   printf("Tecle Enter para continuar..."); */
 /*   getchar(); */
 
-/*   return; */
-/* } */
+  return;
+}
 
-/* /\* ## 2 ## *\/ */
-/* void client_lista_todos(int socketfd) { */
+/* ## 2 ## */
+void client_lista_todos() {
 
 /*   /\* Cliente praticamente igual para a listagem completa. *\/ */
 /*   int n_filmes, i; */
@@ -192,11 +202,11 @@ void read_nota(char *request) {
 	
 /*   da_free_all(lista_filmes); */
 /*   printf("Tecle Enter para continuar..."); getchar(); */
-/*   return; */
-/* } */
+  return;
+}
 
-/* /\* ## 3 ## *\/ */
-/* void client_reg_completo(int socketfd) { */
+/* ## 3 ## */
+void client_reg_completo() {
 
 /*   char c, id_procurado[TAM_REG_ID]; /\* 20 *\/ */
 /*   int i = 0; */
@@ -242,11 +252,11 @@ void read_nota(char *request) {
 /*   printf("\nAperte Enter para continuar..."); */
 /*   getchar(); */
 
-/*   return; */
-/* } */
+  return;
+}
 
-/* /\* ## 4 ## *\/ */
-/* void client_reg_sinopse(int socketfd) { */
+/* ## 4 ## */
+void client_reg_sinopse() {
 
 /*   /\* Cópia do caso de uso para a listagem completa de um filme,  */
 /*      diferenciando apenas a impressão dos dados.*\/ */
@@ -282,11 +292,11 @@ void read_nota(char *request) {
 /*   printf("\nAperte Enter para continuar..."); */
 /*   getchar(); */
 
-/*   return; */
-/* } */
+  return;
+}
 
-/* /\* ## 5 ## *\/ */
-/* void client_reg_media(int socketfd) { */
+/* ## 5 ## */
+void client_reg_media() {
 
 /*   /\* Cópia do caso de uso para a listagem completa de um filme,  */
 /*      diferenciando apenas a impressão dos dados.*\/ */
@@ -322,11 +332,11 @@ void read_nota(char *request) {
 /*   printf("\nAperte Enter para continuar..."); */
 /*   getchar(); */
 
-/*   return; */
-/* } */
+  return;
+}
 
-/* /\* ## 6 ## *\/ */
-/* void client_reg_avalia(int socketfd) { */
+/* ## 6 ## */
+void client_reg_avalia() {
 
 /*   char c, id_avaliar[TAM_REG_ID] /\*20*\/, nota[7]; */
 /*   int i, j; */
@@ -360,8 +370,8 @@ void read_nota(char *request) {
 /*   printf("\nAperte Enter para continuar..."); */
 /*   getchar(); */
 
-/*   return; */
-/* } */
+  return;
+}
 
 /*******[fim] Funções que implementam os casos de uso  ********/
 /**************************************************************/
@@ -397,7 +407,6 @@ int main(int argc, char** argv) {
   */
   /* Configura o UDP para que sempre que for enviar e receber,
      o faça para o IP e porta do servidor (bem-conhecidos). */
-  int socketfd;
   socketfd = client_get_connection(argv); /* como antes */
   
   /* Nota:
@@ -441,70 +450,36 @@ saída. Aperte Enter e tente novamente...\n");
     }
     /* Caso contrário, chama a função para o caso específico */
     else {
-      
+			
       switch(c) {
-	
+				
       case LISTAR_TODOS_COMPLETO:
-	//gettimeofday(&tv1, NULL); /* lê o t1 */
-	//	client_lista_todos_completo(socketfd);
-	//gettimeofday(&tv2, NULL); /* lê o t2 */
-	//timersub(&tv2, &tv1, &tvres); /* resposta = t2 - t1 */
-	//total_time = tvres.tv_sec*1000000 + tvres.tv_usec;
-	/* manda o tempo para a saída padrão de erro: coleta para
-	   um arquivo (via shell) */
-	//fprintf(stderr, "%.0Lf\n", (long double) total_time );
-	printf("Resolvi caso 1\n");
-	break;
+				client_lista_todos_completo();
+				break;
       case LISTAR_TODOS:
-	//	client_lista_todos(socketfd);
-	printf("Resolvi caso 2\n");
-	break;
+				client_lista_todos();
+				break;
       case REG_COMPLETO:
-	//	client_reg_completo(socketfd);
-	printf("Resolvi caso 3\n");
-	break;
+				client_reg_completo();
+				break;
       case REG_SINOPSE:
-	//	client_reg_sinopse(socketfd);
-	printf("Resolvi caso 4\n");
-	break;
+				client_reg_sinopse();
+				break;
       case REG_MEDIA:
-	//	client_reg_media(socketfd);
-	printf("Resolvi caso 5\n");
-	break;
+				client_reg_media();
+				break;
       case REG_AVALIAR:
-	//	client_reg_avalia(socketfd);
-	printf("Resolvi caso 6\n");
-	break;
-	
-      }
-      
-    }
-
-    c = read_option();
-    request[0] = c;
+				client_reg_avalia();
+				break;
+      } /* [fim - switch] */
+    
+    } /* [fim - else] */
+		
+    c = read_option(); request[0] = c;
     
   }
   
-
-  
-  
-/*   char msg[7] = "Oi! :-)"; */
-/*   int tam = 7; */
-  
-/*   send(socketfd, msg, tam, 0); */
-  
-/*   char buffer[100]; */
-/*   int status; */
-/*   status = recv(socketfd, buffer, 99, 0); */
-/*   buffer[10] = '\0'; */
-/*   printf("Resposta do servidor: %s\n", buffer); */
-/*   printf("Status: %d\n", status); */
-  
-  
-/*   c = read_option(); */
-    
-	
-//  close(socketfd); // fecha a conexão com o servidor
+	close(socketfd);
   return(0);
-
+	
 }
