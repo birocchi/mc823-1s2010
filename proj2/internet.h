@@ -13,6 +13,9 @@ int client_get_n_filmes(int socket);
 /* Copia a str de filme da stream */
 void client_get_filme_str(int socket, char *f_str);
 
+int client_udp_push_buffer (int socket, char *buffer, int n);
+
+
 
 /*************************** Cliente *********************************/
 /*********************************************************************/
@@ -21,6 +24,12 @@ void client_get_filme_str(int socket, char *f_str);
 
 /*********************************************************************/
 /**************************** Server *********************************/
+
+//int server_udp_pop_buffer (int socket, char *buffer, int n, 
+//			    struct sockaddr_storage *client_addr, 
+//			    size_t *client_addr_len);
+
+
 
 /* Recebe a opção da stream */
 char server_recv_option(int connect_socketfd);

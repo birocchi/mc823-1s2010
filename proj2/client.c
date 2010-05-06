@@ -54,6 +54,47 @@ char read_option() {
 }
 
 
+/* Função auxiliar para inserção do ID no pacote 'request' */
+void read_id (char *request) {
+
+  char c;
+  int dif, i = 1;
+
+  printf(" Id: ");
+  c = getchar();
+
+  while (c!='\n' && i!=20) {
+    request[i] = c;
+    c = getchar();
+    i++;
+  }
+
+  /* right-shift de i em request[1-20] (id) */
+  i --; /* i == numero de digitos */
+  dif = 20 - i;
+  for (; i >= 1; i--) {
+    request[i+dif] = request[i];
+    request[i] = '0';
+  }
+
+  return;
+}
+
+
+void read_nota(char *request) {
+  
+  char c; int i = 21;
+  
+  printf(" Nota (abc.de): ");
+  c = getchar();
+  while (c!='\n' && i!=26) {
+    request[i] = c;
+    c = getchar();
+    i++;
+  }
+
+  return;
+}
 
 /* /\**************************************************************\/ */
 /* /\******[inicio] Funções que implementam os casos de uso  ******\/ */
@@ -331,6 +372,7 @@ char read_option() {
 
 
 int main(int argc, char** argv) {
+
   /*Variaveis para analise de tempo*/
   //struct timeval tv1, tv2, tvres;
   //long double total_time;
@@ -367,18 +409,33 @@ int main(int argc, char** argv) {
   
   
   /* Loop da interface */
+  char request[27]; /* option(1)+id(20)+nota(6) = 27  */
+  memset(request, '0', 27); /* seta com os caracteres '0's */
+
   char c;
   c = read_option();
+  request[0] = c;
 
-  while(c != SAIR) {
+  while (c != SAIR) {
 
-    /* Envia a opção escolhida ao servidor */
-    status = udp_socket_push_char(socketfd, c);
+    /* Conclui a montagem do pacote 'request' */
+    switch(c) {
+    case REG_COMPLETO:
+    case REG_SINOPSE:
+    case REG_MEDIA:
+      read_id(request);
+      break;
+    case REG_AVALIAR:
+      read_id(request);
+      read_nota(request);
+      break;
+    } 
 
-    /* Caso de erro no envio... */
+    /* Envia o pacote request ao servidor */
+    status = client_udp_push_buffer(socketfd, request, 27);
     if (status == -1) {
       printf("UDP não conseguiu colocar a opção no buffer de \
-             saída. Aperte Enter e tente novamente...\n");
+saída. Aperte Enter e tente novamente...\n");
       fprintf(stderr, "err_send\n");
       getchar();
     }
@@ -424,6 +481,7 @@ int main(int argc, char** argv) {
     }
 
     c = read_option();
+    request[0] = c;
     
   }
   
@@ -446,7 +504,7 @@ int main(int argc, char** argv) {
 /*   c = read_option(); */
     
 	
-  close(socketfd); // fecha a conexão com o servidor
+//  close(socketfd); // fecha a conexão com o servidor
   return(0);
 
 }

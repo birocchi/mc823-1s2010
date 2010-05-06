@@ -121,11 +121,43 @@ void client_get_filme_str(int socket, char *f_str) {
   }
   buffer[n] = '\0';
 	
-  /* por fim, concatena as strings já lidas, copiando para a str de retorno */
+  /* por fim, conca1tena as strings já lidas, copiando para a str de retorno */
   sprintf(f_str, "%d@%s", (tam_reg+i+1), buffer);
 	
   return;
 }
+
+
+
+
+
+
+
+
+
+/* Função que envia um buffer por datagrama (UDP) */
+int client_udp_push_buffer (int socket, char *buffer, int n) {
+  
+  /*
+     Entradas:
+     n - número de caracteres a serem escritos;
+     buffer - buffer de onde se lê.
+  */
+
+  int i = 0;
+  
+  while (i == 0) {
+    i = send(socket, buffer, n, 0);
+  }
+
+  return(i);
+}
+
+
+
+
+
+
 
 /*************************** Cliente *********************************/
 /*********************************************************************/
@@ -134,9 +166,24 @@ void client_get_filme_str(int socket, char *f_str) {
 /*********************************************************************/
 /**************************** Server *********************************/
 
-/* Recebe a opção da stream */
-char server_recv_option(int connect_socketfd) {
-  return(socket_pop_char(connect_socketfd));
+
+
+//    server_udp_pop_buffer(socketfd, request, 27, &client_addr,
+//			  &client_addr_len);
+
+int server_udp_pop_buffer (int socket, char *buffer, int n, 
+			    struct sockaddr_storage *client_addr, 
+			    size_t *client_addr_len) {
+  
+  int status = 0;
+
+  *client_addr_len = sizeof(client_addr); /* necessário */
+  while (status == 0) {
+    status = recvfrom(socket, buffer, n, 0, (struct sockaddr *)
+		      client_addr, (socklen_t *) client_addr_len);
+  }
+  
+  return (status);
 }
 
 
