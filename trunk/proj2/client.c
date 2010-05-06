@@ -78,9 +78,12 @@ void read_id (char *request) {
   /* right-shift de i em request[1-20] (id) */
   i --; /* i == numero de digitos */
   dif = 20 - i;
-  for (; i >= 1; i--) {
-    request[i+dif] = request[i];
-    request[i] = '0';
+  /* caso a diferença seja 0, não precisa fazer o shift */
+  if(dif != 0) {
+    for (; i >= 1; i--) {
+      request[i+dif] = request[i];
+      request[i] = '0';
+    }
   }
   return;
 }
