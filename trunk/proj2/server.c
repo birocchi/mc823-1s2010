@@ -284,9 +284,10 @@ int main() {
 
   /* Loop infinito de recebimento e tratamento das mensagens */
   while (TRUE) {
-    printf("Aguardando opção...\n");
-    
-    char c;
+    printf("Aguardando request...\n");
+
+    char request[27];
+
     
     /* Variáveis para guadar informações do endereço do cliente */
     struct sockaddr_storage client_addr;
@@ -294,12 +295,16 @@ int main() {
 
     /* Esta função chama recvfrom(), que TRAVA o servidor até 
        que chegue um pacote. O endereço do cliente é setado. */
-    c = udp_socket_pop_char(socketfd, &client_addr, &client_addr_len);
+    status = recvfrom(socketfd, request, 27, 0, (struct socket_addr *)
+		      &client_addr, &client_addr_len);
+    
+    //status = server_udp_pop_buffer(socketfd, request, 27, 
+    //				   &client_addr, &client_addr_len);
 
-    printf("Opção recebida: %c\n", c);
+    printf("Opção recebida: %c\n", request[0]);
    
     /* "O que vc quer, cliente?!" */
-    switch(c) {
+    switch(request[0]) {
       
     case LISTAR_TODOS_COMPLETO:
       //      server_lista_todos_completo(connect_socketfd);
