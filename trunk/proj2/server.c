@@ -21,8 +21,23 @@
 #include <unistd.h>
 
 
+
+/**************************************************************/
+/******************* Variáveis Globais ************************/
+
+/* Como o servidor só se comunicará por um socket, e com um 
+	 cliente de cada vez, essas variáveis podem ser globais, o que
+	 facilita sua utilização em funções auxiliares. */
+
 /* Socket único do servidor */
 int socketfd;
+
+/* Variáveis para guardar informações do endereço do cliente */
+struct sockaddr_storage client_addr;
+size_t client_addr_len = sizeof(client_addr); /* necessário */
+
+/******************* Variáveis Globais ************************/
+/**************************************************************/
 
 
 
@@ -31,6 +46,21 @@ int socketfd;
 
 /* ## 1 ## */
 void server_lista_todos_completo() {
+
+	/* Envia ao cliente:
+	 * -> um datagrama com número N de filmes
+	 * -> N datagramas: 1 para cada filme (string crua)
+	 */
+	
+	char n_filmes[10];
+
+	sprintf(n_filmes, "%09d", da_get_n_filmes());
+	sendto(socketfd, n_filmes, 10, 0, (struct sockaddr *)
+				 &client_addr, client_addr_len);
+	
+
+	
+
 
 /*   /\* */
 /*     Esta função envia ao cliente uma sequencia de caracteres no formato: */
@@ -272,15 +302,11 @@ int main() {
   while (TRUE) {
     printf("Aguardando request...\n");
 
-    /* Variáveis para guardar informações do endereço do cliente */
-    struct sockaddr_storage client_addr;
-    size_t client_addr_len = sizeof(client_addr); /* necessário */
-
 		/* Variável para guardar a msg enviada pelo cliente */
     char request[27];
 
     /* Esta função bloqueia o servidor até que chegue um pacote. 
-			 O endereço do cliente é setado. */
+			 O endereço do cliente é setado! */
     status = recvfrom(socketfd, request, 27, 0, (struct sockaddr *)
 											&client_addr, (socklen_t *) &client_addr_len);
 

@@ -111,6 +111,14 @@ void read_nota(char *request) {
 
 /* ## 1 ## */
 void client_lista_todos_completo() {
+
+	
+
+	/* Recebe datagrama com número de filmes. */
+	char n_filmes[10];
+	
+	
+
 /*   /\*  */
 /*      Não é necessário enviar mais informações ao servidor, apenas */
 /*      aguardar um retorno. */
