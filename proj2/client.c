@@ -55,275 +55,278 @@ char read_option() {
 
 
 
-/**************************************************************/
-/******[inicio] Funções que implementam os casos de uso  ******/
+/* /\**************************************************************\/ */
+/* /\******[inicio] Funções que implementam os casos de uso  ******\/ */
 
-/* ## 1 ## */
-void client_lista_todos_completo(int socketfd) {
-  /* 
-     Não é necessário enviar mais informações ao servidor, apenas
-     aguardar um retorno.
-     O formato desse retorno será:
-     n_filmes@str_do_filme1@str_do_filme2@str_do_filme3@
-  */
+/* /\* ## 1 ## *\/ */
+/* void client_lista_todos_completo(int socketfd) { */
+/*   /\*  */
+/*      Não é necessário enviar mais informações ao servidor, apenas */
+/*      aguardar um retorno. */
+/*      O formato desse retorno será: */
+/*      n_filmes@str_do_filme1@str_do_filme2@str_do_filme3@ */
+/*   *\/ */
 
-  int n_filmes, i;
-  char filme_str[TAM_MAX_REG]; /* 1024 */
-  filme *lista_filmes, *f, *last_f;
+/*   int n_filmes, i; */
+/*   char filme_str[TAM_MAX_REG]; /\* 1024 *\/ */
+/*   filme *lista_filmes, *f, *last_f; */
 	
-  /* Leitura do número de filmes retornado pelo servidor */
-  n_filmes = client_get_n_filmes(socketfd);
+/*   /\* Leitura do número de filmes retornado pelo servidor *\/ */
+/*   n_filmes = client_get_n_filmes(socketfd); */
 
-  if (n_filmes == 0) {
-    printf("Não há filmes no servidor!\n");
-    printf("Tecle Enter para continuar...");
-    getchar();
-    return;
-  }
-  printf("Número de filmes encontrados: %d\n\n", n_filmes);
+/*   if (n_filmes == 0) { */
+/*     printf("Não há filmes no servidor!\n"); */
+/*     printf("Tecle Enter para continuar..."); */
+/*     getchar(); */
+/*     return; */
+/*   } */
+/*   printf("Número de filmes encontrados: %d\n\n", n_filmes); */
 
-  for (i = 0; i < n_filmes; i++) {
+/*   for (i = 0; i < n_filmes; i++) { */
 
-    int tam_filme;
+/*     int tam_filme; */
 		
-    /* Le a string do filme */
-    client_get_filme_str(socketfd, filme_str);
+/*     /\* Le a string do filme *\/ */
+/*     client_get_filme_str(socketfd, filme_str); */
 
-    /* Aloca a estrutura para guardar o filme */
-    f = (filme *)malloc(sizeof(filme));
-    da_str_to_filme(f, &tam_filme, filme_str);
+/*     /\* Aloca a estrutura para guardar o filme *\/ */
+/*     f = (filme *)malloc(sizeof(filme)); */
+/*     da_str_to_filme(f, &tam_filme, filme_str); */
 
-    /* Seta a lista dos filmes */
-    if (i==0){ /* primeiro filme */
-      lista_filmes = f;
-    }
-    else {
-      last_f->prox_filme = f; /* concatena o filme à lista */
-    }
-    last_f = f; /* atualiza o apontador para o último filme */
-  }
+/*     /\* Seta a lista dos filmes *\/ */
+/*     if (i==0){ /\* primeiro filme *\/ */
+/*       lista_filmes = f; */
+/*     } */
+/*     else { */
+/*       last_f->prox_filme = f; /\* concatena o filme à lista *\/ */
+/*     } */
+/*     last_f = f; /\* atualiza o apontador para o último filme *\/ */
+/*   } */
 	
-  /* para cada filme na lista, chama da_print_full_info(f) */
-  for (f = lista_filmes; f != NULL; f = (filme *)f->prox_filme) {
-    da_print_full_info(f);
-    printf("\n-------------------------\n");
-  }
+/*   /\* para cada filme na lista, chama da_print_full_info(f) *\/ */
+/*   for (f = lista_filmes; f != NULL; f = (filme *)f->prox_filme) { */
+/*     da_print_full_info(f); */
+/*     printf("\n-------------------------\n"); */
+/*   } */
 	
-  /* libera a memória dos filmes */
-  da_free_all(lista_filmes);
+/*   /\* libera a memória dos filmes *\/ */
+/*   da_free_all(lista_filmes); */
 
-  printf("Tecle Enter para continuar...");
-  getchar();
+/*   printf("Tecle Enter para continuar..."); */
+/*   getchar(); */
 
-  return;
-}
+/*   return; */
+/* } */
 
-/* ## 2 ## */
-void client_lista_todos(int socketfd) {
+/* /\* ## 2 ## *\/ */
+/* void client_lista_todos(int socketfd) { */
 
-  /* Cliente praticamente igual para a listagem completa. */
-  int n_filmes, i;
-  char filme_str[TAM_MAX_REG]; /* 1024 */
-  filme *lista_filmes, *f, *last_f;
+/*   /\* Cliente praticamente igual para a listagem completa. *\/ */
+/*   int n_filmes, i; */
+/*   char filme_str[TAM_MAX_REG]; /\* 1024 *\/ */
+/*   filme *lista_filmes, *f, *last_f; */
 	
-  n_filmes = client_get_n_filmes(socketfd);
+/*   n_filmes = client_get_n_filmes(socketfd); */
 
-  if (n_filmes == 0) { printf("Não há filmes no servidor!\n");
-    printf("Tecle Enter para continuar..."); getchar(); return;
-  }
-  printf("Número de filmes encontrados: %d\n\n", n_filmes);
+/*   if (n_filmes == 0) { printf("Não há filmes no servidor!\n"); */
+/*     printf("Tecle Enter para continuar..."); getchar(); return; */
+/*   } */
+/*   printf("Número de filmes encontrados: %d\n\n", n_filmes); */
 
-  for (i = 0; i < n_filmes; i++) {
+/*   for (i = 0; i < n_filmes; i++) { */
 
-    int tam_filme;
-    client_get_filme_str(socketfd, filme_str);
-    f = (filme *)malloc(sizeof(filme));
-    da_str_to_filme(f, &tam_filme, filme_str);
-    if (i==0) { lista_filmes = f;} else { last_f->prox_filme = f; }
-    last_f = f; /* atualiza o apontador para o último filme */
-  }
+/*     int tam_filme; */
+/*     client_get_filme_str(socketfd, filme_str); */
+/*     f = (filme *)malloc(sizeof(filme)); */
+/*     da_str_to_filme(f, &tam_filme, filme_str); */
+/*     if (i==0) { lista_filmes = f;} else { last_f->prox_filme = f; } */
+/*     last_f = f; /\* atualiza o apontador para o último filme *\/ */
+/*   } */
 	
-  /* para cada filme na lista, chama da_print_partial_info(f) */
-  for (f = lista_filmes; f != NULL; f = (filme *)f->prox_filme) {
-    da_print_partial_info(f);
-    printf("\n-------------------------\n");
-  }
+/*   /\* para cada filme na lista, chama da_print_partial_info(f) *\/ */
+/*   for (f = lista_filmes; f != NULL; f = (filme *)f->prox_filme) { */
+/*     da_print_partial_info(f); */
+/*     printf("\n-------------------------\n"); */
+/*   } */
 	
-  da_free_all(lista_filmes);
-  printf("Tecle Enter para continuar..."); getchar();
-  return;
-}
+/*   da_free_all(lista_filmes); */
+/*   printf("Tecle Enter para continuar..."); getchar(); */
+/*   return; */
+/* } */
 
-/* ## 3 ## */
-void client_reg_completo(int socketfd) {
+/* /\* ## 3 ## *\/ */
+/* void client_reg_completo(int socketfd) { */
 
-  char c, id_procurado[TAM_REG_ID]; /* 20 */
-  int i = 0;
+/*   char c, id_procurado[TAM_REG_ID]; /\* 20 *\/ */
+/*   int i = 0; */
 
-  /* Leitura do id procurado (digito p/ dig.) */
-  printf("ID do filme: ");
-  c = getchar();
-  while (c!='\n') { id_procurado[i] = c; i++; c = getchar(); }
-  id_procurado[i] = '@'; /* coloca um @ para finalizar o id */
+/*   /\* Leitura do id procurado (digito p/ dig.) *\/ */
+/*   printf("ID do filme: "); */
+/*   c = getchar(); */
+/*   while (c!='\n') { id_procurado[i] = c; i++; c = getchar(); } */
+/*   id_procurado[i] = '@'; /\* coloca um @ para finalizar o id *\/ */
 
-  /* envia o id procurado ao servidor */
-  socket_push_buffer(socketfd, i+1, id_procurado);
+/*   /\* envia o id procurado ao servidor *\/ */
+/*   socket_push_buffer(socketfd, i+1, id_procurado); */
 
-  /* leitura da resposta do servidor */
-  do {
-    c = socket_pop_char(socketfd);
-  } while(c == '\0'); /* limpa a stream */
+/*   /\* leitura da resposta do servidor *\/ */
+/*   do { */
+/*     c = socket_pop_char(socketfd); */
+/*   } while(c == '\0'); /\* limpa a stream *\/ */
   
-  /* Caso não tenha encontrado nenhum filme */
-  if (c == '#') {
-    printf("\nFilme não encontrado.\n");
-  } else {
-    /* recebe a str do filme encontrado */
-    char f_str[TAM_MAX_REG];
-    i = 0;
-    c = socket_pop_char(socketfd);
-    while(c != '\0') { 
-      f_str[i] = c;
-      c = socket_pop_char(socketfd);
-      i++;
-    }
+/*   /\* Caso não tenha encontrado nenhum filme *\/ */
+/*   if (c == '#') { */
+/*     printf("\nFilme não encontrado.\n"); */
+/*   } else { */
+/*     /\* recebe a str do filme encontrado *\/ */
+/*     char f_str[TAM_MAX_REG]; */
+/*     i = 0; */
+/*     c = socket_pop_char(socketfd); */
+/*     while(c != '\0') {  */
+/*       f_str[i] = c; */
+/*       c = socket_pop_char(socketfd); */
+/*       i++; */
+/*     } */
 
-    /* monta a estrutura de filme */
-    filme f;
-    int tam_reg;
-    da_str_to_filme(&f, &tam_reg, f_str);
+/*     /\* monta a estrutura de filme *\/ */
+/*     filme f; */
+/*     int tam_reg; */
+/*     da_str_to_filme(&f, &tam_reg, f_str); */
 
-    /* Imprime resultado da pesquisa */
-    printf("Filme encontrado!\n\n");
-    da_print_full_info(&f);
-  }
+/*     /\* Imprime resultado da pesquisa *\/ */
+/*     printf("Filme encontrado!\n\n"); */
+/*     da_print_full_info(&f); */
+/*   } */
 
-  printf("\nAperte Enter para continuar...");
-  getchar();
+/*   printf("\nAperte Enter para continuar..."); */
+/*   getchar(); */
 
-  return;
-}
+/*   return; */
+/* } */
 
-/* ## 4 ## */
-void client_reg_sinopse(int socketfd) {
+/* /\* ## 4 ## *\/ */
+/* void client_reg_sinopse(int socketfd) { */
 
-  /* Cópia do caso de uso para a listagem completa de um filme, 
-     diferenciando apenas a impressão dos dados.*/
+/*   /\* Cópia do caso de uso para a listagem completa de um filme,  */
+/*      diferenciando apenas a impressão dos dados.*\/ */
   
-  char c, id_procurado[TAM_REG_ID]; int i = 0;
+/*   char c, id_procurado[TAM_REG_ID]; int i = 0; */
 
-  printf("ID do filme: "); c = getchar();
-  while (c!='\n') { id_procurado[i] = c; i++; c = getchar(); }
-  id_procurado[i] = '@'; /* coloca um @ para finalizar o id */
+/*   printf("ID do filme: "); c = getchar(); */
+/*   while (c!='\n') { id_procurado[i] = c; i++; c = getchar(); } */
+/*   id_procurado[i] = '@'; /\* coloca um @ para finalizar o id *\/ */
 
-  socket_push_buffer(socketfd, i+1, id_procurado);
+/*   socket_push_buffer(socketfd, i+1, id_procurado); */
 
-  do { c = socket_pop_char(socketfd);
-  } while(c == '\0'); /* limpa a stream */
+/*   do { c = socket_pop_char(socketfd); */
+/*   } while(c == '\0'); /\* limpa a stream *\/ */
   
-  if (c == '#') { printf("\nFilme não encontrado.\n"); }
-  else {
-    char f_str[TAM_MAX_REG];
-    i = 0; c = socket_pop_char(socketfd);
-    while(c != '\0') { 
-      f_str[i] = c; 
-      c = socket_pop_char(socketfd);
-      i++;
-    }
+/*   if (c == '#') { printf("\nFilme não encontrado.\n"); } */
+/*   else { */
+/*     char f_str[TAM_MAX_REG]; */
+/*     i = 0; c = socket_pop_char(socketfd); */
+/*     while(c != '\0') {  */
+/*       f_str[i] = c;  */
+/*       c = socket_pop_char(socketfd); */
+/*       i++; */
+/*     } */
 
-    filme f; int tam_reg;
-    da_str_to_filme(&f, &tam_reg, f_str);
+/*     filme f; int tam_reg; */
+/*     da_str_to_filme(&f, &tam_reg, f_str); */
 
-    printf("Filme encontrado!\n\n");
-    printf("Sinopse: %s\n", f.sinopse);
-  }
+/*     printf("Filme encontrado!\n\n"); */
+/*     printf("Sinopse: %s\n", f.sinopse); */
+/*   } */
 
-  printf("\nAperte Enter para continuar...");
-  getchar();
+/*   printf("\nAperte Enter para continuar..."); */
+/*   getchar(); */
 
-  return;
-}
+/*   return; */
+/* } */
 
-/* ## 5 ## */
-void client_reg_media(int socketfd) {
+/* /\* ## 5 ## *\/ */
+/* void client_reg_media(int socketfd) { */
 
-  /* Cópia do caso de uso para a listagem completa de um filme, 
-     diferenciando apenas a impressão dos dados.*/
+/*   /\* Cópia do caso de uso para a listagem completa de um filme,  */
+/*      diferenciando apenas a impressão dos dados.*\/ */
 
-  char c, id_procurado[TAM_REG_ID]; int i = 0;
+/*   char c, id_procurado[TAM_REG_ID]; int i = 0; */
 
-  printf("ID do filme: "); c = getchar();
-  while (c!='\n') { id_procurado[i] = c; i++; c = getchar(); }
-  id_procurado[i] = '@'; /* coloca um @ para finalizar o id */
+/*   printf("ID do filme: "); c = getchar(); */
+/*   while (c!='\n') { id_procurado[i] = c; i++; c = getchar(); } */
+/*   id_procurado[i] = '@'; /\* coloca um @ para finalizar o id *\/ */
 
-  socket_push_buffer(socketfd, i+1, id_procurado);
+/*   socket_push_buffer(socketfd, i+1, id_procurado); */
 
-  do { c = socket_pop_char(socketfd);
-  } while(c == '\0'); /* limpa a stream */
+/*   do { c = socket_pop_char(socketfd); */
+/*   } while(c == '\0'); /\* limpa a stream *\/ */
   
-  if (c == '#') { printf("\nFilme não encontrado.\n"); }
-  else {
-    char f_str[TAM_MAX_REG];
-    i = 0; c = socket_pop_char(socketfd);
-    while(c != '\0') { 
-      f_str[i] = c; 
-      c = socket_pop_char(socketfd);
-      i++;
-    }
+/*   if (c == '#') { printf("\nFilme não encontrado.\n"); } */
+/*   else { */
+/*     char f_str[TAM_MAX_REG]; */
+/*     i = 0; c = socket_pop_char(socketfd); */
+/*     while(c != '\0') {  */
+/*       f_str[i] = c;  */
+/*       c = socket_pop_char(socketfd); */
+/*       i++; */
+/*     } */
 
-    filme f; int tam_reg;
-    da_str_to_filme(&f, &tam_reg, f_str);
+/*     filme f; int tam_reg; */
+/*     da_str_to_filme(&f, &tam_reg, f_str); */
 
-    printf("Filme encontrado!\n\n");
-    printf("Média: %3.2f (%d avaliações)\n", f.media, f.n_aval);
-  }
+/*     printf("Filme encontrado!\n\n"); */
+/*     printf("Média: %3.2f (%d avaliações)\n", f.media, f.n_aval); */
+/*   } */
 
-  printf("\nAperte Enter para continuar...");
-  getchar();
+/*   printf("\nAperte Enter para continuar..."); */
+/*   getchar(); */
 
-  return;
-}
+/*   return; */
+/* } */
 
-/* ## 6 ## */
-void client_reg_avalia(int socketfd) {
+/* /\* ## 6 ## *\/ */
+/* void client_reg_avalia(int socketfd) { */
 
-  char c, id_avaliar[TAM_REG_ID] /*20*/, nota[7];
-  int i, j;
+/*   char c, id_avaliar[TAM_REG_ID] /\*20*\/, nota[7]; */
+/*   int i, j; */
 
-  /* Leitura do id do filme para avaliar e nota */
-  printf("ID do filme a avaliar: ");
-  i = 0; c = getchar();
-  while (c!='\n') { id_avaliar[i] = c; i++; c = getchar(); }
-  id_avaliar[i] = '@'; /* coloca um @ para finalizar o id */
-  printf("Nota [formato: abc.de]: ");
-  j = 0; c = getchar();
-  while (c!='\n') { nota[j] = c; j++; c = getchar(); }
-  nota[j] = '@'; /* coloca um @ para finalizar a nota*/
+/*   /\* Leitura do id do filme para avaliar e nota *\/ */
+/*   printf("ID do filme a avaliar: "); */
+/*   i = 0; c = getchar(); */
+/*   while (c!='\n') { id_avaliar[i] = c; i++; c = getchar(); } */
+/*   id_avaliar[i] = '@'; /\* coloca um @ para finalizar o id *\/ */
+/*   printf("Nota [formato: abc.de]: "); */
+/*   j = 0; c = getchar(); */
+/*   while (c!='\n') { nota[j] = c; j++; c = getchar(); } */
+/*   nota[j] = '@'; /\* coloca um @ para finalizar a nota*\/ */
 
-  /* envia o id e a nota ao servidor */
-  socket_push_buffer(socketfd, i+1, id_avaliar);
-  socket_push_buffer(socketfd, j+1, nota);
+/*   /\* envia o id e a nota ao servidor *\/ */
+/*   socket_push_buffer(socketfd, i+1, id_avaliar); */
+/*   socket_push_buffer(socketfd, j+1, nota); */
 
-  /* leitura da resposta do servidor */
-  do {
-    c = socket_pop_char(socketfd);
-  } while(c == '\0'); /* limpa a stream */
+/*   /\* leitura da resposta do servidor *\/ */
+/*   do { */
+/*     c = socket_pop_char(socketfd); */
+/*   } while(c == '\0'); /\* limpa a stream *\/ */
   
-  /* Caso não tenha encontrado nenhum filme */
-  if (c == '#') {
-    printf("\nFilme não encontrado.\n");
-  } else {
-    printf("\nAvaliação realizada com sucesso!\n");
-  }
+/*   /\* Caso não tenha encontrado nenhum filme *\/ */
+/*   if (c == '#') { */
+/*     printf("\nFilme não encontrado.\n"); */
+/*   } else { */
+/*     printf("\nAvaliação realizada com sucesso!\n"); */
+/*   } */
 
-  printf("\nAperte Enter para continuar...");
-  getchar();
+/*   printf("\nAperte Enter para continuar..."); */
+/*   getchar(); */
 
-  return;
-}
+/*   return; */
+/* } */
 
 /*******[fim] Funções que implementam os casos de uso  ********/
 /**************************************************************/
+
+
+
 
 
 
@@ -332,89 +335,116 @@ int main(int argc, char** argv) {
   //struct timeval tv1, tv2, tvres;
   //long double total_time;
 
+  /* armazena retornos de status para checagens */
+  int status;
+
+
   /* Caso não haja o nome do servidor, da um erro */
   if (argc != 2) {
     fprintf(stderr, "uso: ./client <nome do servidor>\n");
     exit(1);
   }
 	
-	/* 
-		 Beej 5.8
-		 Remember, if you connect() a datagram socket, you can then
-		 simply use send() and recv() for all your transactions. 
-		 The socket itself is still a datagram socket and the packets
-		 still use UDP, but the socket interface will automatically add 
-		 the destination and source information for you.
-	*/
-	/* Configura o UDP para que sempre que for enviar e receber,
-		 o faça para o IP e porta do servidor (bem-conhecidos). */
+  /* 
+     Beej 5.8
+     Remember, if you connect() a datagram socket, you can then
+     simply use send() and recv() for all your transactions. 
+     The socket itself is still a datagram socket and the packets
+     still use UDP, but the socket interface will automatically add 
+     the destination and source information for you.
+  */
+  /* Configura o UDP para que sempre que for enviar e receber,
+     o faça para o IP e porta do servidor (bem-conhecidos). */
   int socketfd;
   socketfd = client_get_connection(argv); /* como antes */
+  
+  /* Nota:
+     APENAS O CLIENTE estabelece essa configuração de enviar para 
+     e receber de um mesmo IP/porta. Dessa forma, apenas o cliente 
+     envia e recebe usando send() e recv(). Importante lembrar que 
+     a comunicação continua sendo via UDP.
+  */
+  
+  
+  /* Loop da interface */
+  char c;
+  c = read_option();
 
-	/* Nota:
-		 APENAS O CLIENTE estabelece essa configuração de enviar para 
-		 e receber de um mesmo IP/porta. Dessa forma, apenas o cliente 
-		 envia e recebe usando send() e recv(). Importante lembrar que 
-		 a comunicação continua sendo via UDP.
-	*/
+  while(c != SAIR) {
+
+    /* Envia a opção escolhida ao servidor */
+    status = udp_socket_push_char(socketfd, c);
+
+    /* Caso de erro no envio... */
+    if (status == -1) {
+      printf("UDP não conseguiu colocar a opção no buffer de \
+             saída. Aperte Enter e tente novamente...\n");
+      fprintf(stderr, "err_send\n");
+      getchar();
+    }
+    /* Caso contrário, chama a função para o caso específico */
+    else {
+      
+      switch(c) {
 	
+      case LISTAR_TODOS_COMPLETO:
+	//gettimeofday(&tv1, NULL); /* lê o t1 */
+	//	client_lista_todos_completo(socketfd);
+	//gettimeofday(&tv2, NULL); /* lê o t2 */
+	//timersub(&tv2, &tv1, &tvres); /* resposta = t2 - t1 */
+	//total_time = tvres.tv_sec*1000000 + tvres.tv_usec;
+	/* manda o tempo para a saída padrão de erro: coleta para
+	   um arquivo (via shell) */
+	//fprintf(stderr, "%.0Lf\n", (long double) total_time );
+	printf("Resolvi caso 1\n");
+	break;
+      case LISTAR_TODOS:
+	//	client_lista_todos(socketfd);
+	printf("Resolvi caso 2\n");
+	break;
+      case REG_COMPLETO:
+	//	client_reg_completo(socketfd);
+	printf("Resolvi caso 3\n");
+	break;
+      case REG_SINOPSE:
+	//	client_reg_sinopse(socketfd);
+	printf("Resolvi caso 4\n");
+	break;
+      case REG_MEDIA:
+	//	client_reg_media(socketfd);
+	printf("Resolvi caso 5\n");
+	break;
+      case REG_AVALIAR:
+	//	client_reg_avalia(socketfd);
+	printf("Resolvi caso 6\n");
+	break;
+	
+      }
+      
+    }
 
+    c = read_option();
+    
+  }
+  
 
-	char msg[7] = "Oi! :-)";
-	int tam = 7;
-
-	send(socketfd, msg, tam, 0);
-
-	char buffer[100];
-	recv(socketfd, buffer, 99, 0);
-	buffer[10] = '\0';
-	printf("Resposta do servidor: %s\n", buffer);
-
-
-  /* Loop da interface e chamadas para as funções que implementam 
-		 cada uso do sistema. */
-/*   char c; */
-		
+  
+  
+/*   char msg[7] = "Oi! :-)"; */
+/*   int tam = 7; */
+  
+/*   send(socketfd, msg, tam, 0); */
+  
+/*   char buffer[100]; */
+/*   int status; */
+/*   status = recv(socketfd, buffer, 99, 0); */
+/*   buffer[10] = '\0'; */
+/*   printf("Resposta do servidor: %s\n", buffer); */
+/*   printf("Status: %d\n", status); */
+  
+  
 /*   c = read_option(); */
     
-/*   /\* Envia a opção escolhida ao servidor (mesmo se for Sair) *\/ */
-/*   client_send_option(socketfd, c); */
-
-/*   while(c != SAIR) { */
-      
-/*     switch(c) { */
-	
-/*     case LISTAR_TODOS_COMPLETO: */
-/*       //gettimeofday(&tv1, NULL); /\* lê o t1 *\/ */
-/*       client_lista_todos_completo(socketfd); */
-/*       //gettimeofday(&tv2, NULL); /\* lê o t2 *\/ */
-/*       //timersub(&tv2, &tv1, &tvres); /\* resposta = t2 - t1 *\/ */
-/*       //total_time = tvres.tv_sec*1000000 + tvres.tv_usec; /\* resposta em micro-segundos *\/ */
-/*       /\* manda o tempo para a saída padrão de erro: coleta para um arquivo (via shell) *\/ */
-/*       //fprintf(stderr, "%.0Lf\n", (long double) total_time ); */
-/*       break; */
-/*     case LISTAR_TODOS: */
-/*       client_lista_todos(socketfd); */
-/*       break; */
-/*     case REG_COMPLETO: */
-/*       client_reg_completo(socketfd); */
-/*       break; */
-/*     case REG_SINOPSE: */
-/*       client_reg_sinopse(socketfd); */
-/*       break; */
-/*     case REG_MEDIA: */
-/*       client_reg_media(socketfd); */
-/*       break; */
-/*     case REG_AVALIAR: */
-/*       client_reg_avalia(socketfd); */
-/*       break; */
-			
-/*     } */
-    
-/*     c = read_option(); */
-/*     client_send_option(socketfd, c); */
-
-/*   } */
 	
   close(socketfd); // fecha a conexão com o servidor
   return(0);

@@ -234,75 +234,19 @@ void server_reg_avalia(int socket) {
 /**************************************************************/
 
 
-/* Implementa o comportamento de cada thread */
-void *trata_conexao (void *a) {
-  
-  int connect_socketfd;
-  int t;
 
-  char option;
 
-  /* cast pra dizer que é um ap pra thread_attr */
-  connect_socketfd = ((thread_attr *)a)->connect_socket;
-  t = ((thread_attr *)a)->thr_index;
 
-  /* recebe a opção enviada pelo cliente. */
-  option = server_recv_option(connect_socketfd);
-	
-  printf("opção enviada pelo cliente: %c\n", option);
-
-  /* Verificação do caso de saída e chamadas para cada caso específico */
-  while(option != SAIR) {
-      
-    switch(option) {
-			
-    case LISTAR_TODOS_COMPLETO:
-      server_lista_todos_completo(connect_socketfd);
-      break;
-    case LISTAR_TODOS:
-      server_lista_todos(connect_socketfd);
-      break;
-    case REG_COMPLETO:
-      server_reg_completo(connect_socketfd);
-      break;
-    case REG_SINOPSE:
-      server_reg_sinopse(connect_socketfd);
-      break;
-    case REG_MEDIA:
-      server_reg_media(connect_socketfd);
-      break;
-    case REG_AVALIAR:
-      server_reg_avalia(connect_socketfd);
-      break;
-    }
-
-    /* recebe a opção enviada pelo cliente. */
-    option = server_recv_option(connect_socketfd);
-    printf("opção enviada pelo cliente: %c\n", option);
-  }
-	
-  printf("Thread %d diz: terminei! Fechando o socket %d...\n", t, connect_socketfd);
-  close(connect_socketfd);
-
-  /* thread seta o valor do vetor de disponíveis para TRUE novamente */
-  available_thrs[t] = TRUE;
-
-  pthread_exit(NULL);
-}
-
-//Trata o sinal de interrupcao mandar uma mensagem antes de encerrar
+/* Trata o sinal de interrupção */
 void trata_SIGINT(int sig) {
   printf("\nEncerrando o servidor...\n");
-  /* Mesmo usando o socket de listen como variável global, e dando
-     um close(list_socket) aqui, continua com o problema do bind depois de
-     interromper o servidor. Isso acontece por causa da implementação do TCP
-     no Kernel, que demora algum tempo pra liberar novamente a porta para bind. */
-
-  /* Desaloca recursos para o semáforo */
-  sem_destroy(&semaphore);
-
   exit(0);
 }
+
+
+
+
+
 
 int main() {
 
@@ -327,8 +271,8 @@ int main() {
 
   /* Cria o socket e o associa a uma porta */
   socketfd = socket(servinfo->ai_family, servinfo->ai_socktype, 
-										servinfo->ai_protocol);
-  
+		    servinfo->ai_protocol);
+ 
   status = bind(socketfd, servinfo->ai_addr, servinfo->ai_addrlen);
   if (status == -1) {
     fprintf(stderr, "error on binding the socket to a port\n");
@@ -336,89 +280,75 @@ int main() {
   }
   freeaddrinfo(servinfo);
   printf("Socket UDP criado!\n");
+  
 
-	
-	char buffer[100];
-	int tam_msg;
-	struct sockaddr_storage client_addr;
-	size_t client_addr_len;
-
-	client_addr_len = sizeof(client_addr); /* necessário */
-	
-	/* Quando a função retornar, client_addr e client_addr_len
-		 estarão setados. */
-	status = recvfrom(socketfd, buffer, 99, 0,	(struct socket_addr *)
-					 &client_addr, &client_addr_len);
-	
-	buffer[7] = '\0';
-	
-	printf("Mensagem: %s\n", buffer);
-
-	
-	char resposta[10] = "Fala mano!";
-	
-	sendto(socketfd, resposta, 10, 0, (struct socket_addr *)
-				 &client_addr, client_addr_len);
-	
-  /* Atribui o socket como ouvinte das conexões. */
-  //NÃO EH MAIS NECESSARIO DAR LISTEN!//
-  //listen(listen_socketfd, QTDE_CONEXOES);
-
-  /* Inicializa o semáforo. O número de recursos compartilhados é 1 (apenas uma thread 
-     pode usar o arquivo para escrita de cada vez) - este é o terceiro argumento. 
-     O segundo argumento é uma flag com valor padrão 0. */
-/*   sem_init(&semaphore, 0, 1); */
-
-
-/*   /\* Threads Time! *\/ */
-/*   //  pthread_t thread; */
-/*   pthread_t threads[QTDE_CONEXOES]; */
-/*   int i, t; */
-
-/*   /\* Inicializa o vetor de threds disponíveis *\/ */
-/*   for (i = 0; i < QTDE_CONEXOES; i++) available_thrs[i] = TRUE; */
-
-/*   struct sockaddr_storage client_addr; */
-/*   socklen_t addr_size; */
-
-/*   while(TRUE) { */
-
-/*     //TODO Arrumar a manipulação de sockets, ja que o connect_socketfd nao existira mais!// */
-/*     /\* Aceitação da conexão. *\/ */
-/*     //NÃO EH MAIS NECESSARIO DAR ACCEPT!// */
-/*     //printf("Esperando alguma conexao...\n"); */
-/*     //connect_socketfd = accept(listen_socketfd, (struct sockaddr *)&client_addr, &addr_size); */
-/*     //if (connect_socketfd == -1){ */
-/*     //  printf("Problema na conexão.\n"); */
-/*     //  continue; /\* Desiste dessa conexão e volta a tentar conectar a outro. *\/ */
-/*     //} */
-/*     printf("Esperando Datagramas!\n"); */
+  /* Loop infinito de recebimento e tratamento das mensagens */
+  while (TRUE) {
+    printf("Aguardando opção...\n");
     
-/*     /\* Seleciona a primeira thread disponível *\/ */
-/*     /\* t recebe o indice da primeira thread disponível *\/ */
-/*     t = -1; */
-/*     for (i = 0; i < QTDE_CONEXOES; i++) { */
-/*       if (available_thrs[i]==TRUE) { */
-/* 	t = i; break; */
-/*       } */
-/*     } */
+    char c;
     
-/*     /\* caso não haja nenhuma thread disponível, fecha a conexão e volta a ouvir *\/ */
-/*     if (t == -1) {  */
-/*       printf("Não há thread disponível para aceitar a conexão.\n"); */
-/*       close(connect_socketfd); continue; */
-/*     } */
+    /* Variáveis para guadar informações do endereço do cliente */
+    struct sockaddr_storage client_addr;
+    size_t client_addr_len;
 
-/*     /\* Inicia a thread e passa o connect_socketfd pra ela. *\/ */
-/*     available_thrs[t] = FALSE; /\* agora essa thread não está disponível *\/ */
-/*     printf("Main diz: vou passar para a thread o socket %d.\n", connect_socketfd); */
-/*     /\* inicializa o atributo a passar para a thread *\/ */
-/*     thread_attr a; */
-/*     a.connect_socket = connect_socketfd; */
-/*     a.thr_index = t; */
-/*     pthread_create(&threads[t], NULL, trata_conexao, (void *)&a); */
+    /* Esta função chama recvfrom(), que TRAVA o servidor até 
+       que chegue um pacote. O endereço do cliente é setado. */
+    c = udp_socket_pop_char(socketfd, &client_addr, &client_addr_len);
 
-/*   } */
+    printf("Opção recebida: %c\n", c);
+   
+    /* "O que vc quer, cliente?!" */
+    switch(c) {
+      
+    case LISTAR_TODOS_COMPLETO:
+      //      server_lista_todos_completo(connect_socketfd);
+      break;
+    case LISTAR_TODOS:
+      //      server_lista_todos(connect_socketfd);
+      break;
+    case REG_COMPLETO:
+      //      server_reg_completo(connect_socketfd);
+      break;
+    case REG_SINOPSE:
+      //      server_reg_sinopse(connect_socketfd);
+      break;
+    case REG_MEDIA:
+      //      server_reg_media(connect_socketfd);
+      break;
+    case REG_AVALIAR:
+      //      server_reg_avalia(connect_socketfd);
+      break;
+    }
+
+    /* volta ao início do loop principal */
+
+  }
+  
+
+  /**************************************************************/
+  /* Só um exemplo de como o servidor dá sendto() e recvfrom()! */
+  
+/*   char buffer[100]; */
+/*   int tam_msg; */
+  
+/*   client_addr_len = sizeof(client_addr); /\* necessário *\/ */
+	
+/*   /\* Quando a função retornar, client_addr e client_addr_len */
+/*      estarão setados. *\/ */
+/*   status = recvfrom(socketfd, buffer, 99, 0,	(struct socket_addr *) */
+/* 		    &client_addr, &client_addr_len); */
+  
+/*   buffer[7] = '\0'; */
+	
+/*   printf("Mensagem: %s\n", buffer); */
+  
+  
+/*   char resposta[10] = "Fala mano!"; */
+  
+/*   sendto(socketfd, resposta, 10, 0, (struct socket_addr *) */
+/* 	 &client_addr, client_addr_len); */
+  
 
   return(0);
 }
