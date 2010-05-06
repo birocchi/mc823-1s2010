@@ -310,6 +310,12 @@ int main() {
 		      &client_addr, (socklen_t *) &client_addr_len);
     
     printf("Opção recebida: %c\n", request[0]);
+
+    int i;
+    for (i = 1; i<27; i++) {
+      printf("%c", request[i]);
+    }
+    printf("\n");
     
     /* "O que vc quer, cliente?!" */
     switch(request[0]) {

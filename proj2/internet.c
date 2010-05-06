@@ -36,27 +36,27 @@ int client_get_connection(char **argv) {
   status = getaddrinfo(argv[1], SERVER_PORT_STR, &opcoes, &servinfo);
   if (status != 0) {
     fprintf(stderr, "getaddrinfo error: %s\n", 
-						gai_strerror(status));
+	    gai_strerror(status));
     exit(1);
   }
-
+  
   /* cria o socket com os parâmetros setados */
   socketfd = socket(servinfo->ai_family, servinfo->ai_socktype, 
-										servinfo->ai_protocol);
+		    servinfo->ai_protocol);
 
   /* faz a conexão com o socket do servidor */
   status = connect(socketfd, servinfo->ai_addr, servinfo->ai_addrlen);
-
+  
   /* Caso dê algum erro na conexão, pára o cliente */
   if (status == -1){
     fprintf(stderr, "Problema na conexão.\n");
     exit(1);
   }
-	
-	/* libera a estrutura de informações do servidor */
+  
+  /* libera a estrutura de informações do servidor */
   freeaddrinfo(servinfo);
   return(socketfd);
-
+  
 }
 
 
@@ -64,17 +64,28 @@ int client_get_connection(char **argv) {
 int client_udp_push_buffer (int socket, char *buffer, int n) {
   
   /*
-     Entradas:
-     n - número de caracteres a serem escritos;
-     buffer - buffer de onde se lê.
+    Entradas:
+    n - número de caracteres a serem escritos;
+    buffer - buffer de onde se lê.
   */
-
+  
   int i = 0;
   while (i == 0) {
     i = send(socket, buffer, n, 0);
   }
   return(i);
 }
+
+
+/* Recebe o datagrama enviado pelo servidor.
+   Implementa o time-out com o laço e chamada ao
+   recv() não bloqueante */
+int client_udp_pop_buffer (char buffer, int n, int timeout) {
+
+  
+
+}
+
 
 /********************** Cliente ****************************/
 /***********************************************************/

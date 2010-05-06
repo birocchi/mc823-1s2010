@@ -71,7 +71,7 @@ void read_id (char *request) {
 
   printf(" Id: "); c = getchar();
 
-  while (c!='\n' && i!=20) {
+  while (c!='\n' && i<=20) {
     request[i] = c; c = getchar(); i++;
   }
 
@@ -119,6 +119,9 @@ void client_lista_todos_completo() {
   /* Recebe datagrama com número de filmes. */
   char n_filmes[10];
   
+  int status;
+  
+  //status = client_udp_pop_buffer();
   
   
 /*   /\*  */
@@ -426,6 +429,7 @@ int main(int argc, char** argv) {
      a comunicação continua sendo via UDP.
   */
   
+
   
   /* Loop da interface */
   char request[27]; /* option(1)+id(20)+nota(6) = 27  */
