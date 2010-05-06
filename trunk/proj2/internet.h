@@ -33,6 +33,22 @@ char server_recv_option(int connect_socketfd);
 /*********************************************************************/
 /***************************** Geral *********************************/
 
+/* Envia (ou tenta enviar) um caractere para o buffer de saída */
+int udp_socket_push_char(int socket, char c);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /* Envia um caractere para a stream */
 void socket_push_char(int socket, char c);
 

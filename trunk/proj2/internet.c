@@ -66,7 +66,7 @@ int client_get_connection(char **argv) {
 }
 
 /* Função auxiliar de envio da opção para o servidor */
-void client_send_option(int socketfd, char opt) {
+void udp_client_send_option(int socketfd, char opt) {
   socket_push_char(socketfd, opt);
   return;
 }
@@ -147,6 +147,52 @@ char server_recv_option(int connect_socketfd) {
 /*********************************************************************/
 /***************************** Geral *********************************/
 
+/* Envia (ou tenta enviar) um caractere para o buffer de saída */
+int udp_socket_push_char(int socket, char c) {
+  
+  int status = 0;
+
+  /* pára de tentar enviar o char apenas se conseguir 
+     colocar no buffer de saída, OU se der erro. */
+  while (status == 0) {
+    status = send(socket, &c, 1, 0);
+  }
+  
+  return(status); /* -1 em caso de erro */
+}
+
+
+/* Lê um caractere do buffer, e seta o endereço do cliente */
+char udp_socket_pop_char(int socket, struct sockaddr_storage
+			 *client_addr, size_t *client_addr_len) {
+  
+  char c;
+  int status = 0;
+
+  *client_addr_len = sizeof(client_addr); /* necessário */
+
+  while (status == 0) {
+    status = recvfrom(socket, &c, 1, 0,	(struct sockaddr *)
+		      client_addr, (socklen_t *)client_addr_len);
+  }
+  
+  return(c);
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /* Envia um caractere para a stream */
 void socket_push_char(int socket, char c) {
   int n = 0;
@@ -206,6 +252,7 @@ void socket_pop_buffer(int socket, int n, char *buffer) {
 
   return;
 }
+
 
 /***************************** Geral *********************************/
 /*********************************************************************/
