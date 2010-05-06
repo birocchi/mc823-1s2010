@@ -4,7 +4,7 @@ CC_FLAGS = -ggdb -Wall
 
 
 # Dependências gerais
-all: client server relatorio
+all: client server
 
 # Cliente
 client: data_access.o internet.o client.o
@@ -36,3 +36,4 @@ relatorio:
 clean:
 	rm *.o client server
 	rm *.aux *.toc *.pdf *.log
+
