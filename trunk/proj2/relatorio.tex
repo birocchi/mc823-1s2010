@@ -111,19 +111,18 @@ Dar uma pontuação ao filme com o dado ID.
 
 
 \section{Implementação}
-\subsection{Protocolo de comunicação com UDP}
+\subsection{Protocolo de comunicação usando UDP}
 Como o UDP não garante que os dados enviados serão recebidos, e se recebidos, podem chegar fora de ordem, foram implementada duas principais medidas para reger a comunicação:
 \subsubsection{Do cliente para o servidor}
-Anteriormente, com o uso do TCP, o cliente selecionava a opção, que era enviada ao servidor. No caso de se tratar de uma opção que requer um id, o cliente então lê e envia este id, enquanto a thread responsável por aquela conexão espera este id. O mesmo acontecia para a opção 6, que requer uma nota para avaliar o filme.\\
+Anteriormente, com o uso do TCP, o cliente selecionava a opção, que era enviada ao servidor. No caso de se tratar de uma opção que requer um id, o cliente então lê e envia este id, enquanto no lado servidor a thread responsável por aquela conexão espera este id. O mesmo acontecia para a opção 6, que requer uma nota para avaliar o filme.\\
 Como não há uma conexão de fato, seria pouco seguro continuar usando esta abordagem, uma vez que um cliente C1 poderia enviar uma opção que requer um id; e quando o servidor passasse a esperar pelo id, outro cliente C2 poderia enviar uma opção (que seria lida como id), e o programa ficaria inconsistente.\\
 É possível pensar na comunicação do cliente com o servidor como uma pergunta e resposta, onde o cliente envia uma pergunta "atômica" (apenas um datagrama), de modo que o servidor sabe exatamente o que o cliente quer com apenas uma mensagem.\\
-Para isso, foram empacotadas as informações: \textit{opção}, \textit{id} e \textit{nota} num vetor chamado \textit{request}, mesmo para as opções que não requerem id e/ou nota. O envio deste vetor é a considerada pergunta "atômica" e suficiente.
+Para isso, foram empacotadas as informações: \textit{opção}, \textit{id} e \textit{nota} num vetor chamado \textit{request}, mesmo para as opções que não requerem id e/ou nota. O envio deste vetor é, então, a considerada pergunta "atômica" e suficiente.
 \subsubsection{Do servidor para o cliente}
 Depois de enviar uma pergunta ao servidor, o cliente passa a esperar pela resposta. Mas e se a resposta começar a demorar? O UDP não garante que as mensagens enviadas serão recebidas. Logo, tanto a pergunta como a resposta podem se perder. Assim, no caso de um ou outro, o cliente ficaria bloqueado infinitamente no \textit{recv()}, o que não é interessante.\\
-Para contornar isso, implementamos uma espécie de \textit{time-out} para o recebimento de respostas pelo cliente:\\
-%TODO!!!%
-recv não bloqueante + for(vários) { sleep curto }
-%TODO!!!%
+Para contornar isso, implementamos uma espécie de \textit{time-out} para o recebimento de respostas pelo cliente. Seu funcionamento se dá como segue:\\
+Toda vez que o cliente for receber uma resposta do servidor, entra num laço \textit{for()}, razoavelmente grande (por exemplo, de 1000 vezes). A cada iteração, é chamado o \textit{recv()} no modo não-bloqueante (a partir da configuração pela flag). Caso esse \textit{recv()} leia a resposta, sai do laço e sabe-se que nenhuma msg se perdeu. Caso contrário, é chamada uma função de espera \textit{sleep()}, de algum tempo curto (p.e, 100 micro-segundos) e terminado isso, volta ao início do laço. Caso o laço se encerre, sabe-se que a resposta não chegou até o \textit{time-out} e provavelmente ou a pergunta ou a resposta se perdeu.\\
+Dessa forma, o processo cliente entra em espera ocupada (ocupando processamento), mas não trava indefinidamente no caso de perda de pacotes.
 
 
 

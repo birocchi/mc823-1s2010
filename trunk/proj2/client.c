@@ -30,11 +30,11 @@ int socketfd;
 char read_option() {
   /* considera os possiveis erros e só sai quando o usuario
      digitar um caractere válido */
-
+  
   char c, aux;
-
+  
   while(TRUE) {
-
+    
     /* Mensagem com as opções... */
     system("clear");
     printf("Escolha uma entre as opções e tecle Enter:\n");
@@ -115,13 +115,12 @@ void read_nota(char *request) {
 /* ## 1 ## */
 void client_lista_todos_completo() {
 
-	
-
-	/* Recebe datagrama com número de filmes. */
-	char n_filmes[10];
-	
-	
-
+  
+  /* Recebe datagrama com número de filmes. */
+  char n_filmes[10];
+  
+  
+  
 /*   /\*  */
 /*      Não é necessário enviar mais informações ao servidor, apenas */
 /*      aguardar um retorno. */
@@ -461,36 +460,36 @@ saída. Aperte Enter e tente novamente...\n");
     }
     /* Caso contrário, chama a função para o caso específico */
     else {
-			
+      
       switch(c) {
 				
       case LISTAR_TODOS_COMPLETO:
-				client_lista_todos_completo();
-				break;
+	client_lista_todos_completo();
+	break;
       case LISTAR_TODOS:
-				client_lista_todos();
-				break;
+	client_lista_todos();
+	break;
       case REG_COMPLETO:
-				client_reg_completo();
-				break;
+	client_reg_completo();
+	break;
       case REG_SINOPSE:
-				client_reg_sinopse();
-				break;
+	client_reg_sinopse();
+	break;
       case REG_MEDIA:
-				client_reg_media();
-				break;
+	client_reg_media();
+	break;
       case REG_AVALIAR:
-				client_reg_avalia();
-				break;
+	client_reg_avalia();
+	break;
       } /* [fim - switch] */
-    
+      
     } /* [fim - else] */
-		
+    
     c = read_option(); request[0] = c;
     
   }
   
-	close(socketfd);
+  close(socketfd);
   return(0);
-	
+  
 }
