@@ -116,79 +116,65 @@ void read_nota(char *request) {
 void client_lista_todos_completo() {
 
   /* Recebe datagrama com número de filmes. */
-  char n_filmes[10];
-  int status;
+  char n_filmes_str[10];
+  int status, n_filmes, i;
  
-  status = client_udp_pop_buffer(socketfd, n_filmes, 10);
+  /* Espera o timeout, usando select() */
+  status = client_udp_pop_buffer(socketfd, n_filmes_str, 10);
   
   /* Caso ou a pergunta ou a resposta com o n de filmes se perdeu */
   if (status == -1) {
     /* notifica usuário, envia msg de erro p/ log e retorna */
     fprintf(stderr, "ERR\n");
     printf("Request ou response perdido.\n");
-    printf("Aperte Enter para continuar...\n"); getchar();
+    printf("Aperte Enter para continuar..."); getchar();
     return;
   }
 
-  printf("Número de filmes: %s; ou seja: %d\n", n_filmes, atoi(n_filmes));
-  printf("Aperte Enter para continuar...\n"); getchar();
+  n_filmes = atoi(n_filmes_str);
+  if (n_filmes == 0) {
+    printf("Não há filmes no servidor!\n");
+    printf("Tecle Enter para continuar..."); getchar();
+    return;
+  }
+
+  printf("Número de filmes encontrados: %d\n\n", n_filmes);
+
   
+  /* Recebe cada filme e imprime suas informações */
+
+  char filme_str[TAM_MAX_REG]; /* 1024 */
+  filme *f;
+  int perdidos = 0, tam_filme;
   
-/*   /\*  */
-/*      Não é necessário enviar mais informações ao servidor, apenas */
-/*      aguardar um retorno. */
-/*      O formato desse retorno será: */
-/*      n_filmes@str_do_filme1@str_do_filme2@str_do_filme3@ */
-/*   *\/ */
+  for (i = 0; i < n_filmes; i++) {
 
-/*   int n_filmes, i; */
-/*   char filme_str[TAM_MAX_REG]; /\* 1024 *\/ */
-/*   filme *lista_filmes, *f, *last_f; */
-	
-/*   /\* Leitura do número de filmes retornado pelo servidor *\/ */
-/*   n_filmes = client_get_n_filmes(socketfd); */
+    /* recebimento do datagrama com o filme */
+    status = client_udp_pop_buffer(socketfd, filme_str, TAM_MAX_REG);
 
-/*   if (n_filmes == 0) { */
-/*     printf("Não há filmes no servidor!\n"); */
-/*     printf("Tecle Enter para continuar..."); */
-/*     getchar(); */
-/*     return; */
-/*   } */
-/*   printf("Número de filmes encontrados: %d\n\n", n_filmes); */
+    /* Caso tenha dado o timeout */
+    if (status == -1) {
+      /* log de erro; continua para o próximo */
+      fprintf(stderr, "ERR\n");
+      perdidos++; /* valor mantido para informar o usuário */
+      continue;
+    }
+    
+    /* Aloca a estrutura para guardar o filme e o seta */
+    f = (filme *)malloc(sizeof(filme));
+    da_str_to_filme(f, &tam_filme, filme_str);
+    
+    /* imprime informações completas do filme */
+    da_print_full_info(f);
+    printf("\n-------------------------\n");
 
-/*   for (i = 0; i < n_filmes; i++) { */
+    /* libera a memória do filme */
+    da_free_all(f);
+    
+  }
 
-/*     int tam_filme; */
-		
-/*     /\* Le a string do filme *\/ */
-/*     client_get_filme_str(socketfd, filme_str); */
-
-/*     /\* Aloca a estrutura para guardar o filme *\/ */
-/*     f = (filme *)malloc(sizeof(filme)); */
-/*     da_str_to_filme(f, &tam_filme, filme_str); */
-
-/*     /\* Seta a lista dos filmes *\/ */
-/*     if (i==0){ /\* primeiro filme *\/ */
-/*       lista_filmes = f; */
-/*     } */
-/*     else { */
-/*       last_f->prox_filme = f; /\* concatena o filme à lista *\/ */
-/*     } */
-/*     last_f = f; /\* atualiza o apontador para o último filme *\/ */
-/*   } */
-	
-/*   /\* para cada filme na lista, chama da_print_full_info(f) *\/ */
-/*   for (f = lista_filmes; f != NULL; f = (filme *)f->prox_filme) { */
-/*     da_print_full_info(f); */
-/*     printf("\n-------------------------\n"); */
-/*   } */
-	
-/*   /\* libera a memória dos filmes *\/ */
-/*   da_free_all(lista_filmes); */
-
-/*   printf("Tecle Enter para continuar..."); */
-/*   getchar(); */
-
+  printf("  Filmes perdidos no transporte: %d\n\n", perdidos);
+  printf("  Tecle Enter para continuar..."); getchar();
   return;
 }
 

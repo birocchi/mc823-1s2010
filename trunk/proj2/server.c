@@ -52,13 +52,28 @@ void server_lista_todos_completo() {
    * -> N datagramas: 1 para cada filme (string crua)
    */
   
-  char n_filmes[10];
+  char n_filmes_str[10];
+  int n_filmes, i;
 
-  sprintf(n_filmes, "%09d", da_get_n_filmes());
-  sendto(socketfd, n_filmes, 10, 0, (struct sockaddr *)
+  n_filmes = da_get_n_filmes();
+  sprintf(n_filmes_str, "%09d", n_filmes);
+  sendto(socketfd, n_filmes_str, 10, 0, (struct sockaddr *)
 	 &client_addr, client_addr_len);
 	
-  
+  /* Cada datagrama será montado com um vetor de caracteres de tamanho
+     fixo. Esta é uma limitação necessária para o UDP */  
+  char filme_str[TAM_MAX_REG];
+
+  /* Para cada filme no arquivo... */
+  for (i=1 ; i<=n_filmes ; i++) {
+    
+    /* seta o vetor com o i-ésimo filme no arquivo */
+    da_get_raw_str(i, filme_str);
+
+    /* envia o datagrama com o filme ao cliente */
+    sendto(socketfd, filme_str, TAM_MAX_REG, 0, (struct sockaddr *)
+	   &client_addr, client_addr_len);
+  }
   
   
   
@@ -66,18 +81,6 @@ void server_lista_todos_completo() {
   /*     Esta função envia ao cliente uma sequencia de caracteres no formato: */
 /*     n_filmes@str_filme1@str_filme2@...@ */
 /*   *\/ */
-
-/*   /\* Envio do numero de filmes *\/ */
-/*   int n_filmes, n, i; */
-/*   char n_filmes_str[10]; /\* max: 999999999@ *\/ */
-
-/*   n_filmes = da_get_n_filmes(); */
-/*   sprintf(n_filmes_str, "%d@", n_filmes); */
-
-/*   n = 0; */
-/*   while (n < strlen(n_filmes_str)) { */
-/*     n = send(socket, n_filmes_str, strlen(n_filmes_str), 0); */
-/*   } */
 
 /*   /\* Agora, para cada filme, envia sua string crua. *\/ */
 /*   char **registros; */
