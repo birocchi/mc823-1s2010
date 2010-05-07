@@ -124,27 +124,27 @@ void server_reg_completo() {
 
 /* ## 4 ## */
 void server_reg_sinopse() {
-/*   /\* Neste caso, o servidor faz exatamente o mesmo   */
-/*    * que na listagem completa de um registro: */
-/*    * 1- Recebe o registro procurado; */
-/*    * 2- Faz a busca; */
-/*    * 3- Se não encontrar o filme, retorna o caractere '#' */
-/*    * 4- Se encontrar, retorna a string crua do filme */
-/*    *\/ */
-/*   server_reg_completo(socket); */
+  /* Neste caso, o servidor faz exatamente o mesmo
+   * que na listagem completa de um registro:
+   * 1- Recebe o registro procurado;
+   * 2- Faz a busca;
+   * 3- Se não encontrar o filme, retorna o caractere '#'
+   * 4- Se encontrar, retorna a string crua do filme
+   */
+  server_reg_completo();
   return;
 }
 
 /* ## 5 ## */
 void server_reg_media() {
-/*   /\* Neste caso, o servidor faz exatamente o mesmo   */
-/*    * que na listagem completa de um registro: */
-/*    * 1- Recebe o registro procurado; */
-/*    * 2- Faz a busca; */
-/*    * 3- Se não encontrar o filme, retorna o caractere '#' */
-/*    * 4- Se encontrar, retorna a string crua do filme */
-/*    *\/ */
-/*   server_reg_completo(socket); */
+  /* Neste caso, o servidor faz exatamente o mesmo
+   * que na listagem completa de um registro:
+   * 1- Recebe o registro procurado;
+   * 2- Faz a busca;
+   * 3- Se não encontrar o filme, retorna o caractere '#'
+   * 4- Se encontrar, retorna a string crua do filme
+   */
+  server_reg_completo();
   return;
 }
 
