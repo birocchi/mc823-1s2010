@@ -77,13 +77,36 @@ int client_udp_push_buffer (int socket, char *buffer, int n) {
 }
 
 
-/* Recebe o datagrama enviado pelo servidor.
-   Implementa o time-out com o laço e chamada ao
-   recv() não bloqueante */
-int client_udp_pop_buffer (char buffer, int n, int timeout) {
-
+/* Recebe o datagrama enviado pelo servidor. 
+   Implementa o time-out com o uso do select() 
+   Retorna -1 caso tenha esgotado o timeout. */
+int client_udp_pop_buffer (int socket, char *buffer, int n) {
   
+  struct timeval timeout; 
+  fd_set read_fd_set; /* conjunto de fd's de leitura */
 
+  /* seta o valor para o timeout */
+  timeout.tv_sec = 0; 
+  timeout.tv_usec = TIMEOUT;
+
+  /* limpa o conjunto de fd's e adiciona o socket */
+  FD_ZERO(&read_fd_set);
+  FD_SET(socket, &read_fd_set); 
+
+  /* bloqueia até que o socket esteja pronto ou
+     acabe o timeout */
+  select(socket+1, &read_fd_set, NULL, NULL, &timeout);
+
+  /* Caso tenha chegado alguma mensagem, retorna o n de 
+     bytes lidos */
+  if (FD_ISSET(socket, &read_fd_set)) {
+    return(recv(socket, buffer, n, 0));
+  }
+  /* Caso esgote o tempo, retorna -1 */
+  else {
+    return(-1);
+  }
+  
 }
 
 

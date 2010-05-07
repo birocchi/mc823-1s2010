@@ -15,10 +15,10 @@ client.o: client.c data_access.h internet.h defines.h
 
 # Servidor
 server: data_access.o internet.o server.o
-	$(CC) $(CC_FLAGS) -pthread data_access.o internet.o server.o -o server
+	$(CC) $(CC_FLAGS) data_access.o internet.o server.o -o server
 
 server.o: server.c data_access.h internet.h defines.h
-	$(CC) $(CC_FLAGS) -pthread -c server.c
+	$(CC) $(CC_FLAGS) -c server.c
 
 # Bibliotecas
 data_access.o: data_access.c data_access.h defines.h
