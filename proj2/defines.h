@@ -10,16 +10,18 @@
 #define SAIR '7'
 
 
-// A Porta em que o servidor escuta e na qual os clientes irão se conectar
+// A Porta em que o servidor escuta
 #define SERVER_PORT 50000
 #define SERVER_PORT_STR "50000"
 
 // Tamanho do Buffer de recepcao de mensagens
 #define TAM_BUFFER 200
 
-//Tamanho do Buffer de envio de Mensagens
+// Tamanho do Buffer de envio de Mensagens
 #define TAM_MENSAGEM 200
 
+// Tempo limite de espera por resposta do servidor, em MICRO seg
+#define TIMEOUT 50000 /* 50000us = 50ms */
 
 // Estrutura para definir o atributo a ser passado para a thread
 typedef struct {

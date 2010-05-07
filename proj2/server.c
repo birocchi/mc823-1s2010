@@ -53,7 +53,7 @@ void server_lista_todos_completo() {
    */
   
   char n_filmes[10];
-  
+
   sprintf(n_filmes, "%09d", da_get_n_filmes());
   sendto(socketfd, n_filmes, 10, 0, (struct sockaddr *)
 	 &client_addr, client_addr_len);
@@ -304,18 +304,13 @@ int main() {
     /* Variável para guardar a msg enviada pelo cliente */
     char request[27];
     
+
     /* Esta função bloqueia o servidor até que chegue um pacote. 
        O endereço do cliente é setado! */
     status = recvfrom(socketfd, request, 27, 0, (struct sockaddr *)
 		      &client_addr, (socklen_t *) &client_addr_len);
-    
-    printf("Opção recebida: %c\n", request[0]);
 
-    int i;
-    for (i = 1; i<27; i++) {
-      printf("%c", request[i]);
-    }
-    printf("\n");
+    printf("Opção recebida: %c\n", request[0]);
     
     /* "O que vc quer, cliente?!" */
     switch(request[0]) {

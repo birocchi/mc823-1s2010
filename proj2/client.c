@@ -115,13 +115,23 @@ void read_nota(char *request) {
 /* ## 1 ## */
 void client_lista_todos_completo() {
 
-  
   /* Recebe datagrama com número de filmes. */
   char n_filmes[10];
-  
   int status;
+ 
+  status = client_udp_pop_buffer(socketfd, n_filmes, 10);
   
-  //status = client_udp_pop_buffer();
+  /* Caso ou a pergunta ou a resposta com o n de filmes se perdeu */
+  if (status == -1) {
+    /* notifica usuário, envia msg de erro p/ log e retorna */
+    fprintf(stderr, "ERR\n");
+    printf("Request ou response perdido.\n");
+    printf("Aperte Enter para continuar...\n"); getchar();
+    return;
+  }
+
+  printf("Número de filmes: %s; ou seja: %d\n", n_filmes, atoi(n_filmes));
+  printf("Aperte Enter para continuar...\n"); getchar();
   
   
 /*   /\*  */
@@ -429,7 +439,6 @@ int main(int argc, char** argv) {
      a comunicação continua sendo via UDP.
   */
   
-
   
   /* Loop da interface */
   char request[27]; /* option(1)+id(20)+nota(6) = 27  */
