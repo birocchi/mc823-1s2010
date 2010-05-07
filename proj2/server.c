@@ -36,6 +36,10 @@ int socketfd;
 struct sockaddr_storage client_addr;
 size_t client_addr_len = sizeof(client_addr); /* necessário */
 
+/* Variável para guardar a msg enviada pelo cliente */
+char request[27];
+
+
 /******************* Variáveis Globais ************************/
 /**************************************************************/
 
@@ -89,42 +93,31 @@ void server_lista_todos() {
 /* ## 3 ## */
 void server_reg_completo() {
   
-/*   /\* servidor lê o ID que está sendo passado *\/ */
-/*   char c, id_procurado[TAM_REG_ID]; /\* 20 *\/ */
-/*   int i = 0, tam_reg; */
+  /* leitura do id procurado */
+  char id_str[21];
+  int i, id;
 
-/*   /\* leitura do ID pesquisado pelo cliente *\/ */
-/*   c = socket_pop_char(socket); */
-/*   while (c!='@') { */
-/*     id_procurado[i] = c; */
-/*     c = socket_pop_char(socket); */
-/*     i++; */
-/*   } */
-/*   id_procurado[i] = '\0'; */
+  for (i=1; i<21; i++) { id_str[i-1] = request[i]; }
+  id_str[20] = '\0'; id = atoi(id_str);
+  printf("  id requisitado: %d\n", id);
 
-/*   int id; */
-/*   id = atoi(id_procurado); */
 
-/*   printf("  id requisitado: %d\n", id); */
+  /* Realiza a busca. */
+  char f_str[TAM_MAX_REG];
+  int status, tam_reg;
 
-/*   /\* Função que faz a busca. */
-/*      Retorna 1 se n encontrou nenhum filme. */
-/*      Caso contrário, aloca a memória e seta o filme. *\/ */
-  
-/*   char f_str[TAM_MAX_REG]; */
+  /* Retorna 1 se não encontrar nenhum filme. */  
+  status = da_get_filme_by_id(f_str, id, &tam_reg);
 
-/*   /\* se não encontrou nenhum filme, envia erro ao cliente *\/ */
-/*   if (da_get_filme_by_id(f_str, id, &tam_reg) == 1) { */
-/*     socket_push_char(socket, '#'); */
-/*     return; */
-/*   } */
+  /* se não encontrou nenhum filme... */
+  if (status == 1) {
+    /* seta o código de erro na mensagem que irá para o cliente */
+    f_str[0] = '#';
+  }
 
-/*   /\* se encontrou... *\/ */
-/*   /\* envia caractere de confirmação *\/ */
-/*   socket_push_char(socket, '%'); */
-  
-/*   /\* envia o filme *\/ */
-/*   socket_push_buffer(socket, tam_reg, f_str); */
+  /* envia o filme (ou código de erro) ao cliente */
+  sendto(socketfd, f_str, TAM_MAX_REG, 0, (struct sockaddr *)
+	 &client_addr, client_addr_len);
 
   return;
 }
@@ -280,10 +273,6 @@ int main() {
   /* Loop infinito de recebimento e tratamento das mensagens */
   while (TRUE) {
     printf("Aguardando request...\n");
-
-    /* Variável para guardar a msg enviada pelo cliente */
-    char request[27];
-    
 
     /* Esta função bloqueia o servidor até que chegue um pacote. 
        O endereço do cliente é setado! */

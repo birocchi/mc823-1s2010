@@ -227,50 +227,39 @@ void client_lista_todos() {
 /* ## 3 ## */
 void client_reg_completo() {
 
-/*   char c, id_procurado[TAM_REG_ID]; /\* 20 *\/ */
-/*   int i = 0; */
-
-/*   /\* Leitura do id procurado (digito p/ dig.) *\/ */
-/*   printf("ID do filme: "); */
-/*   c = getchar(); */
-/*   while (c!='\n') { id_procurado[i] = c; i++; c = getchar(); } */
-/*   id_procurado[i] = '@'; /\* coloca um @ para finalizar o id *\/ */
-
-/*   /\* envia o id procurado ao servidor *\/ */
-/*   socket_push_buffer(socketfd, i+1, id_procurado); */
-
-/*   /\* leitura da resposta do servidor *\/ */
-/*   do { */
-/*     c = socket_pop_char(socketfd); */
-/*   } while(c == '\0'); /\* limpa a stream *\/ */
+  /* leitura da resposta do servidor */
+  int status;
+  char filme_str[TAM_MAX_REG];
   
-/*   /\* Caso não tenha encontrado nenhum filme *\/ */
-/*   if (c == '#') { */
-/*     printf("\nFilme não encontrado.\n"); */
-/*   } else { */
-/*     /\* recebe a str do filme encontrado *\/ */
-/*     char f_str[TAM_MAX_REG]; */
-/*     i = 0; */
-/*     c = socket_pop_char(socketfd); */
-/*     while(c != '\0') {  */
-/*       f_str[i] = c; */
-/*       c = socket_pop_char(socketfd); */
-/*       i++; */
-/*     } */
+  status = client_udp_pop_buffer(socketfd, filme_str, TAM_MAX_REG);
+  
+  /* caso tenha dado timeout */
+  if (status == -1) { 
+    /* log erro; avisa o cliente; retorna */
+    fprintf(stderr, "ERR\n");
+    printf("Request ou response perdido.\n");
+    printf("Aperte Enter para continuar..."); getchar();
+    return;
+  }
+  
+  /* Caso não tenha encontrado nenhum filme... */
+  if (filme_str[0] == '#') {
+    printf("\nFilme não encontrado.\n");
+  }
+  /* Caso tenha encontrado... */
+  else {
 
-/*     /\* monta a estrutura de filme *\/ */
-/*     filme f; */
-/*     int tam_reg; */
-/*     da_str_to_filme(&f, &tam_reg, f_str); */
+    /* monta a estrutura de filme */
+    filme f;
+    int tam_reg;
+    da_str_to_filme(&f, &tam_reg, filme_str);
 
-/*     /\* Imprime resultado da pesquisa *\/ */
-/*     printf("Filme encontrado!\n\n"); */
-/*     da_print_full_info(&f); */
-/*   } */
+    /* Imprime resultado da pesquisa */
+    printf("Filme encontrado!\n\n");
+    da_print_full_info(&f);
+  }
 
-/*   printf("\nAperte Enter para continuar..."); */
-/*   getchar(); */
-
+  printf("\nAperte Enter para continuar..."); getchar();
   return;
 }
 
