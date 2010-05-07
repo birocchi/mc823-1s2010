@@ -27,6 +27,11 @@ typedef struct {
 
 /* 'da' refere-se a data access (para facilitar depois pra chamar as funções) */
 
+
+/* Retorna o i-ésimo filme do arquivo */
+void da_get_raw_str (int index, char *f_str);
+
+
 /* Função responsável por fazer um parse da string lida do arquivo para um filme */
 int da_str_to_filme(filme *f_ret, int *tam_reg, char *f_str);
 
@@ -62,3 +67,4 @@ void da_get_raw_strings (char **registros, int *tam_registros, int n_registros);
 
 /* Avalia a nota de avaliação do filme e atualiza seu número de atualizações */
 int da_avalia_filme(int id, float nota);
+

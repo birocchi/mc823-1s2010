@@ -2,6 +2,35 @@
 #include <stdlib.h>
 #include "data_access.h"
 
+/* Retorna o i-ésimo filme do arquivo */
+void da_get_raw_str (int index, char *f_str) {
+  
+  FILE *arq;
+  int tam_reg, i = 0;
+  long int cursor = 0; /* indice de leitura do arquivo */
+
+  arq = fopen("filmes.dat", "r");
+
+  /* Enquanto houver registros no arquivo */
+  while(fscanf(arq, "%d@", &tam_reg) != EOF) {
+    i++;
+    fseek(arq, cursor, SEEK_SET); /* pula p/ o inicio do registro */
+
+    /* caso seja o filme procurado, seta a string de retorno */
+    if (i == index) {
+      fgets(f_str, tam_reg, arq);
+      break;
+    }
+
+    cursor += tam_reg; /* ajuste para a leitura do próximo reg no arq */
+  }
+  
+  fclose(arq);
+  
+  return;
+}
+
+
 int da_str_to_filme (filme *f_ret, int *tam_reg, char *f_str) {
   /* Entrada: string crua lida do arquivo, a partir do início de um registro */
   /* Saída: - setup da struct filme passada por referência 
