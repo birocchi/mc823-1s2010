@@ -8,12 +8,6 @@
 #include "data_access.h"
 #include <signal.h>
 
-// Biblioteca para threads
-#include <pthread.h>
-
-// Exclusão Mútua
-#include <semaphore.h>
-
 // Bibliotecas para manipulacao de sockets
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -151,74 +145,45 @@ void server_reg_media() {
 /* ## 6 ## */
 void server_reg_avalia() {
 
-/*   /\* servidor lê o ID que está sendo passado *\/ */
-/*   char c, id_avaliar[TAM_REG_ID] /\*20*\/, nota_s[7]; */
-/*   int i = 0; */
+  /* leitura do id procurado */
+  char id_str[21];
+  int i, id;
 
-/*   /\* leitura do ID requisitado pelo cliente p/ avaliação *\/ */
-/*   do {  */
-/*     c = socket_pop_char(socket); */
-/*   } while (c=='\0'); /\* limpa stream *\/ */
-/*   while (c!='@') { */
-/*     id_avaliar[i] = c; */
-/*     c = socket_pop_char(socket); */
-/*     i++; */
-/*   } */
-/*   id_avaliar[i] = '\0'; */
+  for (i=1; i<21; i++) { id_str[i-1] = request[i]; }
+  id_str[20] = '\0'; id = atoi(id_str);
+  printf("  id requisitado: %d\n", id);
 
-/*   int id; */
-/*   id = atoi(id_avaliar); */
+  /* leitura da nota */
+  char nota_str[7];
+  float nota;
+  for (i=21; i<=26; i++) { nota_str[i-21] = request[i]; }
+  nota_str[6] = '\0'; nota = atof(nota_str);
+  printf("  nota enviada: %06.2f", nota);
 
-/*   /\* leitura da nota *\/ */
-/*   i = 0; */
-/*   do {  */
-/*     c = socket_pop_char(socket); */
-/*   } while (c=='\0'); /\* limpa stream *\/ */
-/*   while (c!='@') { */
-/*     nota_s[i] = c; */
-/*     c = socket_pop_char(socket); */
-/*     i++; */
-/*   } */
-/*   nota_s[i] = '\0'; */
+  /*
+   * Função que realiza a avaliação:
+   * Retorna 1 se o filme não existe.
+   * Retorna 0 se ocorreu tudo bem.
+   */
+  /* Nota: Esta função não requer mais exclusão mútua, pois o 
+     servidor agora é iterativo e só um processo/thread pode
+     querer escrever no arquivo por vez. */
+  int status;
+  status = da_avalia_filme(id, nota); 
 
-/*   float nota; */
-/*   nota = atof(nota_s); */
+  /* 
+   * Prepara o caractere de resposta:
+   * Caso o filme não exista, responde '#'
+   * Caso contrário, confirma a avaliação com '%'
+   */
+  char resposta;
+  if (status == 1) { resposta = '#'; }
+  else { resposta = '%'; }
 
-/*   printf("  id p/ avaliar: %d\n", id); */
-
-/*   printf("  nota enviada: %06.2f", nota); */
-
-/*   /\*  */
-/*    * Importante: Uso do semáforo para controle de concorrência */
-/*    * do recurso (no caso o arquivo), garantido exclusão mútua, */
-/*    * isto é, apenas uma thread poderá escrever nele por vez. */
-/*    *\/ */
-/*   sem_wait(&semaphore); /\* trava até o semáforo estar liberado *\/ */
-
-/*   /\**************************************\/ */
-/*   /\* [Início] Região com Exclusão Mútua *\/ */
-/*   int status; */
-/*   /\* sleep(10); *\/ /\* testes *\/ */
+  /* envia um datagrama com apenas um caractere, o de resposta */
+  sendto(socketfd, &resposta, 1, 0, (struct sockaddr *)
+	 &client_addr, client_addr_len);
   
-/*   /\* */
-/*    * Função que realiza a avaliação: */
-/*    * Retorna 1 se o filme não existe. */
-/*    * Retorna 0 se ocorreu tudo bem. */
-/*    *\/ */
-/*   status = da_avalia_filme(id, nota); */
-/*   /\** [Fim] Região com Exclusão Mútua ***\/ */
-/*   /\**************************************\/ */
-
-/*   sem_post(&semaphore); /\* libera o semáforo *\/ */
-
-/*   /\* se não encontrou nenhum filme, envia erro ao cliente *\/ */
-/*   if (status == 1) { */
-/*     socket_push_char(socket, '#'); */
-/*   } else { */
-/*     /\* se encontrou, envia caractere de confirmação *\/ */
-/*     socket_push_char(socket, '%'); */
-/*   } */
-
   return;
 }
 
