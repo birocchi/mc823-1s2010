@@ -18,10 +18,9 @@
 #include <time.h>
 
 
-/***********************************************************/
-/********************** Cliente ****************************/
-
-/* Retorna o socketfd da conexão com o servidor */
+/* Retorna o socketfd da "conexão" com o servidor */
+/* Note que como estamos usando datagram_socket (UDP),
+   essa conexão funciona apenas como uma configuração. */
 int client_get_connection(char **argv) {
 
   int status, socketfd;
@@ -109,15 +108,3 @@ int client_udp_pop_buffer (int socket, char *buffer, int n) {
   
 }
 
-
-/********************** Cliente ****************************/
-/***********************************************************/
-
-
-
-/***********************************************************/
-/*********************** Server ****************************/
-
-
-/*********************** Server ****************************/
-/***********************************************************/

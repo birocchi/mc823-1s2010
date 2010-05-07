@@ -328,37 +328,28 @@ void client_reg_media() {
 /* ## 6 ## */
 void client_reg_avalia() {
 
-/*   char c, id_avaliar[TAM_REG_ID] /\*20*\/, nota[7]; */
-/*   int i, j; */
+  /* leitura da resposta do servidor */
+  char resposta;
+  int status;
 
-/*   /\* Leitura do id do filme para avaliar e nota *\/ */
-/*   printf("ID do filme a avaliar: "); */
-/*   i = 0; c = getchar(); */
-/*   while (c!='\n') { id_avaliar[i] = c; i++; c = getchar(); } */
-/*   id_avaliar[i] = '@'; /\* coloca um @ para finalizar o id *\/ */
-/*   printf("Nota [formato: abc.de]: "); */
-/*   j = 0; c = getchar(); */
-/*   while (c!='\n') { nota[j] = c; j++; c = getchar(); } */
-/*   nota[j] = '@'; /\* coloca um @ para finalizar a nota*\/ */
+  status = client_udp_pop_buffer(socketfd, &resposta, 1);
 
-/*   /\* envia o id e a nota ao servidor *\/ */
-/*   socket_push_buffer(socketfd, i+1, id_avaliar); */
-/*   socket_push_buffer(socketfd, j+1, nota); */
+  /* caso tenha esgotado o timeout */
+  if (status == -1) { 
+    fprintf(stderr, "ERR\n");
+    printf("Request ou response perdido.\n");
+    printf("Aperte Enter para continuar..."); getchar();
+    return;
+  }
 
-/*   /\* leitura da resposta do servidor *\/ */
-/*   do { */
-/*     c = socket_pop_char(socketfd); */
-/*   } while(c == '\0'); /\* limpa a stream *\/ */
-  
-/*   /\* Caso não tenha encontrado nenhum filme *\/ */
-/*   if (c == '#') { */
-/*     printf("\nFilme não encontrado.\n"); */
-/*   } else { */
-/*     printf("\nAvaliação realizada com sucesso!\n"); */
-/*   } */
+  /* Caso não tenha encontrado nenhum filme */
+  if (resposta == '#') {
+    printf("\nFilme não encontrado.\n");
+  } else {
+    printf("\nAvaliação realizada com sucesso!\n");
+  }
 
-/*   printf("\nAperte Enter para continuar..."); */
-/*   getchar(); */
+  printf("\nAperte Enter para continuar..."); getchar();
 
   return;
 }
@@ -369,17 +360,10 @@ void client_reg_avalia() {
 
 
 
-
-
 int main(int argc, char** argv) {
-
-  /*Variaveis para analise de tempo*/
-  //struct timeval tv1, tv2, tvres;
-  //long double total_time;
 
   /* armazena retornos de status para checagens */
   int status;
-
 
   /* Caso não haja o nome do servidor, da um erro */
   if (argc != 2) {
@@ -433,10 +417,9 @@ int main(int argc, char** argv) {
     /* Envia o pacote request ao servidor */
     status = client_udp_push_buffer(socketfd, request, 27);
     if (status == -1) {
-      printf("UDP não conseguiu colocar a opção no buffer de \
-saída. Aperte Enter e tente novamente...\n");
       fprintf(stderr, "err_send\n");
-      getchar();
+      printf("UDP não conseguiu colocar a opção no buffer de \
+saída. Aperte Enter e tente novamente...\n"); getchar();
     }
     /* Caso contrário, chama a função para o caso específico */
     else {

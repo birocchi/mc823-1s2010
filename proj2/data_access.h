@@ -29,43 +29,35 @@ typedef struct {
 } filme;
 
 
-/******* Funções a serem chamadas externamente (API) ********/
-/*               'da' refere-se a data access               */
+/**** Funções a serem chamadas externamente (API) *****/
+/*            'da' refere-se a data access            */
 
 
 /* Retorna o i-ésimo filme do arquivo */
-/* OK */void da_get_raw_str (int index, char *f_str);
+void da_get_raw_str (int index, char *f_str);
 
-
-/* Função responsável por fazer um parse da string lida do arquivo para um filme */
-/* OK */int da_str_to_filme(filme *f_ret, int *tam_reg, char *f_str);
+/* Faz um parse da string lida do arquivo para um filme */
+int da_str_to_filme(filme *f_ret, int *tam_reg, char *f_str);
 
 /* Libera as strings alocadas dinamicamente */
-/* OK */void da_free_strs(filme *f);
+void da_free_strs(filme *f);
 
 /* Imprime as informações já formatadas de um filme */
-/* OK */void da_print_full_info(filme *f);
+void da_print_full_info(filme *f);
 
 /* Imprime as informações já formatadas de um filme */
-/* OK */void da_print_partial_info(filme *f);
-
+void da_print_partial_info(filme *f);
 
 /* Função que retorna um filme a partir de um id */
 int da_get_filme_by_id(char *f_str, int id, int *tamanho);
 
-/* Libera toda a memória alocada para o(s) filme(s) (strings e struct) 
- - retorna o numero de filmes desalocados */
-/* OK */int da_free_all(filme *f);
-
-/* Seta uma lista com todos os filmes no arquivo */
-/* ? */int da_get_todos_filmes(filme **filmes);
+/* Libera toda a memória alocada para o(s) filme(s) (strings 
+   e struct) e retorna o numero de filmes desalocados */
+int da_free_all(filme *f);
 
 /* Retorna o número de filmes no arquivo */
-/* OK */int da_get_n_filmes();
+int da_get_n_filmes();
 
-/* Retorna uma matriz com os registros todos em formato string pura */
-/* ? */void da_get_raw_strings (char **registros, int *tam_registros, int n_registros);
-
-/* Avalia a nota de avaliação do filme e atualiza seu número de atualizações */
+/* Atualiza o arquivo com a nova avaliação */
 int da_avalia_filme(int id, float nota);
 
