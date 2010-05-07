@@ -75,37 +75,14 @@ void server_lista_todos_completo() {
 	   &client_addr, client_addr_len);
   }
   
-  
-  
-  /*   /\* */
-  /*     Esta função envia ao cliente uma sequencia de caracteres no formato: */
-/*     n_filmes@str_filme1@str_filme2@...@ */
-/*   *\/ */
-
-/*   /\* Agora, para cada filme, envia sua string crua. *\/ */
-/*   char **registros; */
-/*   int *tam_reg; */
-/*   registros = (char **)malloc(n_filmes*sizeof(char *)); */
-/*   tam_reg = (int *)malloc(n_filmes*sizeof(int)); */
-/*   da_get_raw_strings(registros, tam_reg, n_filmes); */
-
-/*   for (i = 0; i < n_filmes; i++) { */
-/*     n = 0; */
-/*     socket_push_buffer(socket, tam_reg[i], registros[i]); */
-/*     free(registros[i]); */
-/*   } */
-/*   free(registros); */
-/*   free(tam_reg); */
-
   return;
 }
 
 /* ## 2 ## */
 void server_lista_todos() {
-/*   /\* O servidor faz exatamente a mesma coisa para a  */
-/*    listagem parcial. Todas informações são passadas */
-/*    para o cliente, mas este só imprime algumas delas. *\/ */
-/*   server_lista_todos_completo(socket); */
+  /* Faz exatamente o mesmo procedimento que para a listagem 
+     completa: todas as info são passadas ao cliente. */
+  server_lista_todos_completo();
   return;
 }
 
