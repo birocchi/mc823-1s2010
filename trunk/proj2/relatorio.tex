@@ -29,13 +29,13 @@
 % DATA DE PUBLICAÇÃO (PARA A CAPA)
 %
 \TRYear{10} % Dois dígitos apenas
-\TRMonth{03} % Numérico, 01-12
+\TRMonth{05} % Numérico, 01-12
 
 % LISTA DE AUTORES PARA CAPA (sem afiliações).
 \TRAuthor{Birocchi, Anderson - RA: 072787 \and Braga, Felipe - RA:070803}
 
 % TÍTULO PARA A CAPA (use \\ para forçar quebras de linha).
-\TRTitle{MC823 - Laboratório de Redes\\Projeto 1: Servidor TCP Multi-usuário para Consulta a Banco de Dados de um Cinema}
+\TRTitle{MC823 - Laboratório de Redes\\Projeto 2: Servidor UDP Iterativo para Consulta a Banco de Dados de um Cinema}
 
 \TRMakeCover
 
@@ -52,14 +52,14 @@
 % Nomes de autores ABREVIADOS e titulo ABREVIADO,
 % para cabeçalhos em cada página.
 %
-\markboth{Birocchi, Braga}{MC823 - Projeto 1, Aplicação TCP}
+\markboth{Birocchi, Braga}{MC823 - Projeto 2, Aplicação UDP}
 \pagestyle{myheadings}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % TÍTULO e NOMES DOS AUTORES, completos, para a página 1.
 % Use "\\" para quebrar linhas, "\and" para separar autores.
 %
-\title{MC823 - Projeto 1, Servidor TCP Multi-usuário para Consulta a Banco de Dados de um Cinema}
+\title{MC823 - Projeto 2, Servidor UDP Iterativo para Consulta a Banco de Dados de um Cinema}
 
 \author{Anderson Birocchi, Felipe Braga}
 
@@ -81,10 +81,19 @@
 
 
 \begin{abstract}
-Este projeto consiste da implementação de um sistema, que implementa comunicação em rede, baseado no paradigma cliente-servidor, motivado pela provisão de acesso a uma base de dados de filmes. O protocolo de transporte utilizado foi o TCP - \textit{Transmission Control Protocol}, e foram feitas análises quanto ao desempenho da aplicação considerando os atrasos de comunicação.
+Complementarmente ao anterior, o objetivo deste projeto é dar uma noção dos aspectos da implementação de um sistema que utiliza comunicação em rede. Desta vez, no entanto, foi usado o protocolo da camada de transporte UDP - \textit{User Datagram Protocol}. Procurou-se verificar as brechas geradas pela inconfiabilidade na entrega deste protocolo, assim como comparar a aplicação com a anterior, em TCP (tanto com relação à implementação como ao desempenho).
 \end{abstract}
 
 \section{Introdução}
+
+
+
+
+
+
+
+
+
 Nos dia de hoje é comum se ter qualquer tipo de informação de forma rápida e prática através da internet, como mapas, receitas, notícias, preços de mercado, cotação das moedas do mundo todo, etc. De tudo que se pode fazer pela internet, a área que mais cresce é a de prestação de serviços, onde já se pode fazer compras, pagar contas, fazer transações bancárias dentre várias outras coisas, e um desses tipos de serviço será implementado pelo nosso projeto.\\
 Nosso projeto irá implementar um servidor TCP multi-usuário para consultas em bancos de dados de um cinema, onde são armazenadas várias informações sobre os filmes em cartaz, como o título, sinopse, horário das sessões e as salas.\\
 O intuito é de centralizar as informações dos filmes em um único local, evitando que cada cliente tenha que ficar se sincronizando toda vez que for fazer uma consulta; além de tornar o programa cliente leve e livre da carga de processamento necessário para as consultas, permitindo assim que aparelhos com poder de processamento menor como celulares ou palm-tops também possam executar o programa sem problemas.\\
