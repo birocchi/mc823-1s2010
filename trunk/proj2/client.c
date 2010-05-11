@@ -433,8 +433,10 @@ saída. Aperte Enter e tente novamente...\n"); getchar();
           client_lista_todos_completo(socketfd);
           gettimeofday(&tv2, NULL); /* lê o t2 */
           timersub(&tv2, &tv1, &tvres); /* resposta = t2 - t1 */
-          total_time = tvres.tv_sec*1000000 + tvres.tv_usec; /* resposta em micro-segundos */
-          /* manda o tempo para a saída padrão de erro: coleta para um arquivo (via shell) */
+					/* resposta em micro-segundos */
+          total_time = tvres.tv_sec*1000000 + tvres.tv_usec; 
+          /* manda o tempo para a saída padrão de erro: coleta 
+						 para um arquivo (via shell) */
           fprintf(stderr, "%.0Lf\n", (long double) total_time );
           break;
         case LISTAR_TODOS:
