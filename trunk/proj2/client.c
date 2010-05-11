@@ -127,14 +127,14 @@ void client_lista_todos_completo() {
     /* notifica usuário, envia msg de erro p/ log e retorna */
     fprintf(stderr, "ERR\n");
     printf("Request ou response perdido.\n");
-    printf("Aperte Enter para continuar..."); getchar();
+    //printf("Aperte Enter para continuar..."); getchar();
     return;
   }
 
   n_filmes = atoi(n_filmes_str);
   if (n_filmes == 0) {
     printf("Não há filmes no servidor!\n");
-    printf("Tecle Enter para continuar..."); getchar();
+    //printf("Tecle Enter para continuar..."); getchar();
     return;
   }
 
@@ -174,7 +174,7 @@ void client_lista_todos_completo() {
   }
 
   printf("  Filmes perdidos no transporte: %d\n\n", perdidos);
-  printf("  Tecle Enter para continuar..."); getchar();
+  //printf("  Tecle Enter para continuar..."); getchar();
   return;
 }
 
@@ -362,6 +362,9 @@ void client_reg_avalia() {
 
 int main(int argc, char** argv) {
 
+  struct timeval tv1, tv2, tvres;
+  long double total_time;
+  
   /* armazena retornos de status para checagens */
   int status;
 
@@ -425,25 +428,30 @@ saída. Aperte Enter e tente novamente...\n"); getchar();
     else {
       
       switch(c) {
-				
-      case LISTAR_TODOS_COMPLETO:
-	client_lista_todos_completo();
-	break;
-      case LISTAR_TODOS:
-	client_lista_todos();
-	break;
-      case REG_COMPLETO:
-	client_reg_completo();
-	break;
-      case REG_SINOPSE:
-	client_reg_sinopse();
-	break;
-      case REG_MEDIA:
-	client_reg_media();
-	break;
-      case REG_AVALIAR:
-	client_reg_avalia();
-	break;
+        case LISTAR_TODOS_COMPLETO:
+          gettimeofday(&tv1, NULL); /* lê o t1 */
+          client_lista_todos_completo(socketfd);
+          gettimeofday(&tv2, NULL); /* lê o t2 */
+          timersub(&tv2, &tv1, &tvres); /* resposta = t2 - t1 */
+          total_time = tvres.tv_sec*1000000 + tvres.tv_usec; /* resposta em micro-segundos */
+          /* manda o tempo para a saída padrão de erro: coleta para um arquivo (via shell) */
+          fprintf(stderr, "%.0Lf\n", (long double) total_time );
+          break;
+        case LISTAR_TODOS:
+          client_lista_todos();
+          break;
+        case REG_COMPLETO:
+          client_reg_completo();
+          break;
+        case REG_SINOPSE:
+          client_reg_sinopse();
+          break;
+        case REG_MEDIA:
+          client_reg_media();
+          break;
+        case REG_AVALIAR:
+          client_reg_avalia();
+          break;
       } /* [fim - switch] */
       
     } /* [fim - else] */
