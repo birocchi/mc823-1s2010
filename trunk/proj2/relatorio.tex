@@ -272,38 +272,1290 @@ clean:
 
 \subsection{repeat\_client.sh}
 \begin{verbatim}
+#!/bin/bash
+
+for i in $(seq 100)
+do
+    ./client 143.106.150.74 < arq.in 2>> tempos.out
+done
 \end{verbatim}
 
 \subsection{arq.in}
 \begin{verbatim}
+1
+7
 \end{verbatim}
 
 \subsection{client.c}
 \begin{verbatim}
+//Bibliotecas comuns
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <netdb.h>   //Para usar o gethostbyname
+#include "data_access.h"
+#include "defines.h"
+#include "internet.h"
+
+//Bibliotecas para manipulacao de sockets
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <unistd.h>
+
+//Bibliotecas para analise de tempo
+#include <sys/time.h>
+#include <time.h>
+
+
+/* Socket único do cliente */
+int socketfd;
+
+
+
+/**************************************************************/
+/******************* Funções auxiliares ***********************/
+
+/* Função auxiliar para tratamento de entrada */
+char read_option() {
+  /* considera os possiveis erros e só sai quando o usuario
+     digitar um caractere válido */
+  
+  char c, aux;
+  
+  while(TRUE) {
+    
+    /* Mensagem com as opções... */
+    system("clear");
+    printf("Escolha uma entre as opções e tecle Enter:\n");
+    printf("(opções com (*) requererão o id do filme)\n");
+    printf(" [1] Listar todas as informações de todos os filmes.\n");
+    printf(" [2] Listar id e título de todos os filmes.\n");
+    printf(" [3] Listar todas as informações de um filme. (*)\n");
+    printf(" [4] Mostrar a sinopse de um filme. (*)\n");
+    printf(" [5] Mostrar a avaliação de um filme. (*)\n");
+    printf(" [6] Avaliar um filme! (*)\n");
+    printf(" [7] Sair\n  ");
+
+    c = getchar(); aux = getchar();
+    if((c==SAIR || c==LISTAR_TODOS_COMPLETO || c==LISTAR_TODOS ||
+				c==REG_COMPLETO || c==REG_SINOPSE || c==REG_MEDIA ||
+				c==REG_AVALIAR) && aux=='\n') {
+      /* se a opcao lida é válida e o próximo caractere foi Enter, 
+				 retorna o caractere válido digitado*/
+      return(c);
+    } else {
+      /* caso contrário, 'come' todo o resto da linha e volta às msgs */
+      if(aux != '\n') { while(getchar()!='\n'); }
+    }
+  } /* fim do while */
+
+}
+
+
+/* Função auxiliar para inserção do ID no pacote 'request' */
+void read_id (char *request) {
+
+  char c;
+  int dif, i = 1;
+
+  printf(" Id: "); c = getchar();
+
+  while (c!='\n' && i<=20) {
+    request[i] = c; c = getchar(); i++;
+  }
+
+  /* right-shift de i em request[1-20] (id) */
+  i --; /* i == numero de digitos */
+  dif = 20 - i;
+  /* caso a diferença seja 0, não precisa fazer o shift */
+  if(dif != 0) {
+    for (; i >= 1; i--) {
+      request[i+dif] = request[i];
+      request[i] = '0';
+    }
+  }
+  return;
+}
+
+
+/* Função auxiliar para inserção da nota no request */
+void read_nota(char *request) {
+  
+  char c; int i = 21;
+  
+  printf(" Nota (abc.de): ");
+  c = getchar();
+  while (c!='\n' && i<=26) {
+    request[i] = c; c = getchar(); i++;
+  }
+  return;
+}
+
+/******************* Funções auxiliares ***********************/
+/**************************************************************/
+
+
+
+
+
+/**************************************************************/
+/******[inicio] Funções que implementam os casos de uso  ******/
+
+/* ## 1 ## */
+void client_lista_todos_completo() {
+
+  /* Recebe datagrama com número de filmes. */
+  char n_filmes_str[10];
+  int status, n_filmes, i;
+ 
+  /* Espera o timeout, usando select() */
+  status = client_udp_pop_buffer(socketfd, n_filmes_str, 10);
+  
+  /* Caso ou a pergunta ou a resposta com o n de filmes se perdeu */
+  if (status == -1) {
+    /* notifica usuário, envia msg de erro p/ log e retorna */
+    fprintf(stderr, "ERR\n");
+    printf("Request ou response perdido.\n");
+    //printf("Aperte Enter para continuar..."); getchar();
+    return;
+  }
+
+  n_filmes = atoi(n_filmes_str);
+  if (n_filmes == 0) {
+    printf("Não há filmes no servidor!\n");
+    //printf("Tecle Enter para continuar..."); getchar();
+    return;
+  }
+
+  printf("Número de filmes encontrados: %d\n\n", n_filmes);
+
+  
+  /* Recebe cada filme e imprime suas informações */
+
+  char filme_str[TAM_MAX_REG]; /* 1024 */
+  filme *f;
+  int perdidos = 0, tam_filme;
+  
+  for (i = 0; i < n_filmes; i++) {
+
+    /* recebimento do datagrama com o filme */
+    status = client_udp_pop_buffer(socketfd, filme_str, TAM_MAX_REG);
+
+    /* Caso tenha dado o timeout */
+    if (status == -1) {
+      /* log de erro; continua para o próximo */
+      fprintf(stderr, "ERR\n");
+      perdidos++; /* valor mantido para informar o usuário */
+      continue;
+    }
+    
+    /* Aloca a estrutura para guardar o filme e o seta */
+    f = (filme *)malloc(sizeof(filme));
+    da_str_to_filme(f, &tam_filme, filme_str);
+    
+    /* imprime informações completas do filme */
+    da_print_full_info(f);
+    printf("\n-------------------------\n");
+
+    /* libera a memória do filme */
+    da_free_all(f);
+    
+  }
+
+  printf("  Filmes perdidos no transporte: %d\n\n", perdidos);
+  //printf("  Tecle Enter para continuar..."); getchar();
+  return;
+}
+
+/* ## 2 ## */
+void client_lista_todos() {
+
+  /* Cliente praticamente igual para a listagem completa. */
+  
+  char n_filmes_str[10]; int status, n_filmes, i;
+ 
+  status = client_udp_pop_buffer(socketfd, n_filmes_str, 10);
+  if (status == -1) {
+    fprintf(stderr, "ERR\n");
+    printf("Request ou response perdido.\n");
+    printf("Aperte Enter para continuar..."); getchar();
+    return;
+  }
+
+  n_filmes = atoi(n_filmes_str);
+  if (n_filmes == 0) {
+    printf("Não há filmes no servidor!\n");
+    printf("Tecle Enter para continuar..."); getchar();
+    return;
+  }
+
+  printf("Número de filmes encontrados: %d\n\n", n_filmes);
+
+  char filme_str[TAM_MAX_REG]; /* 1024 */
+  filme *f; int perdidos = 0, tam_filme;
+  
+  for (i = 0; i < n_filmes; i++) {
+    status = client_udp_pop_buffer(socketfd, filme_str, TAM_MAX_REG);
+
+    if (status == -1) { 
+      fprintf(stderr, "ERR\n");
+      perdidos++; continue;
+    }
+    
+    f = (filme *)malloc(sizeof(filme));
+    da_str_to_filme(f, &tam_filme, filme_str);
+    da_print_partial_info(f); /***************************  <<-- ***/
+    printf("\n-------------------------\n");
+    da_free_all(f);
+  }
+  printf("  Filmes perdidos no transporte: %d\n\n", perdidos);
+  printf("  Tecle Enter para continuar..."); getchar();
+  return;
+}
+
+/* ## 3 ## */
+void client_reg_completo() {
+
+  /* leitura da resposta do servidor */
+  int status;
+  char filme_str[TAM_MAX_REG];
+  
+  status = client_udp_pop_buffer(socketfd, filme_str, TAM_MAX_REG);
+  
+  /* caso tenha dado timeout */
+  if (status == -1) { 
+    /* log erro; avisa o cliente; retorna */
+    fprintf(stderr, "ERR\n");
+    printf("Request ou response perdido.\n");
+    printf("Aperte Enter para continuar..."); getchar();
+    return;
+  }
+  
+  /* Caso não tenha encontrado nenhum filme... */
+  if (filme_str[0] == '#') {
+    printf("\nFilme não encontrado.\n");
+  }
+  /* Caso tenha encontrado... */
+  else {
+
+    /* monta a estrutura de filme */
+    filme f;
+    int tam_reg;
+    da_str_to_filme(&f, &tam_reg, filme_str);
+
+    /* Imprime resultado da pesquisa */
+    printf("Filme encontrado!\n\n");
+    da_print_full_info(&f);
+  }
+
+  printf("\nAperte Enter para continuar..."); getchar();
+  return;
+}
+
+/* ## 4 ## */
+void client_reg_sinopse() {
+
+  /* Cópia do caso de uso para a listagem completa de um filme,
+     diferenciando apenas a impressão dos dados. */
+
+  int status; char filme_str[TAM_MAX_REG];
+  status = client_udp_pop_buffer(socketfd, filme_str, TAM_MAX_REG);
+  
+  if (status == -1) { 
+    fprintf(stderr, "ERR\n");
+    printf("Request ou response perdido.\n");
+    printf("Aperte Enter para continuar..."); getchar();
+    return;
+  }
+  
+  if (filme_str[0] == '#') {
+    printf("\nFilme não encontrado.\n");
+  }
+  else {
+    filme f;
+    int tam_reg;
+    da_str_to_filme(&f, &tam_reg, filme_str);
+    printf("Filme encontrado!\n\n");
+    da_print_partial_info(&f); /***************************  <<-- ***/
+    printf("Sinopse: %s\n", f.sinopse); /******************  <<-- ***/
+  }
+  printf("\nAperte Enter para continuar..."); getchar();
+  return;
+}
+
+/* ## 5 ## */
+void client_reg_media() {
+
+  /* Cópia do caso de uso para a listagem completa de um filme,
+     diferenciando apenas a impressão dos dados.*/
+
+  int status; char filme_str[TAM_MAX_REG];
+  status = client_udp_pop_buffer(socketfd, filme_str, TAM_MAX_REG);
+  
+  if (status == -1) { 
+    fprintf(stderr, "ERR\n");
+    printf("Request ou response perdido.\n");
+    printf("Aperte Enter para continuar..."); getchar();
+    return;
+  }
+  
+  if (filme_str[0] == '#') {
+    printf("\nFilme não encontrado.\n");
+  }
+  else {
+    filme f;
+    int tam_reg;
+    da_str_to_filme(&f, &tam_reg, filme_str);
+    printf("Filme encontrado!\n\n");
+    da_print_partial_info(&f); /**********************************  <<-- */
+    printf("Média: %3.2f (%d avaliações)\n", f.media, f.n_aval); /* <<-- */
+  }
+  printf("\nAperte Enter para continuar..."); getchar();
+  return;
+}
+
+/* ## 6 ## */
+void client_reg_avalia() {
+
+  /* leitura da resposta do servidor */
+  char resposta;
+  int status;
+
+  status = client_udp_pop_buffer(socketfd, &resposta, 1);
+
+  /* caso tenha esgotado o timeout */
+  if (status == -1) { 
+    fprintf(stderr, "ERR\n");
+    printf("Request ou response perdido.\n");
+    printf("Aperte Enter para continuar..."); getchar();
+    return;
+  }
+
+  /* Caso não tenha encontrado nenhum filme */
+  if (resposta == '#') {
+    printf("\nFilme não encontrado.\n");
+  } else {
+    printf("\nAvaliação realizada com sucesso!\n");
+  }
+
+  printf("\nAperte Enter para continuar..."); getchar();
+
+  return;
+}
+
+/*******[fim] Funções que implementam os casos de uso  ********/
+/**************************************************************/
+
+
+
+
+int main(int argc, char** argv) {
+
+  struct timeval tv1, tv2, tvres;
+  long double total_time;
+  
+  /* armazena retornos de status para checagens */
+  int status;
+
+  /* Caso não haja o nome do servidor, da um erro */
+  if (argc != 2) {
+    fprintf(stderr, "uso: ./client <nome do servidor>\n");
+    exit(1);
+  }
+	
+  /* 
+     Beej 5.8
+     Remember, if you connect() a datagram socket, you can then
+     simply use send() and recv() for all your transactions. 
+     The socket itself is still a datagram socket and the packets
+     still use UDP, but the socket interface will automatically add 
+     the destination and source information for you.
+  */
+  /* Configura o UDP para que sempre que for enviar e receber,
+     o faça para o IP e porta do servidor (bem-conhecidos). */
+  socketfd = client_get_connection(argv); /* como antes */
+  
+  /* Nota:
+     APENAS O CLIENTE estabelece essa configuração de enviar para 
+     e receber de um mesmo IP/porta. Dessa forma, apenas o cliente 
+     envia e recebe usando send() e recv(). Importante lembrar que 
+     a comunicação continua sendo via UDP.
+  */
+  
+  
+  /* Loop da interface */
+  char request[27]; /* option(1)+id(20)+nota(6) = 27  */
+  memset(request, '0', 27); /* seta com os caracteres '0's */
+
+  char c;
+  c = read_option();
+  request[0] = c;
+
+  while (c != SAIR) {
+
+    /* Conclui a montagem do pacote 'request' */
+    switch(c) {
+    case REG_COMPLETO:
+    case REG_SINOPSE:
+    case REG_MEDIA:
+      read_id(request);
+      break;
+    case REG_AVALIAR:
+      read_id(request);
+      read_nota(request);
+      break;
+    } 
+
+    /* Envia o pacote request ao servidor */
+    status = client_udp_push_buffer(socketfd, request, 27);
+    if (status == -1) {
+      fprintf(stderr, "err_send\n");
+      printf("UDP não conseguiu colocar a opção no buffer de \
+saída. Aperte Enter e tente novamente...\n"); getchar();
+    }
+    /* Caso contrário, chama a função para o caso específico */
+    else {
+      
+      switch(c) {
+        case LISTAR_TODOS_COMPLETO:
+          gettimeofday(&tv1, NULL); /* lê o t1 */
+          client_lista_todos_completo(socketfd);
+          gettimeofday(&tv2, NULL); /* lê o t2 */
+          timersub(&tv2, &tv1, &tvres); /* resposta = t2 - t1 */
+					/* resposta em micro-segundos */
+          total_time = tvres.tv_sec*1000000 + tvres.tv_usec; 
+          /* manda o tempo para a saída padrão de erro: coleta 
+						 para um arquivo (via shell) */
+          fprintf(stderr, "%.0Lf\n", (long double) total_time );
+          break;
+        case LISTAR_TODOS:
+          client_lista_todos();
+          break;
+        case REG_COMPLETO:
+          client_reg_completo();
+          break;
+        case REG_SINOPSE:
+          client_reg_sinopse();
+          break;
+        case REG_MEDIA:
+          client_reg_media();
+          break;
+        case REG_AVALIAR:
+          client_reg_avalia();
+          break;
+      } /* [fim - switch] */
+      
+    } /* [fim - else] */
+    
+    c = read_option(); request[0] = c;
+    
+  }
+  
+  close(socketfd);
+  return(0);
+  
+}
 \end{verbatim}
 
 \subsection{server.c}
 \begin{verbatim}
+// Bibliotecas comuns
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <netdb.h>
+#include "defines.h"
+#include "internet.h"
+#include "data_access.h"
+#include <signal.h>
+
+// Bibliotecas para manipulacao de sockets
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <unistd.h>
+
+
+
+/**************************************************************/
+/******************* Variáveis Globais ************************/
+
+/* Como o servidor só se comunicará por um socket, e com um 
+   cliente de cada vez, essas variáveis podem ser globais, o que
+   facilita sua utilização em funções auxiliares. */
+
+/* Socket único do servidor */
+int socketfd;
+
+/* Variáveis para guardar informações do endereço do cliente */
+struct sockaddr_storage client_addr;
+size_t client_addr_len = sizeof(client_addr); /* necessário */
+
+/* Variável para guardar a msg enviada pelo cliente */
+char request[27];
+
+
+/******************* Variáveis Globais ************************/
+/**************************************************************/
+
+
+
+/**************************************************************/
+/******[inicio] Funções que implementam os casos de uso  ******/
+
+/* ## 1 ## */
+void server_lista_todos_completo() {
+  
+  /* Envia ao cliente:
+   * -> um datagrama com número N de filmes
+   * -> N datagramas: 1 para cada filme (string crua)
+   */
+  
+  char n_filmes_str[10];
+  int n_filmes, i;
+
+  n_filmes = da_get_n_filmes();
+  sprintf(n_filmes_str, "%09d", n_filmes);
+  sendto(socketfd, n_filmes_str, 10, 0, (struct sockaddr *)
+	 &client_addr, client_addr_len);
+	
+  /* Cada datagrama será montado com um vetor de caracteres de tamanho
+     fixo. Esta é uma limitação necessária para o UDP */  
+  char filme_str[TAM_MAX_REG];
+
+  /* Para cada filme no arquivo... */
+  for (i=1 ; i<=n_filmes ; i++) {
+    
+    /* seta o vetor com o i-ésimo filme no arquivo */
+    da_get_raw_str(i, filme_str);
+
+    /* envia o datagrama com o filme ao cliente */
+    sendto(socketfd, filme_str, TAM_MAX_REG, 0, (struct sockaddr *)
+	   &client_addr, client_addr_len);
+  }
+  
+  return;
+}
+
+/* ## 2 ## */
+void server_lista_todos() {
+  /* Faz exatamente o mesmo procedimento que para a listagem 
+     completa: todas as info são passadas ao cliente. */
+  server_lista_todos_completo();
+  return;
+}
+
+/* ## 3 ## */
+void server_reg_completo() {
+  
+  /* leitura do id procurado */
+  char id_str[21];
+  int i, id;
+
+  for (i=1; i<21; i++) { id_str[i-1] = request[i]; }
+  id_str[20] = '\0'; id = atoi(id_str);
+  printf("  id requisitado: %d\n", id);
+
+
+  /* Realiza a busca. */
+  char f_str[TAM_MAX_REG];
+  int status, tam_reg;
+
+  /* Retorna 1 se não encontrar nenhum filme. */  
+  status = da_get_filme_by_id(f_str, id, &tam_reg);
+
+  /* se não encontrou nenhum filme... */
+  if (status == 1) {
+    /* seta o código de erro na mensagem que irá para o cliente */
+    f_str[0] = '#';
+  }
+
+  /* envia o filme (ou código de erro) ao cliente */
+  sendto(socketfd, f_str, TAM_MAX_REG, 0, (struct sockaddr *)
+	 &client_addr, client_addr_len);
+
+  return;
+}
+
+/* ## 4 ## */
+void server_reg_sinopse() {
+  /* Neste caso, o servidor faz exatamente o mesmo
+   * que na listagem completa de um registro:
+   * 1- Recebe o registro procurado;
+   * 2- Faz a busca;
+   * 3- Se não encontrar o filme, retorna o caractere '#'
+   * 4- Se encontrar, retorna a string crua do filme
+   */
+  server_reg_completo();
+  return;
+}
+
+/* ## 5 ## */
+void server_reg_media() {
+  /* Neste caso, o servidor faz exatamente o mesmo
+   * que na listagem completa de um registro:
+   * 1- Recebe o registro procurado;
+   * 2- Faz a busca;
+   * 3- Se não encontrar o filme, retorna o caractere '#'
+   * 4- Se encontrar, retorna a string crua do filme
+   */
+  server_reg_completo();
+  return;
+}
+
+/* ## 6 ## */
+void server_reg_avalia() {
+
+  /* leitura do id procurado */
+  char id_str[21];
+  int i, id;
+
+  for (i=1; i<21; i++) { id_str[i-1] = request[i]; }
+  id_str[20] = '\0'; id = atoi(id_str);
+  printf("  id requisitado: %d\n", id);
+
+  /* leitura da nota */
+  char nota_str[7];
+  float nota;
+  for (i=21; i<=26; i++) { nota_str[i-21] = request[i]; }
+  nota_str[6] = '\0'; nota = atof(nota_str);
+  printf("  nota enviada: %06.2f", nota);
+
+  /*
+   * Função que realiza a avaliação:
+   * Retorna 1 se o filme não existe.
+   * Retorna 0 se ocorreu tudo bem.
+   */
+  /* Nota: Esta função não requer mais exclusão mútua, pois o 
+     servidor agora é iterativo e só um processo/thread pode
+     querer escrever no arquivo por vez. */
+  int status;
+  status = da_avalia_filme(id, nota); 
+
+  /* 
+   * Prepara o caractere de resposta:
+   * Caso o filme não exista, responde '#'
+   * Caso contrário, confirma a avaliação com '%'
+   */
+  char resposta;
+  if (status == 1) { resposta = '#'; }
+  else { resposta = '%'; }
+
+  /* envia um datagrama com apenas um caractere, o de resposta */
+  sendto(socketfd, &resposta, 1, 0, (struct sockaddr *)
+	 &client_addr, client_addr_len);
+  
+  return;
+}
+
+/*******[fim] Funções que implementam os casos de uso  ********/
+/**************************************************************/
+
+
+
+
+
+/* Trata o sinal de interrupção */
+void trata_SIGINT(int sig) {
+  printf("\nEncerrando o servidor...\n");
+  close(socketfd);
+  exit(0);
+}
+
+
+
+int main() {
+  
+  signal(SIGINT,trata_SIGINT);
+  
+  int status;
+  struct addrinfo opcoes;
+  struct addrinfo *servinfo; // Informações do meu endereço
+  
+  memset(&opcoes, 0, sizeof(opcoes)); // zera a estrutura
+  opcoes.ai_family = AF_INET;         // IPv4
+  opcoes.ai_socktype = SOCK_DGRAM;    // UDP datagram sockets
+  opcoes.ai_flags = AI_PASSIVE;       // fill in my IP for me
+
+  status = getaddrinfo(NULL, SERVER_PORT_STR, &opcoes, &servinfo);
+  if (status != 0) {
+    fprintf(stderr, "getaddrinfo error: %s\n", gai_strerror(status));
+    exit(1);
+  }
+
+  /* Cria o socket e o associa a uma porta */
+  socketfd = socket(servinfo->ai_family, servinfo->ai_socktype, 
+		    servinfo->ai_protocol);
+ 
+  status = bind(socketfd, servinfo->ai_addr, servinfo->ai_addrlen);
+  if (status == -1) {
+    fprintf(stderr, "error on binding the socket to a port\n");
+    exit(1);
+  }
+  freeaddrinfo(servinfo);
+  printf("Socket UDP criado!\n");
+  
+
+  /* Loop infinito de recebimento e tratamento das mensagens */
+  while (TRUE) {
+    printf("Aguardando request...\n");
+
+    /* Esta função bloqueia o servidor até que chegue um pacote. 
+       O endereço do cliente é setado! */
+    status = recvfrom(socketfd, request, 27, 0, (struct sockaddr *)
+		      &client_addr, (socklen_t *) &client_addr_len);
+
+    printf("Opção recebida: %c\n", request[0]);
+    
+    /* "O que vc quer, cliente?!" */
+    switch(request[0]) {
+      
+    case LISTAR_TODOS_COMPLETO:
+      server_lista_todos_completo();
+      break;
+    case LISTAR_TODOS:
+      server_lista_todos();
+      break;
+    case REG_COMPLETO:
+      server_reg_completo();
+      break;
+    case REG_SINOPSE:
+      server_reg_sinopse();
+      break;
+    case REG_MEDIA:
+      server_reg_media();
+      break;
+    case REG_AVALIAR:
+      server_reg_avalia();
+      break;
+    }
+
+    /* volta ao início do loop principal */
+
+  }
+
+
+  /* Processo servidor executa em loop infinito */
+}
 \end{verbatim}
 
 \subsection{defines.h}
 \begin{verbatim}
+#define TRUE 1
+#define FALSE 0
+
+#define LISTAR_TODOS_COMPLETO '1'
+#define LISTAR_TODOS '2'
+#define REG_COMPLETO '3'
+#define REG_SINOPSE '4'
+#define REG_MEDIA '5'
+#define REG_AVALIAR '6'
+#define SAIR '7'
+
+
+// A Porta em que o servidor escuta
+#define SERVER_PORT 50000
+#define SERVER_PORT_STR "50000"
+
+// Tempo limite de espera por resposta do servidor, em MICRO seg
+#define TIMEOUT 50000 /* 50000us = 50ms */
+
+// Estrutura para definir o atributo a ser passado para a thread
+typedef struct {
+  int connect_socket;
+  int thr_index;
+} thread_attr ;
 \end{verbatim}
 
 \subsection{internet.h}
 \begin{verbatim}
+/* Funções para auxiliar nas operações com os sockets  */
+
+/* Retorna o socketfd da "conexão" com o servidor */
+/* Note que como estamos usando datagram_socket (UDP),
+   essa conexão funciona apenas como uma configuração. */
+int client_get_connection(char **argv);
+
+/* Envia um buffer por datagrama (UDP) */
+int client_udp_push_buffer (int socket, char *buffer, int n);
+
+/* Recebe o datagrama enviado pelo servidor. 
+   Implementa o time-out com o uso do select() 
+   Retorna -1 caso tenha esgotado o timeout. */
+int client_udp_pop_buffer (int socket, char *buffer, int n);
 \end{verbatim}
 
 \subsection{internet.c}
 \begin{verbatim}
+//Bibliotecas comuns
+#include "internet.h"
+#include "defines.h"
+#include "data_access.h"
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <netdb.h>
+
+//Bibliotecas para manipulacao de sockets
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <unistd.h>
+
+//Bibliotecas para analise de tempo
+#include <sys/time.h>
+#include <time.h>
+
+
+/* Retorna o socketfd da "conexão" com o servidor */
+/* Note que como estamos usando datagram_socket (UDP),
+   essa conexão funciona apenas como uma configuração. */
+int client_get_connection(char **argv) {
+
+  int status, socketfd;
+  struct addrinfo opcoes;
+  struct addrinfo *servinfo;  // will point to the results
+
+  memset(&opcoes, 0, sizeof(opcoes)); // zera a estrutura
+  opcoes.ai_family = AF_INET;         // IPv4
+  opcoes.ai_socktype = SOCK_DGRAM;    // UDP datagram sockets
+  opcoes.ai_flags = AI_PASSIVE;       // fill in my IP for me
+
+  status = getaddrinfo(argv[1], SERVER_PORT_STR, &opcoes, &servinfo);
+  if (status != 0) {
+    fprintf(stderr, "getaddrinfo error: %s\n", 
+	    gai_strerror(status));
+    exit(1);
+  }
+  
+  /* cria o socket com os parâmetros setados */
+  socketfd = socket(servinfo->ai_family, servinfo->ai_socktype, 
+		    servinfo->ai_protocol);
+
+  /* faz a conexão com o socket do servidor */
+  status = connect(socketfd, servinfo->ai_addr, servinfo->ai_addrlen);
+  
+  /* Caso dê algum erro na conexão, pára o cliente */
+  if (status == -1){
+    fprintf(stderr, "Problema na conexão.\n");
+    exit(1);
+  }
+  
+  /* libera a estrutura de informações do servidor */
+  freeaddrinfo(servinfo);
+  return(socketfd);
+  
+}
+
+
+/* Envia um buffer por datagrama (UDP) */
+int client_udp_push_buffer (int socket, char *buffer, int n) {
+  
+  /*
+    Entradas:
+    n - número de caracteres a serem escritos;
+    buffer - buffer de onde se lê.
+  */
+  
+  int i = 0;
+  while (i == 0) {
+    i = send(socket, buffer, n, 0);
+  }
+  return(i);
+}
+
+
+/* Recebe o datagrama enviado pelo servidor. 
+   Implementa o time-out com o uso do select() 
+   Retorna -1 caso tenha esgotado o timeout. */
+int client_udp_pop_buffer (int socket, char *buffer, int n) {
+  
+  struct timeval timeout; 
+  fd_set read_fd_set; /* conjunto de fd's de leitura */
+
+  /* seta o valor para o timeout */
+  timeout.tv_sec = 0; 
+  timeout.tv_usec = TIMEOUT;
+
+  /* limpa o conjunto de fd's e adiciona o socket */
+  FD_ZERO(&read_fd_set);
+  FD_SET(socket, &read_fd_set); 
+
+  /* bloqueia até que o socket esteja pronto ou
+     acabe o timeout */
+  select(socket+1, &read_fd_set, NULL, NULL, &timeout);
+
+  /* Caso tenha chegado alguma mensagem, retorna o n de 
+     bytes lidos */
+  if (FD_ISSET(socket, &read_fd_set)) {
+    return(recv(socket, buffer, n, 0));
+  }
+  /* Caso esgote o tempo, retorna -1 */
+  else {
+    return(-1);
+  }
+  
+}
 \end{verbatim}
 
 \subsection{data\_access.h}
 \begin{verbatim}
+#define TAM_MAX_REG 1024 /* 1kB */
+#define TAM_MAX_TIT 30
+#define TAM_MAX_SIN 900
+#define TAM_MAX_SALA 20
+#define TAM_MAX_HOR 20
+
+#define TAM_MAX_ATR 900
+
+/* n max de digitos do tamanho do registro e do id */
+#define TAM_REG_ID 20 
+
+/* abc.de (valor de 0 a 100, com 2 dígitos decimais) */
+#define TAM_MEDIA 6 
+
+/* cada filme pode ter até 9999 avaliações */
+#define TAM_N_AVALIACOES 4 
+
+typedef struct {
+  int id;
+  char *titulo;
+  char *sinopse;
+  char *sala;
+  char *horarios;
+  
+  int n_aval; /* número de avaliações */
+  float media;
+  
+  struct filme *prox_filme;
+} filme;
+
+
+/**** Funções a serem chamadas externamente (API) *****/
+/*            'da' refere-se a data access            */
+
+
+/* Retorna o i-ésimo filme do arquivo */
+void da_get_raw_str (int index, char *f_str);
+
+/* Faz um parse da string lida do arquivo para um filme */
+int da_str_to_filme(filme *f_ret, int *tam_reg, char *f_str);
+
+/* Libera as strings alocadas dinamicamente */
+void da_free_strs(filme *f);
+
+/* Imprime as informações já formatadas de um filme */
+void da_print_full_info(filme *f);
+
+/* Imprime as informações já formatadas de um filme */
+void da_print_partial_info(filme *f);
+
+/* Função que retorna um filme a partir de um id */
+int da_get_filme_by_id(char *f_str, int id, int *tamanho);
+
+/* Libera toda a memória alocada para o(s) filme(s) (strings 
+   e struct) e retorna o numero de filmes desalocados */
+int da_free_all(filme *f);
+
+/* Retorna o número de filmes no arquivo */
+int da_get_n_filmes();
+
+/* Atualiza o arquivo com a nova avaliação */
+int da_avalia_filme(int id, float nota);
+
 \end{verbatim}
 
 \subsection{data\_access.c}
 \begin{verbatim}
+#include <stdio.h>
+#include <stdlib.h>
+#include "data_access.h"
+
+/* Retorna o i-ésimo filme do arquivo */
+void da_get_raw_str (int index, char *f_str) {
+  
+  FILE *arq;
+  int tam_reg, i = 0;
+  long int cursor = 0; /* indice de leitura do arquivo */
+
+  arq = fopen("filmes.dat", "r");
+
+  /* Enquanto houver registros no arquivo */
+  while(fscanf(arq, "%d@", &tam_reg) != EOF) {
+    i++;
+    fseek(arq, cursor, SEEK_SET); /* pula p/ o inicio do registro */
+
+    /* caso seja o filme procurado, seta a string de retorno */
+    if (i == index) {
+      fgets(f_str, tam_reg, arq);
+      break;
+    }
+
+    /* ajuste para a leitura do próximo reg no arq */
+    cursor += tam_reg; 
+  }
+  
+  fclose(arq);
+  
+  return;
+}
+
+/* Faz um parse da string lida do arquivo para um filme */
+int da_str_to_filme (filme *f_ret, int *tam_reg, char *f_str) {
+  /* Entrada: string crua de um filme lida do arquivo */
+  /* Saída:
+     - setup da struct filme passada por referência 
+     - tamanho do registro no arquivo
+     - valor numérico para erros */
+
+  /* Formato do registro no arquivo */
+  /* Como há atributos de texto, é difícil manter os registros 
+     com tamanho constante no arq. Assim, uma ideia é usar 
+     separadores entre os atributos */
+
+  /* [tam][id][aval][media][tit][sinopse][sala][horarios]
+     int tam_total_do_reg (incluindo todos os separadores), 
+     int id, int avaliacoes, float media [TAMANHO FIXO NO ARQUIVO!], 
+     string titulo, string sinopse, string sala, string horarios.
+     Separador: @
+  */
+
+  char str[TAM_MAX_ATR]; /* comporta qq atributo */
+
+  int i = 0; /* índice de acesso de f_str */
+  int j = 0; /* indice para montagem da string  */
+
+  /* tamanho do registro */
+  while(f_str[i]!='@') {
+    str[j] = f_str[i];
+    i++; j++;
+  }
+  str[j] = '\0';
+  *tam_reg = atoi(str);
+
+  /* id */
+  i++; j = 0;
+  while(f_str[i]!='@') { str[j] = f_str[i]; i++; j++; }
+  str[j] = '\0'; 
+  f_ret->id = atoi(str);
+
+  /* numero de avaliações */
+  i++; j = 0;
+  while(f_str[i]!='@') { str[j] = f_str[i]; i++; j++; }
+  str[j] = '\0';
+  f_ret->n_aval = atoi(str);
+	
+  /* média */
+  i++; j = 0;
+  while(f_str[i]!='@') { str[j] = f_str[i]; i++; j++; }
+  str[j] = '\0';
+  f_ret->media = atof(str);
+	
+  /* titulo */
+  i++; j = 0;
+  while(f_str[i]!='@') {
+    str[j] = f_str[i];
+    i++; j++;
+  }
+  str[j] = '\0';
+  /* aloca a string dinamicamente */
+  f_ret->titulo = (char *)malloc((j+1)*sizeof(char));
+  sprintf(f_ret->titulo, "%s", str);
+
+  /* Blocos de código similares ao de cima, comprimidos */
+  /* sinopse */
+  i++; j = 0;
+  while(f_str[i]!='@') { str[j] = f_str[i]; i++; j++; } 
+  str[j] = '\0'; 
+  f_ret->sinopse = (char *)malloc((j+1)*sizeof(char));
+  sprintf(f_ret->sinopse, "%s", str);
+
+  /* sala */
+  i++; j = 0;
+  while(f_str[i]!='@') { str[j] = f_str[i]; i++; j++; }
+  str[j] = '\0';
+  f_ret->sala = (char *) malloc((j+1)*sizeof(char));
+  sprintf(f_ret->sala, "%s", str);
+
+  /* horarios */
+  i++; j = 0;
+  while(f_str[i]!='@' && f_str[i]!='\0') { 
+    str[j] = f_str[i]; i++; j++; 
+  } 
+  str[j] = '\0';
+  f_ret->horarios = (char *) malloc((j+1)*sizeof(char));
+  sprintf(f_ret->horarios, "%s", str);
+
+  /* next - lembra dele? :) */
+  f_ret->prox_filme = NULL;
+
+  return(0);
+}
+
+
+/* Imprime as informações já formatadas de um filme */
+void da_print_full_info(filme *f) {
+  printf("Id: %d\n", f->id);
+  printf("Titulo: %s\n", f->titulo);
+  printf("Sinopse: %s\n", f->sinopse);
+  printf("Sala: %s\n", f->sala);
+  printf("Horários: %s\n", f->horarios);
+  printf("Média: %06.2f (%d avaliações)\n", 
+	 f->media, f->n_aval);
+  return;
+}
+
+/* Imprime as informações já formatadas de um filme */
+void da_print_partial_info(filme *f) {
+  printf("Id: %d\n", f->id);
+  printf("Titulo: %s\n", f->titulo);
+  return;
+}
+
+
+/* Libera as strings alocadas dinamicamente */
+void da_free_strs(filme *f) {
+  free(f->titulo);
+  free(f->sinopse);
+  free(f->sala);
+  free(f->horarios);
+  return;
+}
+
+
+int da_free_all(filme *f) {
+  /* Esta função desaloca todos os filmes que estiverem na 
+     lista, e retorna o número desses filmes que foram desa-
+     locados. A lista precisa ser resolvida de trás pra 
+     frente, por isso está sendo usada recursão. */
+
+  int i;
+
+  da_free_strs(f);
+
+  /* Condição de parada (último filme) */
+  if(f->prox_filme == NULL) {
+    free(f);
+    return(0); /* retorna, inicializando contador */
+  }
+
+  /* Chamada recursiva */
+  /* cast pro -Wall n reclamar */
+  i = da_free_all((filme *)f->prox_filme);
+
+  /* Resolvida a recursão, libera a struct e retorna */
+  free(f);
+  return(i);
+}
+	
+
+/* Função que retorna um filme a partir de um id */
+int da_get_filme_by_id(char *f_str, int id, int *tamanho) {
+
+  /* Função responsável por acessar o arquivo dos registros,
+     buscar o filme com o id igual ao passado como argumento,
+     e retornar o resultado da busca
+     Saídas: 0 - filme encontrado (setado em f_str)
+     1 - código de retorno que indica que nada foi encontrado
+  */
+
+  int tam_reg, id_reg;
+  long int cursor = 0; /* indice de leitura do arquivo */
+  FILE *arq;
+
+  arq = fopen("filmes.dat", "r");
+
+  while(fscanf(arq, "%d@%d@", &tam_reg, &id_reg) != EOF) {
+    /* registro encontrado */
+    if(id_reg == id) {
+      /* caminha no arquivo até o inicio do registro */
+      fseek(arq, cursor, SEEK_SET);
+      fgets(f_str, tam_reg, arq);
+      *tamanho = tam_reg;
+      fclose(arq);
+      return(0);
+    } else {
+      cursor += tam_reg;
+      fseek(arq, cursor, SEEK_SET);
+    }
+  } /* só vai sair do while se não encontrar o filme */
+  
+  fclose(arq);
+  
+  return(1);
+
+}
+
+
+/* Retorna o número de filmes no arquivo */
+int da_get_n_filmes() {
+
+  FILE *arq;
+  int tam_reg, i = 0;
+  long int cursor = 0; /* indice de leitura do arquivo */
+
+  arq = fopen("filmes.dat", "r");
+
+  /* Enquanto houver registros no arquivo */
+  while(fscanf(arq, "%d@", &tam_reg) != EOF) {
+    i++;
+    /* pula p/ o inicio do registro */
+    fseek(arq, cursor, SEEK_SET); 
+
+    /* ajuste para a leitura do próximo reg no arq */
+    cursor += tam_reg; 
+  }
+  
+  fclose(arq);
+  
+  return(i-1);
+	
+}
+
+/* Atualiza o arquivo com a nova avaliação */
+int da_avalia_filme(int id, float nota) {
+  /* Retorno
+     1 - O filme com o id passado não existe
+     0 - Atualização efetuada.
+  */
+
+  int tam_reg, id_reg, n_aval;
+  float media;
+  long int cursor = 0; /* indice de leitura do arquivo */
+  FILE *arq;
+
+  /* abre o arquivo com permissão para escrita */
+  arq = fopen("filmes.dat", "r+");
+
+  while(fscanf(arq, "%d@%d@%d@%f@", &tam_reg, &id_reg, 
+	       &n_aval, &media) != EOF) {
+    /* registro encontrado */
+    if(id_reg == id) {
+      /* Cálculo da nova média para o filme */
+      float nova_media;
+      nova_media = (media*n_aval + nota)/(n_aval+1);
+      
+      /* caminha no arquivo até o início do n de avaliações */
+      fseek(arq, -(2/*@s*/ + TAM_MEDIA + TAM_N_AVALIACOES), 
+	    SEEK_CUR);
+
+      /* Atualização dos valores: n de avaliações e média */
+      fprintf(arq, "%04d@%06.2f@", n_aval+1, nova_media);
+
+      fclose(arq);
+      return(0);
+    } else {
+      cursor += tam_reg;
+      fseek(arq, cursor, SEEK_SET);
+    }
+  } /* só vai sair do while se não encontrar o filme */
+  
+  fclose(arq);
+  
+  return(1);
+
+}
 \end{verbatim}
 
 
