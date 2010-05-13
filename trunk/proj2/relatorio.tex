@@ -205,8 +205,11 @@ Desvios padrão:\\
 %% TODO - inserir comentários sobre os tempos...
 
 \section{Confiabilidade e Consistência}
-%% TODO
-
+Apesar de fazermos alguns testes, não conseguimos verificar a perda de pacotes de fato, possível pelo uso do UDP.\\
+Um provável fato que gerou isso foi que usamos a rede interna da Unicamp, sem a necessidade dos pacotes serem realmente transportados por grandes distâncias. Não podemos dizer que testamos apenas numa LAN, mas também não chegou a uma WAN.\\
+No entanto, a implementação do time-out pôde ser testada com a adição de um sleep() no servidor. Ao enviar uma request, o cliente passou a esperar pela resposta. Como o servidor estava nesse atraso inserido manualmente, o cliente esperou pelo time-out no select() e, ao fim, verificou que nada havia chegado.\\
+Dessa forma, pudemos verificar a confiabilidade do sistema, que permite sim que possíveis erros gerados pelo UDP aconteçam, mas não bloqueia o cliente aguardando a resposta.\\
+Com relação à consistência, com a ausência de conexões concorrentes, não é necessário ter preocupação com a escrita no arquivo. Assim, é mantida a consistência dos dados no nível de persistência.\\
 
 \section{Conclusão}
 %% TODO
