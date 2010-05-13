@@ -2,5 +2,5 @@
 
 for i in $(seq 100)
 do
-    ./client localhost < arq.in 2>> tempos.out
+    ./client 143.106.150.74 < arq.in 2>> tempos.out
 done
