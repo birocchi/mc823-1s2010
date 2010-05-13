@@ -143,7 +143,7 @@ Em uma aplicação UDP não faz sentido se falar de múltiplas conexões, de con
 
 
 \section{Análise de Tempo}
-Para a análise de tempo, foram consideradas duas operações a serem analisadas: tempo de comunicação (RTT) e consulta ao servidor.\\
+Para a análise de tempo, foi considerada apenas uma operação a ser analisada,o tempo de consulta ao servidor, já que o tempo de conexão (RTT) não faz mais sentido exatamente por não haver mais conexão.\\
 Para se obter uma boa precisão, foi utilizada a função "gettimeofday", que tem a precisão em microsegundos, o que já é boa o suficiente para nossa aplicação. A função pega o tempo atual em que foi chamada, portanto, para calcular o tempo de alguma operação, basta calcular o tempo antes e depois da operação e calcular a diferença entre eles.\\
 Foram usadas duas configurações:\\
 \textbf{Configuração 1: }Dois computadores presentes na mesma sub-rede (SIFEEC).\\
@@ -166,36 +166,49 @@ traceroute to 143.106.150.74 (143.106.150.74), 30 hops max, 60 byte packets
 \end{verbatim}
 \textit{Observação: }Todos os tempos que serão mostrados nas próximas seções estão em micro-segundos, e pode-se verificar todos os valores encontrados na seção de Anexos.\\
 
-\subsection{Tempo de Comunicação - RTT}
-Tempo decorrido entre o cliente chamar a função para conectar ao servidor e a resposta deste.\\
+\subsection{Tempo de Consulta}
+Tempo decorrido entre o cliente realizar o caso de uso 1 (consulta completa de todos os filmes do banco de dados).\\
 \textbf{Configuração 1: }\\
-Média do tempo de RTT: \textbf{274,16 us}\\
-Desvio padrão: \textbf{10,72 us}\\
+Média do tempo de consulta: \textbf{2288,52 us}\\
+Desvio padrão: \textbf{792,62 us}\\
 \textbf{Configuração 2: }\\
-Média do tempo de RTT: \textbf{1601,7 us}\\
-Desvio padrão: \textbf{1697,68 us}\\
+Média do tempo de consulta: \textbf{3606,54 us}\\
+Desvio padrão: \textbf{1094,37 us}\\
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=15cm]{consulta.png} 
+  \caption{Representação das medições para a consulta.}
+  \label{fig:rtt}
+\end{figure}
+
+\subsection{Comparação de Desempenho entre TCP e UDP}
+Para comparar os resultados de tempo de consulta entre um servidor TCP e outro UDP, vamos colocar os tempos lado a lado:
+
+\textbf{Configuração 1: Mesma Sub-rede}
+Médias do tempo de consulta:
+- TCP: 1769,16 us
+- UDP: 2288,52 us
+
+Desvios padrão:
+- TCP: 432,29 us
+- UDP: 792,62 us
+
+\textbf{Configuração 2: Sub-redes diferentes}
+Médias do tempo de consulta:
+- TCP: 9390,89 us
+- UDP: 3606,54 us
+
+Desvios padrão:
+- TCP: 9758,98 us
+- UDP: 1094,37 us
+
+
 %\begin{figure}[htb]
 %  \centering
 %  \includegraphics[width=15cm]{rtt.png} 
 %  \caption{Representação das medições para o RTT.}
 %  \label{fig:rtt}
 %\end{figure}
-
-\subsection{Tempo de Consulta}
-Tempo decorrido entre o cliente realizar o caso de uso 1 (consulta completa de todos os filmes do banco de dados).\\
-\textbf{Configuração 1: }\\
-Média do tempo de RTT: \textbf{1769,16 us}\\
-Desvio padrão: \textbf{432,29 us}\\
-\textbf{Configuração 2: }\\
-Média do tempo de RTT: \textbf{9390,89 us}\\
-Desvio padrão: \textbf{9758,98 us}\\
-%\begin{figure}[htb]
-%  \centering
-%  \includegraphics[width=15cm]{consulta.png} 
-%  \caption{Representação das medições para a consulta.}
-%  \label{fig:rtt}
-%\end{figure}
-
 
 Pode-se verificar a diferença considerável entre os tempos de RTT para as duas configurações. Obviamente, o tempo para abertura da conexão foi maior para a segunda 
 configuração, já que os pacotes devem ser transmitidos através de roteadores e enlaces adicionais, como mostrado no resultado do traceroute acima.\\
