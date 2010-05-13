@@ -182,51 +182,34 @@ Desvio padrão: \textbf{1094,37 us}\\
 \end{figure}
 
 \subsection{Comparação de Desempenho entre TCP e UDP}
-Para comparar os resultados de tempo de consulta entre um servidor TCP e outro UDP, vamos colocar os tempos lado a lado:
+Para comparar os resultados de tempo de consulta entre um servidor TCP e outro UDP, vamos colocar os tempos lado a lado:\\
 
-\textbf{Configuração 1: Mesma Sub-rede}
-Médias do tempo de consulta:
-- TCP: 1769,16 us
-- UDP: 2288,52 us
+\textbf{Configuração 1: Mesma Sub-rede}\\
+Médias do tempo de consulta:\\
+- TCP: 1769,16 us\\
+- UDP: 2288,52 us\\
 
-Desvios padrão:
-- TCP: 432,29 us
-- UDP: 792,62 us
+Desvios padrão:\\
+- TCP: 432,29 us\\
+- UDP: 792,62 us\\
 
-\textbf{Configuração 2: Sub-redes diferentes}
-Médias do tempo de consulta:
-- TCP: 9390,89 us
-- UDP: 3606,54 us
+\textbf{Configuração 2: Sub-redes diferentes}\\
+Médias do tempo de consulta:\\
+- TCP: 9390,89 us\\
+- UDP: 3606,54 us\\
 
-Desvios padrão:
-- TCP: 9758,98 us
-- UDP: 1094,37 us
+Desvios padrão:\\
+- TCP: 9758,98 us\\
+- UDP: 1094,37 us\\
 
-
-%\begin{figure}[htb]
-%  \centering
-%  \includegraphics[width=15cm]{rtt.png} 
-%  \caption{Representação das medições para o RTT.}
-%  \label{fig:rtt}
-%\end{figure}
-
-Pode-se verificar a diferença considerável entre os tempos de RTT para as duas configurações. Obviamente, o tempo para abertura da conexão foi maior para a segunda 
-configuração, já que os pacotes devem ser transmitidos através de roteadores e enlaces adicionais, como mostrado no resultado do traceroute acima.\\
-De modo a comprovar a influência do tráfego na rede, é visível a grande diferença entre os desvios padrão em porcentagem com relação ao valor absoluto.\\
-
+%% TODO - inserir comentários sobre os tempos...
 
 \section{Confiabilidade e Consistência}
-Dois pontos a considerar: robustez quanto à comunicação e consistência dos dados.\\
-Tentamos fazer todas as verificações de erros possíveis nas funções das bibliotecas de comunicação com o socket, tanto no lado cliente como no servidor. Ainda assim, não conseguimos implementar um importante caso de exceção: notificar e encerrar o cliente quando o servidor "cai".\\
-Com relação à consistência dos dados, esta é garantida pela exclusão mútua nas operações de atualização de avaliação.
+%% TODO
+
 
 \section{Conclusão}
-Podemos considerar que a aplicação já está totalmente funcional, todas as consultas estão funcionando corretamente, há a garantia da consistência do banco de dados do cinema e a comunicação entre cliente e servidor está boa, exceto no caso em que o servidor cai, deixando o cliente esperando por uma resposta.\\
-Por utilizar o protocolo TCP, a comunicação possui todas as suas vantagens, como confiabilidade na transferência de pacotes, controle de fluxo e controle de congestionamento, o que garante uma qualidade maior à aplicação.\\
-A análise de tempo também cumpriu com as espectativas, tendo uma média e um desvio padrão mais baixo para redes próximas e valores mais altos para redes mais distantes.\\
-Ao fazer a aplicação em C, o nível de abstração não foi muito alto, pois tivemos que tratar muitos detalhes das conexões.\\
-Podemos dizer também que fomos felizes ao utilizar um controle de conexões por threads, pois fica mais fácil de controlar do que com processos, já que quando o processo principal termina, todas as threads também terminam, evitando assim processos zumbi, além de ser mais fácil se implementar exclusão mútua de threads, por exemplo, com semáforos ou mutex lock.\\
-Nosso servidor de banco de dados de cinema ainda não é um sistema completo e bem acabado, mas já provê uma base sólida para implementar aplicações gráficas e de maior porte, utilizando o servidor como o núcleo da aplicação. Pretendemos, em versões posteriores, melhorar o programa, resolver bugs e talvez, utilizar uma biblioteca gráfica para tornar sua interface mais usável. 
+%% TODO
 
 \section{Código Fonte}
 \subsection{Makefile}
@@ -1560,13 +1543,13 @@ int da_avalia_filme(int id, float nota) {
 
 
 
-%\section{Anexo}
-%\begin{figure}[htb]
-%  \centering
-%  \includegraphics[width=15cm]{medicoes.png} 
-%  \caption{Representação das medições para a consulta.}
-%  \label{fig:rtt}
-%\end{figure}
+\section{Anexo}
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=15cm]{medicoes.png} 
+  \caption{Representação das medições para a consulta.}
+  \label{fig:rtt}
+\end{figure}
 
 \begin{thebibliography}{99}
 \bibitem{R1} HALL, Brian. Beej's Guide to Network Programming. Disponível em: http://http://beej.us/guide/bgnet/output/html/multipage/index.html.
