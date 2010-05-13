@@ -34,6 +34,5 @@ relatorio:
 
 # Clean
 clean:
-	rm *.o client server
-	rm *.aux *.toc *.pdf *.log
+	rm *.o client server *.aux *.toc *.pdf *.log
 
