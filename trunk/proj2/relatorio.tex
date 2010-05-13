@@ -86,23 +86,16 @@ Complementarmente ao anterior, o objetivo deste projeto é dar uma noção dos a
 
 \section{Introdução}
 
-
-
-
-
-
-
-
-
-Nos dia de hoje é comum se ter qualquer tipo de informação de forma rápida e prática através da internet, como mapas, receitas, notícias, preços de mercado, cotação das moedas do mundo todo, etc. De tudo que se pode fazer pela internet, a área que mais cresce é a de prestação de serviços, onde já se pode fazer compras, pagar contas, fazer transações bancárias dentre várias outras coisas, e um desses tipos de serviço será implementado pelo nosso projeto.\\
-Nosso projeto irá implementar um servidor TCP multi-usuário para consultas em bancos de dados de um cinema, onde são armazenadas várias informações sobre os filmes em cartaz, como o título, sinopse, horário das sessões e as salas.\\
-O intuito é de centralizar as informações dos filmes em um único local, evitando que cada cliente tenha que ficar se sincronizando toda vez que for fazer uma consulta; além de tornar o programa cliente leve e livre da carga de processamento necessário para as consultas, permitindo assim que aparelhos com poder de processamento menor como celulares ou palm-tops também possam executar o programa sem problemas.\\
-Iremos criar os 2 aplicativos, o servidor e o cliente, e também criaremos o protocolo de comunicação entre os 2, e esse protocolo será baseado em sockets TCP programados em C.\\
-A seção 2 irá especificar o que exatamente o programa deve fazer; a seção 3 irá comentar mais detalhadamente a implementação, as definições, suposições tomadas e ferramentas utilizadas; a seção 4 irá analisar o desempenho da aplicação atraveś de várias medidas de tempo; a seção 5 irá mostrar quão confiável e consistente é a aplicação; na seção 6 encontra-se uma breve conclusão sobre o projeto e, por último, na seção 7 estará o código fonte necessário para compilar e executar o servidor e o cliente.
+Vimos no projeto anterior que os sockets TCP são ótimos para atividades que requerem robustez e segurança, como transações bancárias, armazenamento remoto de dados, transferência de arquivos em geral, etc. Porém, em troca dessa robustez e segurança, a velocidade da transmissão é prejudicada, já que no protocolo TCP há controle de fluxo, controle de congestionamento da rede e tratamento de perda de pacotes. Isso não costuma ser um problemas para as atividades citadas anteriormente, pois a velocidade não é algo crucial, no entanto, e se a atividade for uma transmissão ao vivo pela internet? A velocidade é fundamental, e a perda de alguns pacotes não condenam totalmente a transmissão.\\
+Para esse e muitos outros casos, são utilizados sockets UDP, com comunicação sem conexão, apenas através de datagramas, que por não ter nenhum tipo de controle de fluxo, congestionamento ou perda de pacotes, consegue uma transmissão rápida porém não confiável de datagramas.\\
+E se utilizarmos sockets UDP para o servidor de banco de dados de um cinema já implementado anteriormente? Será que a velocidade de comunicação realmente vai aumentar? Será que a perda de pacotes vai inviabilizar o uso da aplicação?\\
+Nosso projeto irá reimplementar o servidor para consultas em bancos de dados de um cinema, mas agora utilizando sockets UDP na comunicação entre o servidor e o cliente.\\
+A seção 2 irá especificar novamente o que exatamente o programa deve fazer; a seção 3 irá comentar mais detalhadamente a implementação, as definições, suposições tomadas e ferramentas utilizadas; a seção 4 irá analisar o desempenho da aplicação atraveś de várias medidas de tempo; na seção 5 será feita uma comparação do desempenho se utilizando TCP e UDP; a seção 6 irá mostrar quão não-confiável inconsistente é a aplicação se utilizando UDP; na seção 7 encontra-se uma breve conclusão sobre o projeto e, por último, na seção 8 estará o código fonte necessário para compilar e executar o servidor e o cliente.
 
 
 \section{Casos de Uso}
-Primeiramente, devemos especificar o que a aplicação deve fazer, portanto segue abaixo uma listagem de 6 ações que serão implementadas. Nota: as ações com (*) precisam receber um identificador numérico do filme como entrada.\\
+
+Relembrando o que a aplicação deve fazer, segue abaixo uma listagem de 6 ações que serão implementadas. Nota: as ações com (*) precisam receber um identificador numérico do filme como entrada.\\
 As ações sempre serão tomadas pelo cliente, sendo o servidor apenas quem irá processar o pedido. O resultado da ação apenas é vista pelo cliente que a iniciou, deixando o servidor totalmente à parte do que está acontecendo do lado dos seus clientes.
 \subsection{Listar todas as informações de todos os filmes}
 Mostrar o ID, título, sinopse, horário das sessões e as salas de todos os filmes cadastrados no banco de dados do servidor.
@@ -137,12 +130,6 @@ No entanto, ao tentarmos efetuar a implementação, surgiram alguns problemas pa
 Dando uma grande facilidade, a função \textit{select()} implementa tanto um "ouvinte" para o socket de leitura, retornando quando algum datagrama chegou até ele, como o \textit{time-out}, tornando a codificação bem mais simples.\\
 
 
-
-
-
-
-
-
 O sistema é desenvolvido na linguagem C, utiliza as bibliotecas de sockets TCP para fazer a comunicação pela rede, gerencia as várias conexões com threads da biblioteca pthreads.h e faz controle de exclusão mútua através de semáforos da biblioteca semaphore.h.\\
 Primeiramente vamos explicar como foi implementado o banco de dados e suas operações, e depois explicar como é feita a comunicação entre o servidor e o cliente, qual protocolo seguem, como são distribuídas as conexões entre as threads e quando e como são criadas.\\
 Basicamente, o funcionamento do sistema é: o servidor fica em um laço infinito, aguardando requisições de conexão; o cliente estabelece essa conexão; inicia-se uma sequencia de requisições do cliente e respostas por parte do servidor; cliente encerra o uso.\\
@@ -172,12 +159,16 @@ A fim de facilitar a utilização das funções de envio e recebimento de inform
 Já as outras duas, uma envia outra recebe um buffer, uma cadeia de caracteres da conexão. Mais útil e eficiente para transportar grandes lotes de informações de uma só vez.\\
 Analisando o número de \textit{send()}s e \textit{recv()}s, certamente a comunicação caractere por caractere é muito despendiosa, pois cada mensagem de 1 byte é empacotada e enviada às camadas mais baixas da rede. Certamente essa não foi a melhor escolha possível, mas facilitou em grande parte o trabalho de verificação do fim de cada atributo.
 
-\subsection{Concorrência}
-A despeito da referência do Beej's, decidimos por implementar a concorrência através do uso de threads, e fomos muito felizes nessa decisão. A implementação está dentro do arquivo server.c, na seção 7.7.\\
-Dentro do main() do servidor, existe um laço infinito, cuja responsabilidade é, ao chegar uma nova conexão, alocar uma thread disponível para tratá-la (através da função trata\_thread()). O controle das threads disponíveis é feito através de um vetor global available\_thrs[].\\
-A partir de impressões de mensagens na saída padrão, é possível verificar facilmente o comportamento multi-usuário do servidor. Além de aceitar conexões simultâneas, pode-se forçar mais conexões do que o disponível, o que faz com que o servidor recuse a conexão. Se o cliente quiser tentar mais uma vez posteriormente, ele pode.
+%% !! Não é mais necessário se ter exclusão mútua !! %%
+%
+%\subsection{Concorrência}
+%A despeito da referência do Beej's, decidimos por implementar a concorrência através do uso de threads, e fomos muito felizes nessa decisão. A implementação está dentro do arquivo server.c, na seção 7.7.\\
+%Dentro do main() do servidor, existe um laço infinito, cuja responsabilidade é, ao chegar uma nova conexão, alocar uma thread disponível para tratá-la (através da função trata\_thread()). O controle das threads disponíveis é feito através de um vetor global available\_thrs[].\\
+%A partir de impressões de mensagens na saída padrão, é possível verificar facilmente o comportamento multi-usuário do servidor. Além de aceitar conexões simultâneas, pode-se forçar mais conexões do que o disponível, o que faz com que o servidor recuse a conexão. Se o cliente quiser tentar mais uma vez posteriormente, ele pode.
 
-\subsection{Exclusão Mútua}
+\subsection{Concorrência e Exclusão Mútua}
+
+%%Falar que naum eh mais necessario, por que o servidor eh iterativo e naum regido à conexão, que não tem como saber de quem vem o pacote%%
 Decidimos implementar a funcionalidade de avaliação de filme no nosso projeto, o que implicou na necessidade de prover uma maneira segura de garantir que threads concorrentes não fariam escritas no arquivo de modo inconsistente.\\
 O cenário de inconsistência é o seguinte: a thread T1 lê o número de avaliações N0 e média M0 do arquivo e processa novos valores N1 e M1 a partir da avaliação do cliente. Então, antes de T1 atualizar os dados no arquivo, a thread T2 lê N0 e M0 arquivo e calcula seus valores N2 e M2. Aconteça o que acontecer, os dados estarão inconsistentes, pois as operações não estarão sendo cumulativas, como espera-se que sejam.\\
 O meio de implementação da exclusão mútua entre as threads foi utilizando semáforos, conforme pode-se ver em server.c (7.7).\\
@@ -190,22 +181,22 @@ Para a análise de tempo, foram consideradas duas operações a serem analisadas
 Para se obter uma boa precisão, foi utilizada a função "gettimeofday", que tem a precisão em microsegundos, o que já é boa o suficiente para nossa aplicação. A função pega o tempo atual em que foi chamada, portanto, para calcular o tempo de alguma operação, basta calcular o tempo antes e depois da operação e calcular a diferença entre eles.\\
 Foram usadas duas configurações:\\
 \textbf{Configuração 1: }Dois computadores presentes na mesma sub-rede (SIFEEC).\\
-IP local: 143.106.150.81\\
-IP remoto: 143.106.150.80\\
+IP local: 143.106.150.77\\
+IP remoto: 143.106.150.74\\
 \textbf{Configuração 2: }Um computador no laboratório do IC3 e outro no SIFEEC.\\
-IP local: 143.106.150.81\\
+IP local: 143.106.150.77\\
 IP remoto: 143.106.16.163 (xaveco)\\
 \begin{verbatim}
-[ra070803@xaveco ~]$ traceroute 143.106.150.81
-traceroute to 143.106.150.81 (143.106.150.81), 30 hops max, 60 byte packets
- 1  routeric3.lab.ic.unicamp.br (143.106.16.148)  2.786 ms  5.378 ms  7.860 ms
- 2  143.106.16.150 (143.106.16.150)  0.094 ms  0.069 ms  0.067 ms
- 3  143.106.7.129 (143.106.7.129)  0.158 ms  0.119 ms  0.120 ms
- 4  area3-gw.unicamp.br (143.106.1.129)  0.668 ms  0.819 ms  1.020 ms
- 5  ptp-nct-nbs.unicamp.br (143.106.199.13)  0.542 ms  0.735 ms  0.920 ms
- 6  fee-gw.unicamp.br (143.106.1.10)  0.979 ms  1.263 ms  1.636 ms
- 7  le20-17.grad.fee.unicamp.br (143.106.150.81)  1.999 ms  1.978 ms  2.346 ms
-[ra070803@xaveco ~]$
+[ra072787@xaveco ~]$ traceroute 143.106.150.74
+traceroute to 143.106.150.74 (143.106.150.74), 30 hops max, 60 byte packets
+ 1  routeric3.lab.ic.unicamp.br (143.106.16.148)  2.801 ms  5.398 ms  7.873 ms
+ 2  143.106.16.150 (143.106.16.150)  0.099 ms  0.074 ms  0.065 ms
+ 3  143.106.7.129 (143.106.7.129)  0.218 ms  0.182 ms  0.159 ms
+ 4  area3-gw.unicamp.br (143.106.1.129)  0.570 ms  0.748 ms  0.981 ms
+ 5  ptp-nct-nbs.unicamp.br (143.106.199.13)  0.636 ms  0.870 ms  1.036 ms
+ 6  fee-gw.unicamp.br (143.106.1.10)  1.049 ms  1.332 ms  1.305 ms
+ 7  le20-10.grad.fee.unicamp.br (143.106.150.74)  2.070 ms  2.047 ms  2.401 ms
+[ra072787@xaveco ~]$
 \end{verbatim}
 \textit{Observação: }Todos os tempos que serão mostrados nas próximas seções estão em micro-segundos, e pode-se verificar todos os valores encontrados na seção de Anexos.\\
 
