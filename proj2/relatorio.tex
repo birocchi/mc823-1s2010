@@ -168,10 +168,10 @@ traceroute to 143.106.150.74 (143.106.150.74), 30 hops max, 60 byte packets
 
 \subsection{Tempo de Consulta}
 Tempo decorrido entre o cliente realizar o caso de uso 1 (consulta completa de todos os filmes do banco de dados).\\
-\textbf{Configuração 1: }\\
+\textbf{Configuração 1: Mesma Sub-rede}\\
 Média do tempo de consulta: \textbf{2288,52 us}\\
 Desvio padrão: \textbf{792,62 us}\\
-\textbf{Configuração 2: }\\
+\textbf{Configuração 2: Sub-redes diferentes}\\
 Média do tempo de consulta: \textbf{3606,54 us}\\
 Desvio padrão: \textbf{1094,37 us}\\
 \begin{figure}[htb]
@@ -188,7 +188,6 @@ Para comparar os resultados de tempo de consulta entre um servidor TCP e outro U
 Médias do tempo de consulta:\\
 - TCP: 1769,16 us\\
 - UDP: 2288,52 us\\
-
 Desvios padrão:\\
 - TCP: 432,29 us\\
 - UDP: 792,62 us\\
@@ -197,12 +196,13 @@ Desvios padrão:\\
 Médias do tempo de consulta:\\
 - TCP: 9390,89 us\\
 - UDP: 3606,54 us\\
-
 Desvios padrão:\\
 - TCP: 9758,98 us\\
 - UDP: 1094,37 us\\
 
-%% TODO - inserir comentários sobre os tempos...
+Na configuração 1, onde os computadores estão na mesma subrede, podemos notar que não houve muita diferença, já que as médias do TCP e UDP estão dentro do desvio padrão de cada um. O TCP deveria ser mais devagar, mas isso ocorreu porque, quando numa mesma subrede, praticamente não há muitos roteadores e consequentemente pouco controle de fluxo, congestionamento, e perda de pacotes, deixando-o tão rápido quanto o UDP, tendo também um desvio padrão bem baixo por conta dessa falta de trabalho.\\
+Na configuração 2, onde os computadores estão em subredes diferentes, podemos ver que o tempo médio dos dois protocolos aumentou, porém, agora é visível a diferença entre os 2 protocolos. O tempo médio do TCP demorou aproximadamente 3 vezes mais que o UDP, e seu desvio padrão foi muito elevado, tudo isso por conta de possiveis controles de fluxo e congestionamento, fazendo com que a variação dos tempos seja muito alto, pois depende muito da situação atual da rede. Já o UDP continuou com o mesmo comportamento, baixo desvio padrão por não se preocupar com nenhum controle de qualidade.\\
+Vale relembrar que, além da aparente vantagem do UDP, problemas como datagramas chegando fora de ordem e perda de datagramas podem comprometer a usabilidade da aplicação.\\
 
 \section{Confiabilidade e Consistência}
 Apesar de fazermos alguns testes, não conseguimos verificar a perda de pacotes de fato, possível pelo uso do UDP.\\
@@ -212,7 +212,13 @@ Dessa forma, pudemos verificar a confiabilidade do sistema, que permite sim que 
 Com relação à consistência, com a ausência de conexões concorrentes, não é necessário ter preocupação com a escrita no arquivo. Assim, é mantida a consistência dos dados no nível de persistência.\\
 
 \section{Conclusão}
-%% TODO
+Podemos considerar que a aplicação está totalmente funcional, todas as consultas estão funcionando corretamente, porém por ser UDP, não há a garantia da consistência do banco de dados do cinema, já que o datagrama com a nota de uma pessoa pode se perder, e a comunicação entre cliente e servidor está boa.\\
+Por utilizar o protocolo UDP, a comunicação possui toda sua velocidade, porém, não é indicado para esse tipo de aplicação, já que é necessário se manter a consistência dos dados.\\
+A análise de tempo também cumpriu com as espectativas, tendo uma média e um desvio padrão mais baixo para redes próximas e valores mais altos para redes mais distantes, além da visível comparação entre os dois tipos de protocolo.\\
+Ao fazer a aplicação em C, o nível de abstração não foi muito alto, pois tivemos que tratar muitos detalhes das conexões.\\
+Não foi necessário tratar o uso de múltiplos usuários, pois do jeito que nossa aplicação foi feita, com mensagens "atômicas", simplesmente não há concorrência entre os clientes.\\
+Nosso servidor de banco de dados de cinema ainda não é um sistema completo e bem acabado, mas já provê uma base sólida para implementar aplicações gráficas e de maior porte, utilizando o servidor como o núcleo da aplicação. Pretendemos, em versões posteriores, melhorar o programa, resolver bugs e talvez, utilizar uma biblioteca gráfica para tornar sua interface mais usável. 
+
 
 \section{Código Fonte}
 \subsection{Makefile}
