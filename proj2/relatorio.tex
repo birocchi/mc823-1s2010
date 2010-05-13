@@ -115,7 +115,7 @@ Dar uma pontuação ao filme com o dado ID.
 \section{Implementação}
 Assim como no projeto anterior, o programa é desenvolvido na linguagem C e utiliza as bibliotecas padrão de comunicação do Unix. Desta vez, porém, são setadas as informações para o uso do UDP (\textit{DATAGRAM\_SOCKET}).\\
 O funcionamento básico do sistema é: o cliente envia uma requisição ao servidor, que realiza alguma tarefa (caso necessário) e envia uma resposta ao cliente. Adiantamos que, diferentemente do TCP, a requisição é única, já contendo todas as informações que o servidor possa precisar.\\
-No fim, a quantidade de linhas de código de todos os arquivos do sistema (*.c e *.h) é 1246.\\
+No fim, a quantidade de linhas de código de todos os arquivos do sistema (*.c e *.h) é 1246 (aproximadamente 200 linhas a menos que com o TCP - essa diferença se deve às simplicidades geradas pela falta de complexidade do UDP, como será explicado posteriormente).\\
 A seguir, serão pontuadas características do desenvolvimento em alguns assuntos que encontramos.\\
 
 \subsection{Dados}
@@ -216,6 +216,82 @@ Podemos dizer também que fomos felizes ao utilizar um controle de conexões por
 Nosso servidor de banco de dados de cinema ainda não é um sistema completo e bem acabado, mas já provê uma base sólida para implementar aplicações gráficas e de maior porte, utilizando o servidor como o núcleo da aplicação. Pretendemos, em versões posteriores, melhorar o programa, resolver bugs e talvez, utilizar uma biblioteca gráfica para tornar sua interface mais usável. 
 
 \section{Código Fonte}
+\subsection{Makefile}
+\begin{verbatim}
+# Variáveis
+CC = gcc
+CC_FLAGS = -ggdb -Wall
+
+
+# Dependências gerais
+all: client server
+
+# Cliente
+client: data_access.o internet.o client.o
+	$(CC) $(CC_FLAGS) data_access.o internet.o client.o -o client
+
+client.o: client.c data_access.h internet.h defines.h
+	$(CC) $(CC_FLAGS) -c client.c
+
+# Servidor
+server: data_access.o internet.o server.o
+	$(CC) $(CC_FLAGS) data_access.o internet.o server.o -o server
+
+server.o: server.c data_access.h internet.h defines.h
+	$(CC) $(CC_FLAGS) -c server.c
+
+# Bibliotecas
+data_access.o: data_access.c data_access.h defines.h
+	$(CC) $(CC_FLAGS) -c data_access.c
+
+internet.o: internet.c internet.h defines.h
+	$(CC) $(CC_FLAGS) -c internet.c
+
+
+# Relatório (LaTeX)
+relatorio:
+	pdflatex relatorio.tex
+
+# Clean
+clean:
+	rm *.o client server *.aux *.toc *.pdf *.log
+\end{verbatim}
+
+\subsection{repeat\_client.sh}
+\begin{verbatim}
+\end{verbatim}
+
+\subsection{arq.in}
+\begin{verbatim}
+\end{verbatim}
+
+\subsection{client.c}
+\begin{verbatim}
+\end{verbatim}
+
+\subsection{server.c}
+\begin{verbatim}
+\end{verbatim}
+
+\subsection{defines.h}
+\begin{verbatim}
+\end{verbatim}
+
+\subsection{internet.h}
+\begin{verbatim}
+\end{verbatim}
+
+\subsection{internet.c}
+\begin{verbatim}
+\end{verbatim}
+
+\subsection{data\_access.h}
+\begin{verbatim}
+\end{verbatim}
+
+\subsection{data\_access.c}
+\begin{verbatim}
+\end{verbatim}
 
 
 
