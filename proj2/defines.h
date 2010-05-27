@@ -15,7 +15,7 @@
 #define SERVER_PORT_STR "50000"
 
 // Tempo limite de espera por resposta do servidor, em MICRO seg
-#define TIMEOUT 50000 /* 50000us = 50ms */
+#define TIMEOUT 5000000 /* 50000us = 50ms */
 
 // Estrutura para definir o atributo a ser passado para a thread
 typedef struct {
