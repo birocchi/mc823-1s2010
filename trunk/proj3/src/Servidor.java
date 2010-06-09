@@ -1,6 +1,5 @@
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Scanner;
 
 
 import bd.ConnectionFactory;
@@ -12,7 +11,9 @@ public class Servidor {
 
 	public static void main(String[] args) throws SQLException {
 
-		ConnectionFactory.caminhoAbsolutoBd = readDataBasePath();
+		// o servidor é executado com o caminho do arquivo do 
+		// BD como primeiro e único parâmetro
+		ConnectionFactory.caminhoAbsolutoBd = args[0];
 		
 		ConnectionTest teste = new ConnectionTest();
 		List<Filme> lf = teste.getListaFilmes();
@@ -23,12 +24,6 @@ public class Servidor {
 		}
 
 		return;
-	}
-
-	private static String readDataBasePath() {
-		System.out.println("Entre com o caminho absoluto para o arq do banco:");
-		Scanner in = new Scanner(System.in);
-		return in.nextLine();
 	}
 
 }
