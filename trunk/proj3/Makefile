@@ -8,15 +8,16 @@ all: classpath bd servidor
 
 # concatena :./sqlitejdbc.jar ao Classpath
 classpath:
-	CLASSPATH=$(CLASSPATH):./sqlitejdbc-v056.jar:./bin/:./bin/bd
+	CLASSPATH=$(CLASSPATH):./sqlitejdbc-v056.jar
 
 # Compila as classes do banco de dados
 bd:
 	javac src/bd/*.java -d bin/
 
 servidor:
-	javac src/Servidor.java -d bin/
+	cd bin;	javac ../src/Servidor.java -d ./
 
 # Clean
+# remove os arquivos compilados silenciosamente
 clean:
-	rm -rf bin/*.class
+	rm -rf bin/*.class bin/bd/*.class > /dev/null 2> /dev/null

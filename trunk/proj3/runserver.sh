@@ -6,10 +6,10 @@ then
     exit 1
 fi
 
-CLASSPATH=$CLASSPATH:./sqlitejdbc-v056.jar
-FULLPATH=$(pwd)
+ROOT=$(pwd) #/home/ec2007/..../mc823-1s2010/proj3
+CLASSPATH=$CLASSPATH:$ROOT/sqlitejdbc-v056.jar
 
 cd bin
 
 # executa o servidor passando como parâmetro o arquivo do BD
-java Servidor $FULLPATH/$1
+java Servidor $ROOT/$1
