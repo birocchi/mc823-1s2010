@@ -64,4 +64,21 @@ public class Filme implements Serializable {
 		return;
 	}
 	
+	public void printIdNome() {
+		System.out.println("  Id: " + id + " | Título: " + titulo);
+		return;
+	}
+
+	public void printSinopse() {
+		System.out.println("  Sinopse: " + sinopse);
+	}
+
+	public void printNota() {
+		String aval = (n_avaliacoes > 1) ? "avaliações" : "avaliação";
+		if (n_avaliacoes != 0) {
+			System.out.println("  Nota: " + nota + " (a partir de " + n_avaliacoes + aval + ")");
+		}
+		return;
+	}
+	
 }

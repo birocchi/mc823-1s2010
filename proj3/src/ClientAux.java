@@ -1,7 +1,6 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.rmi.RemoteException;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -44,27 +43,56 @@ public class ClientAux {
 	
 	// método que seleciona a opção e realiza as chamadas ao servidor
 	public static void makeRequest(RequestInterface servidor, int option) 
-		throws RemoteException, SQLException {
+		throws SQLException, IOException {
+		
+		// variáveis para retorno das consultas
+		List<Filme> listaFilmes;
+		Filme filme;
+		
+		int idProcurado;
 		
 		switch (option) {
 		case LISTAR_TODOS_COMPLETO:
-			List<Filme> filmes = servidor.getFullList();
-			for(Filme f : filmes) {
+			listaFilmes = servidor.getFullList();
+			for(Filme f : listaFilmes) {
 				f.printFullInfo();
 			}
 			break;
 		case LISTAR_TODOS:
+			listaFilmes = servidor.getFullList();
+			for(Filme f : listaFilmes) {
+				f.printIdNome();
+			}
 			break;
 		case REG_COMPLETO:
+			idProcurado = readId();
+			filme = servidor.getFilmeById(idProcurado);
+			if(filme != null) filme.printFullInfo();
+			else System.out.println("  Filme não encontrado!");
 			break;
 		case REG_SINOPSE:
+			idProcurado = readId();
+			filme = servidor.getFilmeById(idProcurado);
+			filme.printSinopse();
 			break;
 		case REG_MEDIA:
+			idProcurado = readId();
+			filme = servidor.getFilmeById(idProcurado);
+			filme.printNota();
 			break;
 		case REG_AVALIAR:
+//			idProcurado = readId();
+//			filme = servidor.getFilmeById(idProcurado);
+//			filme.setNota();
 			break;
 		}
 		
+	}
+
+	private static int readId() throws IOException {
+		System.out.println("  Id procurado: ");
+		BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+		return Integer.parseInt(in.readLine());
 	}
 
 

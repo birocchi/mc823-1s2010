@@ -6,7 +6,10 @@ import java.util.List;
 import bd.Filme;
 
 public interface RequestInterface extends Remote {
-	//RMIResponse executeRequest(RMIRequest request);
+
 	void sayHello() throws RemoteException;
-	List<Filme> getFullList() throws RemoteException, SQLException;;
+	List<Filme> getFullList() throws RemoteException, SQLException;
+	Filme getFilmeById(int idProcurado);
+	//List<Filme> setNota(int id, int nota) throws RemoteException, SQLException;
+	
 }
