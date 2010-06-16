@@ -17,7 +17,13 @@ bd:
 geral:
 	cd bin;	javac ../src/*.java -d ./
 
+# Relatório (LaTeX)
+relatorio:
+	pdflatex relatorio.tex
+
+
 # Clean
 # remove os arquivos compilados silenciosamente
 clean:
 	rm -rf bin/*.class bin/bd/*.class > /dev/null 2> /dev/null
+	rm *.aux *.toc *.pdf *.log
