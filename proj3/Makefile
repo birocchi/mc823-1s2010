@@ -4,7 +4,7 @@ CC_FLAGS = -ggdb -Wall
 
 
 # Dependências gerais
-all: classpath bd servidor
+all: classpath bd geral
 
 # concatena :./sqlitejdbc.jar ao Classpath
 classpath:
@@ -14,8 +14,8 @@ classpath:
 bd:
 	javac src/bd/*.java -d bin/
 
-servidor:
-	cd bin;	javac ../src/Servidor.java -d ./
+geral:
+	cd bin;	javac ../src/*.java -d ./
 
 # Clean
 # remove os arquivos compilados silenciosamente
