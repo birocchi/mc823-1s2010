@@ -1,13 +1,16 @@
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.sql.SQLException;
 
 
 public class Cliente {
 
 	private static final int serverPort = 3232;
 	
-    static public void main(String args[]) throws RemoteException {
+    static public void main(String args[]) throws IOException, SQLException {
 
     	// o cliente tem acesso à interface para o objeto remoto
 		RequestInterface servidor = null;
@@ -37,7 +40,7 @@ public class Cliente {
     	
     	// a partir daqui, se o cliente conseguiu encontrar o objeto remoto,
     	// então pode-se realizar as chamadas para os métodos remotos
-    	servidor.sayHello(); // TODO TESTE!!
+    	servidor.sayHello();
     	
     	// loop principal do cliente
     	int option = ClientAux.readOption();

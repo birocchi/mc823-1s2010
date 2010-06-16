@@ -3,8 +3,11 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.sql.SQLException;
+import java.util.List;
 
 import bd.ConnectionFactory;
+import bd.DataAccess;
+import bd.Filme;
 
 
 @SuppressWarnings("serial")
@@ -21,6 +24,8 @@ public class Servidor extends UnicastRemoteObject
 		registry = LocateRegistry.createRegistry(port);
 		// faz o bind para o nome do objeto
 		registry.rebind("servidor", this);
+		
+		System.out.println("Aguardando requisições...");
 		
 		return;
 	}
@@ -51,7 +56,12 @@ public class Servidor extends UnicastRemoteObject
 //	}
 
 	public void sayHello() {
-		System.out.println("Hello! :)");
+		System.out.println("Algum cliente se conectou.");
+	}
+
+	public List<Filme> getFullList() throws RemoteException, SQLException {
+		System.out.println(" getFullList()");
+		return DataAccess.getFullList();
 	}
 
 }
