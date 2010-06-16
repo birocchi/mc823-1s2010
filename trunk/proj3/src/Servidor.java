@@ -63,5 +63,36 @@ public class Servidor extends UnicastRemoteObject
 		System.out.println(" getFullList()");
 		return DataAccess.getFullList();
 	}
+	
+	public List<Filme> getIdTitle() throws RemoteException, SQLException {
+		System.out.println(" getIdTitle()");
+		return DataAccess.getIdTitle();
+	}
+
+	@Override
+	public Filme getFilmeById(int idProcurado) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+//	public List<Filme> getFullList() throws RemoteException, SQLException {
+//		System.out.println(" getInformation()");
+//		return DataAccess.getInformation();
+//	}
+//	
+//	public List<Filme> getFullList() throws RemoteException, SQLException {
+//		System.out.println(" getSinopse()");
+//		return DataAccess.getSinopse();
+//	}
+//	
+//	public List<Filme> getFullList() throws RemoteException, SQLException {
+//		System.out.println(" getEvaluation()");
+//		return DataAccess.getEvaluation();
+//	}
+//	
+//	public List<Filme> getFullList() throws RemoteException, SQLException {
+//		System.out.println(" evaluate()");
+//		return DataAccess.evaluate();
+//	}
 
 }
