@@ -42,7 +42,7 @@ public class Filme {
 		return sinopse;
 	}
 
-	
+
 	public void buildBeanByRs(ResultSet rs) throws SQLException {
 		this.id = rs.getInt("id");
 		this.n_avaliacoes = rs.getInt("n_avaliacoes");

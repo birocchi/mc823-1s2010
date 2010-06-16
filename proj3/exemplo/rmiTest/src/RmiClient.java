@@ -2,8 +2,8 @@ import java.rmi.*;
 import java.rmi.registry.*;
 import java.net.*;
 
-public class RmiClient
-{
+public class RmiClient {
+
     static public void main(String args[])
     {
        ReceiveMessageInterface rmiServer;
