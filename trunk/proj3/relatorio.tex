@@ -81,14 +81,14 @@
 
 
 \begin{abstract}
-Este projeto consiste da implementação de um sistema, que implementa comunicação em rede, baseado no paradigma cliente-servidor, motivado pela provisão de acesso a uma base de dados de filmes. O protocolo de transporte utilizado foi o TCP - \textit{Transmission Control Protocol}, e foram feitas análises quanto ao desempenho da aplicação considerando os atrasos de comunicação.
+Este projeto consiste da implementação de um sistema, que implementa comunicação em rede, baseado no paradigma cliente-servidor, motivado pela provisão de acesso a uma base de dados de filmes. Para a comunicação entre cliente e servidor, foi utilizado o Java RMI - \textit{Remote Method Invocation}, foram feitas análises quanto ao desempenho da aplicação e uma comparação desse sistema de mais alto nível com o sistema anterior implementado em C que tem um nível de abstração mais baixo.
 \end{abstract}
 
 \section{Introdução}
 Nos dia de hoje é comum se ter qualquer tipo de informação de forma rápida e prática através da internet, como mapas, receitas, notícias, preços de mercado, cotação das moedas do mundo todo, etc. De tudo que se pode fazer pela internet, a área que mais cresce é a de prestação de serviços, onde já se pode fazer compras, pagar contas, fazer transações bancárias dentre várias outras coisas, e um desses tipos de serviço será implementado pelo nosso projeto.\\
-Nosso projeto irá implementar um servidor TCP multi-usuário para consultas em bancos de dados de um cinema, onde são armazenadas várias informações sobre os filmes em cartaz, como o título, sinopse, horário das sessões e as salas.\\
+Nosso projeto irá implementar um servidor Java multi-usuário utilizando RMI comunicação e SQL para consultas em bancos de dados de um cinema, onde são armazenadas várias informações sobre os filmes em cartaz, como o título, sinopse, horário das sessões e as salas.\\
 O intuito é de centralizar as informações dos filmes em um único local, evitando que cada cliente tenha que ficar se sincronizando toda vez que for fazer uma consulta; além de tornar o programa cliente leve e livre da carga de processamento necessário para as consultas, permitindo assim que aparelhos com poder de processamento menor como celulares ou palm-tops também possam executar o programa sem problemas.\\
-Iremos criar os 2 aplicativos, o servidor e o cliente, e também criaremos o protocolo de comunicação entre os 2, e esse protocolo será baseado em sockets TCP programados em C.\\
+Iremos criar os 2 aplicativos, o servidor e o cliente, e também criaremos o protocolo de comunicação entre os 2, e esse protocolo será baseado em objetos invocados remotamente através do Java RMI.\\
 A seção 2 irá especificar o que exatamente o programa deve fazer; a seção 3 irá comentar mais detalhadamente a implementação, as definições, suposições tomadas e ferramentas utilizadas; a seção 4 irá analisar o desempenho da aplicação atraveś de várias medidas de tempo; a seção 5 irá mostrar quão confiável e consistente é a aplicação; na seção 6 encontra-se uma breve conclusão sobre o projeto e, por último, na seção 7 estará o código fonte necessário para compilar e executar o servidor e o cliente.
 
 
@@ -108,13 +108,15 @@ Mostrar a quantidade de votos o filme teve e qual foi a pontuação obtida.
 \subsection{Avaliar um filme (*)}
 Dar uma pontuação ao filme com o dado ID.
 
-
+%% Corrigi até esse ponto ----------------------------------------%%
 
 \section{Implementação}
-O sistema é desenvolvido na linguagem C, utiliza as bibliotecas de sockets TCP para fazer a comunicação pela rede, gerencia as várias conexões com threads da biblioteca pthreads.h e faz controle de exclusão mútua através de semáforos da biblioteca semaphore.h.\\
-Primeiramente vamos explicar como foi implementado o banco de dados e suas operações, e depois explicar como é feita a comunicação entre o servidor e o cliente, qual protocolo seguem, como são distribuídas as conexões entre as threads e quando e como são criadas.\\
+O sistema é desenvolvido na linguagem Java, utiliza as bibliotecas RMI "java.rmi.*" para fazer a comunicação pela rede e gerencia as várias conexões automaticamente, conseguido pelo alto nível de abstração oferecida pela linguagem Java.\\
+Primeiramente vamos explicar como foi implementado o banco de dados e suas operações, e depois explicar como é feita a comunicação entre o servidor e o cliente e como é feita a comunicação entre eles.\\
+%Explicar o funcionamento do sistema
 Basicamente, o funcionamento do sistema é: o servidor fica em um laço infinito, aguardando requisições de conexão; o cliente estabelece essa conexão; inicia-se uma sequencia de requisições do cliente e respostas por parte do servidor; cliente encerra o uso.\\
 
+%Ao terminar o projeto, fazer um word count e ver quantas linhas deu, e fazer um comentário
 No fim, a quantidade de linhas de código de todos os arquivos do sistema (*.c e *.h) é 1461, o que já não é um programa simples, porém ainda está longe de ser uma grande aplicação.\\
 
 Para organizar a discussão sobre a implementação, vamos tratar de tópicos separamente.\\
