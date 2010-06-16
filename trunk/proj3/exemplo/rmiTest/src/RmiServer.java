@@ -78,6 +78,7 @@ implements ReceiveMessageInterface
 			e.printStackTrace();
 			System.exit(1);
 		}
+		return;
 	}
 
 }
