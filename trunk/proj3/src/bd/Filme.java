@@ -1,9 +1,11 @@
 package bd;
 
+import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class Filme {
+@SuppressWarnings("serial")
+public class Filme implements Serializable {
 
 	private int id;
 	private int n_avaliacoes;
