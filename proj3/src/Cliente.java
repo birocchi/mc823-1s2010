@@ -40,7 +40,12 @@ public class Cliente {
     	
     	// a partir daqui, se o cliente conseguiu encontrar o objeto remoto,
     	// então pode-se realizar as chamadas para os métodos remotos
+    	long t1,t2;
+    	t1 = System.nanoTime();
     	servidor.sayHello();
+		t2 = System.nanoTime();
+		System.out.println("Tempo demorado: " + ((t2-t1)/1000) + "us");
+    	
     	
     	// loop principal do cliente
     	int option = ClientAux.readOption();
