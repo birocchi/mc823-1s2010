@@ -10,6 +10,6 @@ public interface RequestInterface extends Remote {
 	void sayHello() throws RemoteException;
 	List<Filme> getFullList() throws RemoteException, SQLException;
 	List<Filme> getFilmeById(Integer idProcurado) throws RemoteException, SQLException;
-	//List<Filme> setNota(int id, int nota) throws RemoteException, SQLException;
+	Boolean avaliaFilme(Integer idFilme, Float novaNota) throws RemoteException, SQLException;
 	
 }

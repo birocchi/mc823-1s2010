@@ -15,6 +15,7 @@ public class Filme implements Serializable {
 	private String sinopse;
 	private String salas;
 	
+	// método público para recurar id de um filme
 	public int getId() {
 		return id;
 	}
@@ -40,15 +41,16 @@ public class Filme implements Serializable {
 		if (n_avaliacoes != 0) {
 			// aval recebe 'avaliação' (exatamente UMA) ou 'avaliações' (>1)
 			String aval = (n_avaliacoes > 1) ? "avaliações" : "avaliação";
-			System.out.println("  Nota: " + nota + " (a partir de " + n_avaliacoes + aval + ")");
+			System.out.println("  Nota: " + nota + " (a partir de " + 
+					n_avaliacoes + " " + aval + ")");
 		} else {
 			System.out.println("  Ainda não há avaliações para este filme.");
 		}
-		System.out.println("-----");
+		System.out.println("___");
 		return;
 	}
 	public void printIdNome() {
-		System.out.println("  Id: " + getId() + " | Título: " + titulo + "\n-----");
+		System.out.println("  Id: " + getId() + " | Título: " + titulo + "\n___");
 		return;
 	}
 	public void printSinopse() {
@@ -57,12 +59,13 @@ public class Filme implements Serializable {
 	public void printNota() {
 		if (n_avaliacoes != 0) {
 			String aval = (n_avaliacoes > 1) ? "avaliações" : "avaliação";
-			System.out.println("  Nota: " + nota + " (a partir de " + n_avaliacoes + aval + ")");
+			System.out.println("  Nota: " + nota + " (a partir de " + 
+					n_avaliacoes + " " + aval + ")");
 		} else {
 			System.out.println("  Ainda não há avaliações para este filme.");
 		}
 		return;
 	}
 
-	
+
 }

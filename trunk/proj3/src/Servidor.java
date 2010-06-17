@@ -50,48 +50,20 @@ public class Servidor extends UnicastRemoteObject
 	
 	
 	// ========== Métodos remotos que o servidor implementa ==========
-//	public RMIResponse executeRequest(RMIRequest request) {
-//		System.out.println("Oi, eu sou o servidor, com o método sendo chamado pelo cliente! :)");
-//		return null;
-//	}
-
 	public void sayHello() {
 		System.out.println("Algum cliente se conectou.");
 	}
 
 	public List<Filme> getFullList() throws RemoteException, SQLException {
-		System.out.println(" getFullList()");
 		return DataAccess.getFullList();
 	}
 	
-	public List<Filme> getIdTitle() throws RemoteException, SQLException {
-		System.out.println(" getIdTitle()");
-		return DataAccess.getIdTitle();
-	}
-
 	public List<Filme> getFilmeById(Integer idProcurado) throws SQLException {
-		System.out.println(" getFilmeById()");
 		return DataAccess.getFilmeById(idProcurado);
 	}
 
-//	public List<Filme> getFullList() throws RemoteException, SQLException {
-//		System.out.println(" getInformation()");
-//		return DataAccess.getInformation();
-//	}
-//	
-//	public List<Filme> getFullList() throws RemoteException, SQLException {
-//		System.out.println(" getSinopse()");
-//		return DataAccess.getSinopse();
-//	}
-//	
-//	public List<Filme> getFullList() throws RemoteException, SQLException {
-//		System.out.println(" getEvaluation()");
-//		return DataAccess.getEvaluation();
-//	}
-//	
-//	public List<Filme> getFullList() throws RemoteException, SQLException {
-//		System.out.println(" evaluate()");
-//		return DataAccess.evaluate();
-//	}
+	public Boolean avaliaFilme(Integer idProcurado, Float novaNota) throws SQLException {
+		return DataAccess.avaliaFilme(idProcurado, novaNota);
+	}
 
 }
