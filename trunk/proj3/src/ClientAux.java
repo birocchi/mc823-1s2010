@@ -82,11 +82,16 @@ public class ClientAux {
 		// seleciona o que será executado a partir da opção de entrada
 		switch (option) {
 		case LISTAR_TODOS_COMPLETO:
-			// faz a requisição de todos os filmes ao servidor
+			// inicia a contagem de tempo de requisição
 			t1 = System.nanoTime();
+			
+			// faz a requisição de todos os filmes ao servidor
 			listaFilmes = servidor.getFullList();
+			
+			// termina a contagem do tempo
 			t2 = System.nanoTime();
-			System.out.println("Tempo demorado: " + ((t2-t1)/1000) + "us");
+			System.err.println( ( (t2-t1)/1000 ) );
+			
 			// para cada filme na lista retornada, imprime as informações
 			for(Filme f : listaFilmes) {
 				f.printFullInfo();
