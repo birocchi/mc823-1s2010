@@ -49,7 +49,7 @@ public class ClientAux {
 
 	// método para interface com o usuário e leitura de Id
 	private static int readId() throws IOException {
-		System.out.println("  Id procurado: ");
+		System.out.print("  Id: ");
 		BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
 		try {
 			return Integer.parseInt(in.readLine());
@@ -58,6 +58,15 @@ public class ClientAux {
 		}
 	}
 	
+	private static float readNota() throws IOException {
+		System.out.print("  Nota: ");
+		BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+		try {
+			return Float.parseFloat(in.readLine());
+		} catch (NumberFormatException e) {
+			return readNota();
+		}
+	}
 	
 	// método que seleciona a opção e realiza as chamadas ao servidor
 	public static void makeRequest(RequestInterface servidor, int option) 
@@ -67,6 +76,7 @@ public class ClientAux {
 		List<Filme> listaFilmes;
 		
 		int idProcurado;
+		float novaNota;
 		
 		// seleciona o que será executado a partir da opção de entrada
 		switch (option) {
@@ -79,6 +89,8 @@ public class ClientAux {
 			}
 			break;
 		case LISTAR_TODOS:
+			// cliente requisita todos os campos de todos os filmes
+			// ao servidor, mas imprime apenas os campos ID e Nome
 			listaFilmes = servidor.getFullList();
 			for(Filme f : listaFilmes) {
 				f.printIdNome();
@@ -106,13 +118,18 @@ public class ClientAux {
 			else listaFilmes.get(0).printNota();
 			break;
 		case REG_AVALIAR:
-//			idProcurado = readId();
-//			filme = servidor.getFilmeById(idProcurado);
-//			filme.setNota();
+			idProcurado = readId(); // leitura do id do filme a avaliar
+			novaNota = readNota(); // nota a ser dada para o filme
+			if(servidor.avaliaFilme(idProcurado, novaNota)) {
+				System.out.println("  Avaliação realizada com sucesso!");
+			} else {
+				System.out.println("  Filme não encontrado!");
+			}
 			break;
 		}
 		
 	}
+
 
 
 
