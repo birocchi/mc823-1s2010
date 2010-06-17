@@ -7,7 +7,7 @@ import java.sql.SQLException;
 
 public class Cliente {
 
-	private static final int serverPort = 3232;
+	private static final int serverPort = 50000;
 	
     static public void main(String args[]) throws IOException, SQLException {
 
@@ -57,7 +57,11 @@ public class Cliente {
     		} catch(RemoteException e) {
         		System.out.println("Servidor não disponível.");
         		System.exit(1);
+    		} catch(Exception e) {
+    			System.out.println("Algum erro ocorreu no servidor.");
+        		System.exit(1);
     		}
+    		
     		option = ClientAux.readOption();
     	}
 
