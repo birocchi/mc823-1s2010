@@ -16,7 +16,12 @@ public class DataAccess {
 	
 	// retorna a lista de todos os filmes no banco
 	public static List<Filme> getFullList() throws SQLException {
-
+		
+		long t1,t2;
+		
+		// inicia a contagem do tempo de consulta
+    	t1 = System.nanoTime();
+    	
 		// abre a conexão com o banco
 		Connection con = ConnectionFactory.getConnection();
 
@@ -38,6 +43,11 @@ public class DataAccess {
 
 		stmt.close();
 		con.close(); // fecha a conexão
+		
+		//termina a contagem do tempo de consulta
+		t2 = System.nanoTime();
+		System.err.println( ( (t2-t1)/1000 ) );
+		
 		return listaFilmes;
 	}
 
