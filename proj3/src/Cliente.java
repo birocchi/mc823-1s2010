@@ -11,7 +11,7 @@ public class Cliente {
 	private static final int serverPort = 50000;
 	
 	// constantes para a seção de teste
-	private static final boolean TEST = true;
+	private static final boolean TEST = false;
 	private static final int DEFAULT_OPT = ClientAux.LISTAR_TODOS_COMPLETO;
 	private static final int TEST_ITERATIONS = 100;
 	
@@ -56,14 +56,16 @@ public class Cliente {
 		t2 = System.nanoTime();
 		System.err.println( ( (t2-t1)/1000 ) );
     	
+    	int option;
     	
     	// loop principal do cliente
-    	int option = ClientAux.readOption();
-    	
+		if(!TEST) {
+	    	option = ClientAux.readOption();
+		}
     	// [início] Seção de teste
     	// tivemos dificuldade em gerar um script para a automação do teste 
     	// de sucessivas consultas. Desconsiderar esta seção
-    	if(TEST) {
+		else {
     		option = DEFAULT_OPT;
     		for(int i = 0; i < TEST_ITERATIONS; i++) {
         		ClientAux.makeRequest(servidor, option);
