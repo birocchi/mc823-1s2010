@@ -3,16 +3,6 @@ CREATE TABLE filme (
   n_avaliacoes INTEGER,
   nota REAL,
   titulo TEXT,
-  sinopse TEXT
-);
-
-CREATE TABLE sala (
-  id INTEGER PRIMARY KEY,
-  nome TEXT
-);
-
-CREATE TABLE horario (
-  idfilme INTEGER,
-  idsala INTEGER,
-  horario TEXT
+  sinopse TEXT,
+  salas TEXT
 );
