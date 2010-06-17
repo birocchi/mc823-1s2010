@@ -14,7 +14,7 @@ import bd.Filme;
 public class Servidor extends UnicastRemoteObject 
 	implements RequestInterface {
 
-	private static int port = 50000;
+	private static int port = 3232;
 	private Registry registry;
 
 	// ========== Construtor ==========
