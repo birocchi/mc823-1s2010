@@ -1,8 +1,8 @@
 #!/bin/bash
 
-for i in $(seq 10)
-do
-  ./runclient.sh localhost < file.in 2>> tempos.time
-done
+#for i in $(seq 100)
+#do
+  ./runclient.sh localhost 2>> tempos
+#done
 
 
