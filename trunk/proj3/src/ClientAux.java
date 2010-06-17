@@ -77,12 +77,16 @@ public class ClientAux {
 		
 		int idProcurado;
 		float novaNota;
+		long t1,t2;
 		
 		// seleciona o que será executado a partir da opção de entrada
 		switch (option) {
 		case LISTAR_TODOS_COMPLETO:
 			// faz a requisição de todos os filmes ao servidor
+			t1 = System.nanoTime();
 			listaFilmes = servidor.getFullList();
+			t2 = System.nanoTime();
+			System.out.println("Tempo demorado: " + ((t2-t1)/1000) + "us");
 			// para cada filme na lista retornada, imprime as informações
 			for(Filme f : listaFilmes) {
 				f.printFullInfo();
@@ -92,6 +96,7 @@ public class ClientAux {
 			// cliente requisita todos os campos de todos os filmes
 			// ao servidor, mas imprime apenas os campos ID e Nome
 			listaFilmes = servidor.getFullList();
+			
 			for(Filme f : listaFilmes) {
 				f.printIdNome();
 			}

@@ -15,7 +15,7 @@ public class Filme implements Serializable {
 	private String sinopse;
 	private String salas;
 	
-	// método público para recurar id de um filme
+	// método público para recuperar id de um filme
 	public int getId() {
 		return id;
 	}
