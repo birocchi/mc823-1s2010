@@ -1,4 +1,5 @@
 import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.rmi.RemoteException;
@@ -40,7 +41,9 @@ public class ClientAux {
 		// tenta fazer o parse da string digitada para inteiro. Se funcio-
 		// nar, retorna o valor; caso contrário, chama novamente a função
 		try {
-			return Integer.parseInt(in.readLine());
+			String str = in.readLine();
+			System.out.println("Olha, você está me passando o seguinte: " + str);
+			return Integer.parseInt(str);
 		} catch (NumberFormatException e) {
 			return readOption();
 		}
