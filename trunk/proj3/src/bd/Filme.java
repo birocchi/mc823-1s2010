@@ -7,78 +7,62 @@ import java.sql.SQLException;
 @SuppressWarnings("serial")
 public class Filme implements Serializable {
 
+	// atributos do filme
 	private int id;
 	private int n_avaliacoes;
 	private float nota;
 	private String titulo;
 	private String sinopse;
+	private String salas;
 	
-	public void setId(int id) {
-		this.id = id;
-	}
 	public int getId() {
 		return id;
 	}
-	public void setN_avaliacoes(int n_avaliacoes) {
-		this.n_avaliacoes = n_avaliacoes;
-	}
-	public int getN_avaliacoes() {
-		return n_avaliacoes;
-	}
-	public void setNota(float nota) {
-		this.nota = nota;
-	}
-	public float getNota() {
-		return nota;
-	}
-	public void setTitulo(String titulo) {
-		this.titulo = titulo;
-	}
-	public String getTitulo() {
-		return titulo;
-	}
-	public void setSinopse(String sinopse) {
-		this.sinopse = sinopse;
-	}
-	public String getSinopse() {
-		return sinopse;
-	}
+	
 
-
+	// método de população do objeto que representa um registro (bean)
+	// a partir do ResultSet retornado da consulta SQL
 	public void buildBeanByRs(ResultSet rs) throws SQLException {
 		this.id = rs.getInt("id");
 		this.n_avaliacoes = rs.getInt("n_avaliacoes");
 		this.nota = rs.getFloat("nota");
 		this.titulo = rs.getString("titulo");
 		this.sinopse = rs.getString("sinopse");
+		this.salas = rs.getString("salas");
 		return;
 	}
 	
+	// métodos de impressão das informações de um filme
 	public void printFullInfo() {
-		System.out.println("  Id: " + id + " | Título: " + titulo);
+		System.out.println("  Id: " + getId() + " | Título: " + titulo);
 		System.out.println("  Sinopse: " + sinopse);
-		String aval = (n_avaliacoes > 1) ? "avaliações" : "avaliação";
+		System.out.println("  Salas: " + salas);
 		if (n_avaliacoes != 0) {
+			// aval recebe 'avaliação' (exatamente UMA) ou 'avaliações' (>1)
+			String aval = (n_avaliacoes > 1) ? "avaliações" : "avaliação";
 			System.out.println("  Nota: " + nota + " (a partir de " + n_avaliacoes + aval + ")");
+		} else {
+			System.out.println("  Ainda não há avaliações para este filme.");
 		}
+		System.out.println("-----");
 		return;
 	}
-	
 	public void printIdNome() {
-		System.out.println("  Id: " + id + " | Título: " + titulo);
+		System.out.println("  Id: " + getId() + " | Título: " + titulo + "\n-----");
 		return;
 	}
-
 	public void printSinopse() {
 		System.out.println("  Sinopse: " + sinopse);
 	}
-
 	public void printNota() {
-		String aval = (n_avaliacoes > 1) ? "avaliações" : "avaliação";
 		if (n_avaliacoes != 0) {
+			String aval = (n_avaliacoes > 1) ? "avaliações" : "avaliação";
 			System.out.println("  Nota: " + nota + " (a partir de " + n_avaliacoes + aval + ")");
+		} else {
+			System.out.println("  Ainda não há avaliações para este filme.");
 		}
 		return;
 	}
+
 	
 }

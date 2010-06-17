@@ -1,6 +1,7 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.rmi.RemoteException;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -36,24 +37,43 @@ public class ClientAux {
 		System.out.println(" [6] Avaliar um filme!");
 		System.out.println(" [7] Sair");
 		
-		return Integer.parseInt(in.readLine());
+		// tenta fazer o parse da string digitada para inteiro. Se funcio-
+		// nar, retorna o valor; caso contrário, chama novamente a função
+		try {
+			return Integer.parseInt(in.readLine());
+		} catch (NumberFormatException e) {
+			return readOption();
+		}
 
+	}
+
+	// método para interface com o usuário e leitura de Id
+	private static int readId() throws IOException {
+		System.out.println("  Id procurado: ");
+		BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+		try {
+			return Integer.parseInt(in.readLine());
+		} catch (NumberFormatException e) {
+			return readOption();
+		}
 	}
 	
 	
 	// método que seleciona a opção e realiza as chamadas ao servidor
 	public static void makeRequest(RequestInterface servidor, int option) 
-		throws SQLException, IOException {
+		throws SQLException, IOException, RemoteException {
 		
-		// variáveis para retorno das consultas
+		// variável para retorno das consultas
 		List<Filme> listaFilmes;
-		Filme filme;
 		
 		int idProcurado;
 		
+		// seleciona o que será executado a partir da opção de entrada
 		switch (option) {
 		case LISTAR_TODOS_COMPLETO:
+			// faz a requisição de todos os filmes ao servidor
 			listaFilmes = servidor.getFullList();
+			// para cada filme na lista retornada, imprime as informações
 			for(Filme f : listaFilmes) {
 				f.printFullInfo();
 			}
@@ -66,19 +86,24 @@ public class ClientAux {
 			break;
 		case REG_COMPLETO:
 			idProcurado = readId();
-			filme = servidor.getFilmeById(idProcurado);
-			if(filme != null) filme.printFullInfo();
-			else System.out.println("  Filme não encontrado!");
+			// faz a requisição por um filme específico
+			listaFilmes = servidor.getFilmeById(idProcurado);
+			// o retorno da busca por um filme é uma lista, de modo
+			// que é possível verificar se a mesma está vazia ou não
+			if(listaFilmes.isEmpty()) System.out.println("  Filme não encontrado!");
+			else listaFilmes.get(0).printFullInfo();
 			break;
 		case REG_SINOPSE:
 			idProcurado = readId();
-			filme = servidor.getFilmeById(idProcurado);
-			filme.printSinopse();
+			listaFilmes = servidor.getFilmeById(idProcurado);
+			if(listaFilmes.isEmpty()) System.out.println("  Filme não encontrado!");
+			else listaFilmes.get(0).printSinopse();
 			break;
 		case REG_MEDIA:
 			idProcurado = readId();
-			filme = servidor.getFilmeById(idProcurado);
-			filme.printNota();
+			listaFilmes = servidor.getFilmeById(idProcurado);
+			if(listaFilmes.isEmpty()) System.out.println("  Filme não encontrado!");
+			else listaFilmes.get(0).printNota();
 			break;
 		case REG_AVALIAR:
 //			idProcurado = readId();
@@ -89,11 +114,6 @@ public class ClientAux {
 		
 	}
 
-	private static int readId() throws IOException {
-		System.out.println("  Id procurado: ");
-		BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-		return Integer.parseInt(in.readLine());
-	}
 
 
 }

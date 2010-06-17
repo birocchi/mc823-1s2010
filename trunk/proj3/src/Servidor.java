@@ -69,12 +69,11 @@ public class Servidor extends UnicastRemoteObject
 		return DataAccess.getIdTitle();
 	}
 
-	@Override
-	public Filme getFilmeById(int idProcurado) {
-		// TODO Auto-generated method stub
-		return null;
+	public List<Filme> getFilmeById(Integer idProcurado) throws SQLException {
+		System.out.println(" getFilmeById()");
+		return DataAccess.getFilmeById(idProcurado);
 	}
-	
+
 //	public List<Filme> getFullList() throws RemoteException, SQLException {
 //		System.out.println(" getInformation()");
 //		return DataAccess.getInformation();
