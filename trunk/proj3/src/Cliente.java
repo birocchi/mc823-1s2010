@@ -7,7 +7,14 @@ import java.sql.SQLException;
 
 public class Cliente {
 
+	// número da porta que o servidor usará
 	private static final int serverPort = 50000;
+	
+	// constantes para a seção de teste
+	private static final boolean TEST = true;
+	private static final int DEFAULT_OPT = ClientAux.LISTAR_TODOS_COMPLETO;
+	private static final int TEST_ITERATIONS = 100;
+	
 	
     static public void main(String args[]) throws IOException, SQLException {
 
@@ -44,13 +51,27 @@ public class Cliente {
     	
     	// faz a contagem do tempo de RTT
     	t1 = System.nanoTime();
-    	servidor.sayHello();
+    	// notifica o servidor da conexão
+    	servidor.sayHello();  
 		t2 = System.nanoTime();
 		System.err.println( ( (t2-t1)/1000 ) );
     	
     	
     	// loop principal do cliente
     	int option = ClientAux.readOption();
+    	
+    	// [início] Seção de teste
+    	// tivemos dificuldade em gerar um script para a automação do teste 
+    	// de sucessivas consultas. Desconsiderar esta seção
+    	if(TEST) {
+    		option = DEFAULT_OPT;
+    		for(int i = 0; i < TEST_ITERATIONS; i++) {
+        		ClientAux.makeRequest(servidor, option);
+    		}
+    		option = ClientAux.SAIR;
+    	}
+    	// [fim] Seção de teste
+    	
     	while(option != ClientAux.SAIR) {
     		try {
         		ClientAux.makeRequest(servidor, option);

@@ -10,4 +10,4 @@ then
 fi
 
 # $1 - endereço do servidor
-java Cliente $1
+java -Djava.security.policy=../policy Cliente $1
