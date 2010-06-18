@@ -115,7 +115,7 @@ Primeiramente vamos explicar como foi implementado o banco de dados e suas opera
 Basicamente, o funcionamento do sistema é: o servidor é um objeto instanciado na máquina virtual Java que publica seus métodos para serem acessados remotamente e aguarda requisições de conexão; o cliente procura pelo servidor através dp RMI Registry no endereço especificado, que libera o acesso do cliente ao servidor; inicia-se uma sequencia de requisições do cliente e respostas por parte do servidor; cliente encerra o uso.\\
 
 %Ao terminar o projeto, fazer um word count e ver quantas linhas deu, e fazer um comentário
-No fim, a quantidade de linhas de código de todos os arquivos do sistema (*.java) é (NUMERO DE LINHAS), o que já não é um programa simples, porém ainda está longe de ser uma grande aplicação.\\
+No fim, a quantidade de linhas de código de todos os arquivos do sistema (*.java) é 561, o que já não é um programa simples, porém ainda está longe de ser uma grande aplicação.\\
 
 Para organizar a discussão sobre a implementação, vamos tratar de tópicos separamente.\\
 
@@ -140,58 +140,75 @@ Com relação à implementação, foi criado um pacote chamado bd, com as classe
 
 
 \section{Análise de Tempo}
-Para a análise de tempo, foram consideradas duas operações a serem analisadas: tempo de comunicação (RTT) e consulta ao servidor.\\
+Para a análise de tempo, foram consideradas duas operações a serem analisadas: tempo de comunicação (RTT) e requisição ao servidor.\\
+Uma coisa importante a se notar é que para calcular o tempo real de requisição ao servidor, temos que subtrair o tempo gasto pelo servidor para realizar a consulta ao bando de dados SQL.\\
 Para se obter uma boa precisão, foi utilizada a função "System.nanoTime()", que tem a precisão em nanosegundos, que será convertida em microsegundos, o que é boa o suficiente para nossa aplicação. A função pega o tempo atual em que foi chamada, portanto, para calcular o tempo de alguma operação, basta calcular o tempo antes e depois da operação e calcular a diferença entre eles.\\
-Foram usadas duas configurações:\\
-\textbf{Configuração 1: }Dois computadores presentes na mesma sub-rede (IC3).\\
-IP local: 143.106.150.81\\
-IP remoto: 143.106.150.80\\
-\textbf{Configuração 2: }Um computador no laboratório do IC3 e outro no SIFEEC.\\
-IP local: 143.106.150.81\\
+Foram feitas 5 análises, cada uma feita em um computador diferente, em salas diferentes, e todos logados com o computador principal da rede do IC3\\
+IP local 1: 143.106.16.35 (sala 303)\\
+IP local 2: 143.106.16.198 (sala 304)\\
+IP local 3: 143.106.16.3 (sala 302)\\
+IP local 4: 143.106.16.104(sala 317)\\
+IP local 5: 143.106.16.81 (sala 305)\\
 IP remoto: 143.106.16.163 (xaveco)\\
-\begin{verbatim}
-[ra070803@xaveco ~]$ traceroute 143.106.150.81
-traceroute to 143.106.150.81 (143.106.150.81), 30 hops max, 60 byte packets
- 1  routeric3.lab.ic.unicamp.br (143.106.16.148)  2.786 ms  5.378 ms  7.860 ms
- 2  143.106.16.150 (143.106.16.150)  0.094 ms  0.069 ms  0.067 ms
- 3  143.106.7.129 (143.106.7.129)  0.158 ms  0.119 ms  0.120 ms
- 4  area3-gw.unicamp.br (143.106.1.129)  0.668 ms  0.819 ms  1.020 ms
- 5  ptp-nct-nbs.unicamp.br (143.106.199.13)  0.542 ms  0.735 ms  0.920 ms
- 6  fee-gw.unicamp.br (143.106.1.10)  0.979 ms  1.263 ms  1.636 ms
- 7  le20-17.grad.fee.unicamp.br (143.106.150.81)  1.999 ms  1.978 ms  2.346 ms
-[ra070803@xaveco ~]$
-\end{verbatim}
+
 \textit{Observação: }Todos os tempos que serão mostrados nas próximas seções estão em micro-segundos, e pode-se verificar todos os valores encontrados na seção de Anexos.\\
 
-\subsection{Tempo de Comunicação - RTT}
-Tempo decorrido entre o cliente chamar a função para conectar ao servidor e a resposta deste.\\
-\textbf{Configuração 1: }\\
+\subsection{Tempo de Comunicação}
+Tempo decorrido para realizar a conexão (RTT) e tempo total decorrido para o servidor responder a requisição do cliente.\\
+
+%TODO MODIFICAR OS TEMPO DE ACORDO COM AS NOSSAS TABELAS
+\textbf{Análise 1: }\\
 Média do tempo de RTT: \textbf{274,16 us}\\
 Desvio padrão: \textbf{10,72 us}\\
-\textbf{Configuração 2: }\\
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=15cm]{analise1.png} 
+  \caption{Representação das medições da análise 1.}
+  \label{fig:analise1}
+\end{figure}
+
+\textbf{Análise 2: }\\
 Média do tempo de RTT: \textbf{1601,7 us}\\
 Desvio padrão: \textbf{1697,68 us}\\
-%\begin{figure}[htb]
-%  \centering
-%  \includegraphics[width=15cm]{rtt.png} 
-%  \caption{Representação das medições para o RTT.}
-%  \label{fig:rtt}
-%\end{figure}
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=15cm]{analise2.png} 
+  \caption{Representação das medições da análise 2.}
+  \label{fig:analise2}
+\end{figure}
 
-\subsection{Tempo de Consulta}
-Tempo decorrido entre o cliente realizar o caso de uso 1 (consulta completa de todos os filmes do banco de dados).\\
-\textbf{Configuração 1: }\\
-Média do tempo de RTT: \textbf{1769,16 us}\\
-Desvio padrão: \textbf{432,29 us}\\
-\textbf{Configuração 2: }\\
-Média do tempo de RTT: \textbf{9390,89 us}\\
-Desvio padrão: \textbf{9758,98 us}\\
-%\begin{figure}[htb]
-%  \centering
-%  \includegraphics[width=15cm]{consulta.png} 
-%  \caption{Representação das medições para a consulta.}
-%  \label{fig:rtt}
-%\end{figure}
+\textbf{Análise 3: }\\
+Média do tempo de RTT: \textbf{274,16 us}\\
+Desvio padrão: \textbf{10,72 us}\\
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=15cm]{analise3.png} 
+  \caption{Representação das medições da análise 3.}
+  \label{fig:analise3}
+\end{figure}
+
+\textbf{Análise 4: }\\
+Média do tempo de RTT: \textbf{1601,7 us}\\
+Desvio padrão: \textbf{1697,68 us}\\
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=15cm]{analise4.png} 
+  \caption{Representação das medições da análise 4.}
+  \label{fig:analise4}
+\end{figure}
+
+\textbf{Análise 5: }\\
+Média do tempo de RTT: \textbf{1601,7 us}\\
+Desvio padrão: \textbf{1697,68 us}\\
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=15cm]{analise5.png} 
+  \caption{Representação das medições da análise 5.}
+  \label{fig:analise5}
+\end{figure}
+
+\subsection{Comparação dos projetos feitos em Java RMI e em Sockets TCP em C }
+%TODO Fazer a comparação
 
 
 Pode-se verificar a diferença considerável entre os tempos de RTT para as duas configurações. Obviamente, o tempo para abertura da conexão foi maior para a segunda 
