@@ -11,9 +11,9 @@ public class Cliente {
 	private static final int serverPort = 3232;
 	
 	// constantes para a seção de teste
-	private static final boolean TEST = true;
+	private static final boolean TEST = false;
 	private static final int DEFAULT_OPT = ClientAux.LISTAR_TODOS_COMPLETO;
-	private static final int TEST_ITERATIONS = 100;
+	private static final int TEST_ITERATIONS = 500;
 	
 	
     static public void main(String args[]) throws IOException, SQLException {
