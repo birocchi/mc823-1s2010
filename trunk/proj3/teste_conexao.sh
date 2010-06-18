@@ -12,7 +12,7 @@ OUT=tempos.rtt
 # limpa o arquivo com os tempos antigos
 rm $OUT
 
-for i in $(seq 100)
+for i in $(seq 500)
 do
   ./runclient.sh $1 <file.in 2>> $OUT
 done
