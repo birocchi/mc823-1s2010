@@ -728,7 +728,8 @@ public class Servidor extends UnicastRemoteObject
 		return DataAccess.getFilmeById(idProcurado);
 	}
 
-	public Boolean avaliaFilme(Integer idProcurado, Float novaNota) throws SQLException {
+	public Boolean avaliaFilme(Integer idProcurado, Float novaNota) 
+                throws SQLException {
 		return DataAccess.avaliaFilme(idProcurado, novaNota);
 	}
 
@@ -828,7 +829,8 @@ public class DataAccess {
 
 	// consulta a filme a partir do seu ID:
 	// retorna uma lista ou vazia ou com um único elemento
-	public static List<Filme> getFilmeById(Integer idProcurado) throws SQLException {
+	public static List<Filme> getFilmeById(Integer idProcurado) 
+                throws SQLException {
 
 		// abre a conexão com o banco
 		Connection con = ConnectionFactory.getConnection();
