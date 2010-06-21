@@ -217,25 +217,30 @@ Desvio padrão de requisição: \textbf{846 us}\\
 \end{figure}
 
 \subsection{Comparação dos projetos feitos em Java RMI e em Sockets TCP em C }
-%TODO Fazer a comparação
 
+As diferenças mais relevantes entre os dois projetos são:\\
+- Nível de Abtração: Em Java o nível de abstração é alto, e foi fácil implementar o sistema já que toda parte de comunicação TCP já vem pronta e não necessita um controle mais intensivo, utilizando aproximadamente 500 linhas de código, porém, roda sobre uma máquina virtual que costuma ser responsável por quedas no desempenho. Já em C, o nível de abstração é baixo, pois é necessário configurar todos os detalhes da comunicação TCP e é muito suscetível a erros, sendo mais trabalhoso de se implementar, também utilizou aproximadamente 1500 linhas de código, 3 vezes mais linhas que o sistema feito em Java, porém, o ganho deste trabalho é um maior poder de controle e maior velocidade.\\
+- Implementação do Banco de Dados: Em C, utilizamos um arquivo simples para armazenar nossos dados, e em Java utilizamos um programa de banco de dados sql.\\
+Para fazer a análise de tempo, primeiro temos que relembrar os tempos obtidos no mesmo projeto mas feito com Sockets TCP em C, que foram:\\
 
-Pode-se verificar a diferença considerável entre os tempos de RTT para as duas configurações. Obviamente, o tempo para abertura da conexão foi maior para a segunda 
-configuração, já que os pacotes devem ser transmitidos através de roteadores e enlaces adicionais, como mostrado no resultado do traceroute acima.\\
-De modo a comprovar a influência do tráfego na rede, é visível a grande diferença entre os desvios padrão em porcentagem com relação ao valor absoluto.\\
+Média do tempo de RTT: \textbf{274,16 us}\\
+Desvio padrão: \textbf{10,72 us}\\
+Média do tempo de consulta: \textbf{1769,16 us}\\
+Desvio padrão: \textbf{432,29 us}\\
 
-
+Podemos notar que o tempo de RTT em C é muito menor do que em Java, como já era de se esperar já que em C não é necessário se rodar o sistema em uma máquina virtual além de uma implementação que é mais eficiênte por ser de mais baixo nível. Já no tempo de consulta, temos resultados interessantes, pois em Java foi mais rápido que em C, que vai contra o esperado, mas isso pode ser explicado por causa da implementação do banco de dados. Um sistema de banco de dados sql é uma forma otimizada de se armazenar dados, o que é muito mais eficiênte que se abrir, fechar e manipular arquivos em disco, e por isso os resultados de tempo obtidos em Java foram um pouco melhores que em C.\\
+Analisando o desempenho geral dos dois sistemas, os prós e contras de cada um fizeram com que ambos tivessem um desempenho bem similar, e que assim, a escolha de qual sistema utilizar vem da escolha de cada usuário.\\ 
 \section{Confiabilidade e Consistência}
 Dois pontos a considerar: robustez quanto à comunicação e consistência dos dados.\\
 Tentamos fazer todas as verificações de erros possíveis nas funções das bibliotecas de comunicação com o socket, tanto no lado cliente como no servidor. Ainda assim, não conseguimos implementar um importante caso de exceção: notificar e encerrar o cliente quando o servidor "cai".\\
 Com relação à consistência dos dados, esta é garantida pela exclusão mútua nas operações de atualização de avaliação.
 
 \section{Conclusão}
-Podemos considerar que a aplicação já está totalmente funcional, todas as consultas estão funcionando corretamente, há a garantia da consistência do banco de dados do cinema e a comunicação entre cliente e servidor está boa, exceto no caso em que o servidor cai, deixando o cliente esperando por uma resposta.\\
-Por utilizar o protocolo TCP, a comunicação possui todas as suas vantagens, como confiabilidade na transferência de pacotes, controle de fluxo e controle de congestionamento, o que garante uma qualidade maior à aplicação.\\
-A análise de tempo também cumpriu com as espectativas, tendo uma média e um desvio padrão mais baixo para redes próximas e valores mais altos para redes mais distantes.\\
-Ao fazer a aplicação em C, o nível de abstração não foi muito alto, pois tivemos que tratar muitos detalhes das conexões.\\
-Podemos dizer também que fomos felizes ao utilizar um controle de conexões por threads, pois fica mais fácil de controlar do que com processos, já que quando o processo principal termina, todas as threads também terminam, evitando assim processos zumbi, além de ser mais fácil se implementar exclusão mútua de threads, por exemplo, com semáforos ou mutex lock.\\
+Podemos considerar que a aplicação já está totalmente funcional, todas as consultas estão funcionando corretamente, há a garantia da consistência do banco de dados do cinema e a comunicação entre cliente e servidor está boa, tendo também a garantia que se o servidor cai, o cliente é notificado do erro.\\
+Além de não ter sido transṕarente o jeito que é implementado a comunicação, ela é feita interiormente por protocolo TCP, e por utilizar o protocolo TCP, a comunicação possui todas as suas vantagens, como confiabilidade na transferência de pacotes, controle de fluxo e controle de congestionamento, o que garante uma qualidade maior à aplicação.\\
+A análise de tempo foi bem interessante, já que por utilizar um banco de dados sql ao invés de manipular arquivos, teve um desempenho similar ao projeto feito em C.\\
+Ao fazer a aplicação em Java, o nível de abstração foi alto, pois não tivemos que tratar muitos detalhes das conexões.\\
+Outra vantagem trazida pelo alto nível de abstração é a exclusão mútua já ser implementada no banco de dados sql, facilitando mais a implementação do sistema.\\
 Nosso servidor de banco de dados de cinema ainda não é um sistema completo e bem acabado, mas já provê uma base sólida para implementar aplicações gráficas e de maior porte, utilizando o servidor como o núcleo da aplicação. Pretendemos, em versões posteriores, melhorar o programa, resolver bugs e talvez, utilizar uma biblioteca gráfica para tornar sua interface mais usável. 
 
 \section{Código Fonte}
